@@ -1,0 +1,436 @@
+/* management pages */
+
+/* teacher management */
+#adminTeacherManagement .list th:nth-child(1),
+#adminTeacherManagement .list td:nth-child(1) {
+  text-align: left;
+}
+#adminTeacherManagement .list th:nth-child(2),
+#adminTeacherManagement .list td:nth-child(2) {
+  width: 10rem;
+}
+#adminTeacherManagement .list th:nth-child(3),
+#adminTeacherManagement .list td:nth-child(3) {
+  width: 14rem;
+}
+#adminTeacherManagement .list th:nth-child(4),
+#adminTeacherManagement .list td:nth-child(4) {
+  width: 12rem;
+}
+#adminTeacherManagement .list th:nth-child(5),
+#adminTeacherManagement .list td:nth-child(5) {
+  width: 12rem;
+}
+#adminTeacherManagement .table th:last-child,
+#adminTeacherManagement .table td:last-child {
+  width: 7rem;
+}
+#adminTeacherManagement .list .status {
+  padding: 0.5rem 1rem;
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: 0.9rem;
+  border-radius: 0.3rem;
+  border: var(--border);
+  text-transform: capitalize;
+}
+#adminTeacherManagement .list .status.approved {
+  background-color: #8eb48618;
+  color: #8eb486;
+  border-color: #8eb486;
+}
+#adminTeacherManagement .list .status.in-review {
+  background-color: #81bfda1e;
+  color: #81bfda;
+  border-color: #81bfda;
+}
+#adminTeacherManagement .list .status.on-hold {
+  background-color: #f0bc7815;
+  color: #f0bb78;
+  border-color: #f0bb78;
+}
+#adminTeacherManagement .list .status.rejected {
+  background-color: #ff748b21;
+  color: #ff748b;
+  border-color: #ff748b;
+}
+#adminTeacherManagement .status-filter .button {
+  color: var(--text-color);
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 0.5rem 1rem;
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+  border: var(--border);
+  border-radius: 0.3rem;
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#adminTeacherManagement .status-filter .button.active,
+#adminTeacherManagement .status-filter .button:hover {
+  background-color: #fff;
+  border-color: var(--accent-color);
+  color: var(--dark-text-color);
+}
+
+/* student management */
+#adminStudentManagement .list th:nth-child(1),
+#adminStudentManagement .list td:nth-child(1) {
+  text-align: left;
+}
+#adminStudentManagement .list th:nth-child(2),
+#adminStudentManagement .list td:nth-child(2) {
+  text-align: left;
+  width: 12rem;
+}
+#adminStudentManagement .list th:nth-child(3),
+#adminStudentManagement .list td:nth-child(3) {
+  text-align: left;
+  width: 12rem;
+}
+#adminStudentManagement .list th:nth-child(4),
+#adminStudentManagement .list td:nth-child(4) {
+  width: 6rem;
+}
+#adminStudentManagement .list th:nth-child(5),
+#adminStudentManagement .list td:nth-child(5) {
+  width: 12rem;
+}
+#adminStudentManagement .table th:last-child,
+#adminStudentManagement .table td:last-child {
+  width: 7rem;
+}
+#adminStudentManagement .select-filters {
+  display: flex;
+  gap: 0.5rem;
+}
+#adminStudentManagement .select-filters .custom-select-wrapper {
+  width: 15rem;
+  position: relative;
+  display: inline-block; /* Allow positioning the arrow next to the select */
+}
+#adminStudentManagement .select-filters select {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+  border: var(--border);
+  border-radius: 0.4rem;
+  outline: none;
+  padding: 0.7rem 2rem 0.7rem 1rem;
+  appearance: none; /* Remove the default dropdown arrow (for most browsers) */
+  -webkit-appearance: none; /* Remove the default dropdown arrow in WebKit browsers */
+  -moz-appearance: none; /* Remove the default dropdown arrow in Firefox */
+  width: 100%; /* Make select take full width of the wrapper */
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#adminStudentManagement .select-filters select::-ms-expand {
+  display: none;
+}
+#adminStudentManagement .select-filters select:focus {
+  border-color: var(--accent-color) !important;
+}
+#adminStudentManagement .select-filters .custom-arrow {
+  position: absolute;
+  top: 50%;
+  right: 10px; /* Adjust the right padding to position the arrow */
+  transform: translateY(-50%); /* Vertically center the arrow */
+  font-size: 1rem; /* Adjust the size of the arrow */
+  pointer-events: none; /* Prevent interaction with the icon */
+}
+
+/* parent management */
+#adminParentManagement .list th:nth-child(1),
+#adminParentManagement .list td:nth-child(1) {
+  text-align: left;
+}
+#adminParentManagement .list th:nth-child(2),
+#adminParentManagement .list td:nth-child(2) {
+  width: 15rem;
+}
+#adminParentManagement .list th:nth-child(3),
+#adminParentManagement .list td:nth-child(3) {
+  width: 15rem;
+}
+#adminParentManagement .table th:last-child,
+#adminParentManagement .table td:last-child {
+  width: 7rem;
+}
+#adminParentManagement .filter-container {
+  flex-direction: row-reverse;
+}
+
+/* course levels page */
+#adminCourseLevel .content-section {
+  flex-direction: row !important;
+  align-items: flex-start;
+}
+#adminCourseLevel .add-form {
+  flex: 1;
+  border-radius: 0.4rem !important;
+}
+#adminCourseLevel .table {
+  flex: 1;
+}
+#adminCourseLevel .table th:nth-child(1),
+#adminCourseLevel .table td:nth-child(1) {
+  text-align: left;
+}
+#adminCourseLevel .table th:last-child,
+#adminCourseLevel .table td:last-child {
+  width: 7rem;
+}
+#adminCourseLevel .edit-form {
+  border-radius: 0.4rem !important;
+  width: 100%;
+  max-width: 40rem;
+}
+
+/* course grades page */
+#adminCourseGrade .content-section {
+  flex-direction: row !important;
+  align-items: flex-start;
+}
+#adminCourseGrade .add-form {
+  flex: 1;
+  border-radius: 0.4rem !important;
+}
+#adminCourseGrade .table {
+  flex: 1;
+}
+#adminCourseGrade .table th:nth-child(1),
+#adminCourseGrade .table td:nth-child(1) {
+  text-align: left;
+}
+#adminCourseGrade .table th:last-child,
+#adminCourseGrade .table td:last-child {
+  width: 7rem;
+}
+#adminCourseGrade .edit-form {
+  border-radius: 0.4rem !important;
+  width: 100%;
+  max-width: 40rem;
+}
+
+/* course topics page */
+/* #adminCourseTopic .content-section {
+  flex-direction: row !important;
+  align-items: flex-start;
+}
+#adminCourseTopic .add-form {
+  flex: 2;
+  border-radius: 0.4rem !important;
+}
+#adminCourseTopic .table {
+  flex: 3;
+} */
+#adminCourseTopic .table th:nth-child(1),
+#adminCourseTopic .table td:nth-child(1) {
+  text-align: left;
+}
+#adminCourseTopic .table th:nth-child(2),
+#adminCourseTopic .table td:nth-child(2) {
+  width: 20rem;
+  text-align: left;
+}
+#adminCourseTopic .table th:nth-child(3),
+#adminCourseTopic .table td:nth-child(3) {
+  width: 8rem;
+  text-align: left;
+}
+#adminCourseTopic .table th:nth-child(4),
+#adminCourseTopic .table td:nth-child(4) {
+  width: 8rem;
+  text-align: left;
+}
+#adminCourseTopic .table th:nth-child(5),
+#adminCourseTopic .table td:nth-child(5) {
+  width: 5rem;
+}
+#adminCourseTopic .table th:last-child,
+#adminCourseTopic .table td:last-child {
+  width: 7rem;
+}
+#adminCourseTopic .edit-form {
+  border-radius: 0.4rem !important;
+  width: 100%;
+  /* max-width: 40rem; */
+}
+#adminCourseTopic .topic-image {
+  width: 100%;
+  max-width: 2.5rem;
+  height: 2.5rem;
+  object-fit: cover;
+  border: var(--border);
+  border-radius: 0.3rem;
+}
+#adminCourseTopic .topic-image.thumbnail {
+  max-width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.2rem;
+}
+#adminCourseTopic .topic-image.medium {
+  max-width: 20rem;
+  height: 15rem;
+  border-radius: 0.5rem;
+  margin: 0 auto;
+}
+
+/* course categroies page */
+#adminCourseCategory .content-section {
+  flex-direction: row !important;
+  align-items: flex-start;
+}
+#adminCourseCategory .add-form {
+  flex: 1;
+  border-radius: 0.4rem !important;
+}
+#adminCourseCategory .table {
+  flex: 1;
+}
+#adminCourseCategory .table th:nth-child(1),
+#adminCourseCategory .table td:nth-child(1) {
+  text-align: left;
+}
+#adminCourseCategory .table th:nth-child(2),
+#adminCourseCategory .table td:nth-child(2) {
+  width: 10rem;
+}
+#adminCourseCategory .table th:last-child,
+#adminCourseCategory .table td:last-child {
+  width: 7rem;
+}
+#adminCourseCategory .edit-form {
+  border-radius: 0.4rem !important;
+  width: 100%;
+  max-width: 40rem;
+}
+#adminCourseCategory .category-image {
+  width: 100%;
+  max-width: 2.5rem;
+  height: 2.5rem;
+  object-fit: cover;
+  border: var(--border);
+  border-radius: 0.3rem;
+}
+#adminCourseCategory .category-image.thumbnail {
+  max-width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.2rem;
+}
+#adminCourseCategory .category-image.medium {
+  max-width: 20rem;
+  height: 15rem;
+  border-radius: 0.5rem;
+  margin: 0 auto;
+}
+
+/* course management page */
+#adminCourseManagement .course-image {
+  width: 100%;
+  max-width: 2.5rem;
+  height: 2.5rem;
+  object-fit: cover;
+  border: var(--border);
+  border-radius: 0.3rem;
+}
+#adminCourseManagement .course-image.thumbnail {
+  max-width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.2rem;
+}
+#adminCourseManagement .course-image.medium {
+  max-width: 20rem;
+  height: 15rem;
+  border-radius: 0.5rem;
+  margin: 0 auto;
+}
+#adminCourseManagement .table th:nth-child(1),
+#adminCourseManagement .table td:nth-child(1) {
+  text-align: left;
+}
+#adminCourseManagement .table th:nth-child(2),
+#adminCourseManagement .table td:nth-child(2) {
+  text-align: left;
+  width: 20rem;
+}
+#adminCourseManagement .table th:nth-child(3),
+#adminCourseManagement .table td:nth-child(3) {
+  text-align: left;
+  width: 10rem;
+}
+#adminCourseManagement .table th:nth-child(4),
+#adminCourseManagement .table td:nth-child(4) {
+  text-align: left;
+  width: 9rem;
+}
+#adminCourseManagement .table th:nth-child(5),
+#adminCourseManagement .table td:nth-child(5) {
+  text-align: left;
+  width: 9rem;
+}
+#adminCourseManagement .table th:last-child,
+#adminCourseManagement .table td:last-child {
+  width: 7rem;
+}
+
+/* add course page */
+#adminAddCourse .search-teacher .teacher-container,
+#adminAddCourse .selected-teachers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+#adminAddCourse .search-teacher .teacher-card,
+#adminAddCourse .selected-teachers .teacher-card {
+  width: calc((100% / 3) - 0.3rem);
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: var(--secondary-color);
+  border: var(--border);
+  border-radius: 0.3rem;
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#adminAddCourse .selected-teachers .teacher-card {
+  cursor: initial;
+  position: relative;
+  background-color: #fff5f1;
+  border-color: #ffbe9d;
+  box-shadow: var(--box-shadow-light);
+}
+#adminAddCourse .search-teacher .teacher-card:hover {
+  background-color: var(--primary-color);
+  box-shadow: var(--box-shadow-medium);
+}
+#adminAddCourse .search-teacher .teacher-image,
+#adminAddCourse .selected-teachers .teacher-image {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.3rem;
+  object-fit: cover;
+  border: var(--border);
+}
+#adminAddCourse .search-teacher .teacher-name,
+#adminAddCourse .selected-teachers .teacher-name {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--text-font-size);
+}
+#adminAddCourse .search-teacher .teacher-card:hover .teacher-name {
+  color: #fff;
+}
+#adminAddCourse .selected-teachers .remove-teacher {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.4rem;
+  background-color: transparent;
+  color: crimson;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
