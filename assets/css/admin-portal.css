@@ -1,3 +1,59 @@
+/* dashboard */
+#adminDashboard .statistic-box.total-teacher {
+  background-color: rgb(242, 248, 255);
+}
+#adminDashboard .statistic-box.total-teacher:hover {
+  background-color: rgb(221, 237, 255);
+}
+#adminDashboard .statistic-box.total-teacher .statistic-value {
+  color: rgb(0, 96, 206);
+}
+#adminDashboard .statistic-box.total-approved-teacher {
+  background-color: rgb(248, 255, 238);
+}
+#adminDashboard .statistic-box.total-approved-teacher:hover {
+  background-color: rgb(236, 255, 208);
+}
+#adminDashboard .statistic-box.total-approved-teacher .statistic-value {
+  color: rgb(133, 216, 0);
+}
+#adminDashboard .statistic-box.total-in-review-teacher {
+  background-color: rgb(255, 248, 238);
+}
+#adminDashboard .statistic-box.total-in-review-teacher:hover {
+  background-color: rgb(255, 240, 219);
+}
+#adminDashboard .statistic-box.total-in-review-teacher .statistic-value {
+  color: rgb(238, 139, 0);
+}
+#adminDashboard .statistic-box.total-student {
+  background-color: rgb(255, 255, 238);
+}
+#adminDashboard .statistic-box.total-student:hover {
+  background-color: rgb(255, 255, 221);
+}
+#adminDashboard .statistic-box.total-student .statistic-value {
+  color: rgb(212, 212, 0);
+}
+#adminDashboard .statistic-box.total-parent {
+  background-color: rgb(255, 238, 248);
+}
+#adminDashboard .statistic-box.total-parent:hover {
+  background-color: rgb(255, 221, 241);
+}
+#adminDashboard .statistic-box.total-parent .statistic-value {
+  color: rgb(223, 0, 130);
+}
+#adminDashboard .statistic-box.total-course {
+  background-color: rgb(247, 242, 255);
+}
+#adminDashboard .statistic-box.total-course:hover {
+  background-color: rgb(237, 227, 253);
+}
+#adminDashboard .statistic-box.total-course .statistic-value {
+  color: rgb(106, 0, 255);
+}
+
 /* management pages */
 
 /* teacher management */

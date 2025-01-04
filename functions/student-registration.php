@@ -16,6 +16,7 @@ function create_students_table() {
 
     $sql = "CREATE TABLE $table_name (
         id BIGINT(20) UNSIGNED NOT NULL,
+        image VARCHAR(255) DEFAULT NULL,
         first_name VARCHAR(255) NOT NULL,
         last_name VARCHAR(255) NOT NULL,
         date_of_birth DATE NOT NULL,
@@ -100,13 +101,17 @@ function custom_student_registration_form() {
                 <input type="date" id="date_of_birth" name="date_of_birth" required>
             </div>
             <div class="col">
-                <label for="gender">Genre <span class="required">*</span></label>
-                <select id="gender" name="gender" required>
-                    <option value="" disabled selected>Sélectionnez le sexe</option>
-                    <option value="Male">Mâle</option>
-                    <option value="Female">Femelle</option>
-                    <option value="Other">Autre</option>
-                </select>
+                <label for="topic">Sujet <span class="required">*</span></label>
+                <div class="custom-select-wrapper">
+                    <select id="gender" name="gender" required>
+                        <option value="" disabled selected>Sélectionnez le sexe</option>
+                        <option value="Mâle">Mâle</option>
+                        <option value="Femelle">Femelle</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                    <!-- <i class="fas fa-chevron-down custom-arrow" style="color: #585858;"></i> -->
+                    <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
+                </div>
             </div>
         </div>
     </section>
@@ -124,25 +129,59 @@ function custom_student_registration_form() {
 
         <div class="row">
             <div class="col">
-                <label for="grade_level">Niveau scolaire actuel <span class="required">*</span></label>
-                <select id="grade_level" name="grade_level" required>
-                    <option value="" disabled selected>Sélectionnez votre niveau scolaire</option>
-                    <option value="Third">Troisième</option>
-                    <option value="Fourth">Quatrième</option>
-                    <option value="Fifth">Cinquième</option>
-                    <option value="Sixth">Sixième</option>
-                    <!-- <option value="Seventh">Seventh</option> -->
-                </select>
+                <label for="grade">Grade <span class="required">*</span></label>
+                <div class="custom-select-wrapper">
+                    <select id="grade" name="grade" required>
+                        <option value="" disabled selected>Sélectionnez le Grade</option>
+
+                        <?php
+                                                        global $wpdb; // Access the global $wpdb object for database queries
+                
+                                                        // Query the custom 'course_grades' table
+                                                        $grades = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_grades");
+                
+                                                        // Check if grades are available
+                                                        if ($grades) {
+                                                            foreach ($grades as $grade) {
+                                                                echo '<option value="' . esc_attr($grade->grade) . '">' . esc_html($grade->grade) . '</option>';
+                                                            }
+                                                        } else {
+                                                            echo '<option disabled>No grade found</option>';
+                                                        }
+                                                    ?>
+
+                    </select>
+                    <!-- <i class="fas fa-chevron-down custom-arrow" style="color: #585858;"></i> -->
+                    <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
+                </div>
             </div>
 
             <div class="col">
-                <label for="math_level">Niveau en Mathématiques <span class="required">*</span></label>
-                <select id="math_level" name="math_level" required>
-                    <option value="" disabled selected>Sélectionnez votre niveau en mathématiques</option>
-                    <option value="Beginner">Débutant</option>
-                    <option value="Intermediate">Intermédiaire</option>
-                    <option value="Advanced">Avancé</option>
-                </select>
+                <label for="level">Niveau <span class="required">*</span></label>
+                <div class="custom-select-wrapper">
+                    <select id="level" name="level" required>
+                        <option value="" disabled selected>Sélectionnez le niveau</option>
+
+                        <?php
+                                                        global $wpdb; // Access the global $wpdb object for database queries
+                
+                                                        // Query the custom 'course_levels' table
+                                                        $levels = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_levels");
+                
+                                                        // Check if levels are available
+                                                        if ($levels) {
+                                                            foreach ($levels as $level) {
+                                                                echo '<option value="' . esc_attr($level->level) . '">' . esc_html($level->level) . '</option>';
+                                                            }
+                                                        } else {
+                                                            echo '<option disabled>No level found</option>';
+                                                        }
+                                                    ?>
+
+                    </select>
+                    <!-- <i class="fas fa-chevron-down custom-arrow" style="color: #585858;"></i> -->
+                    <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
+                </div>
             </div>
         </div>
     </section>
@@ -151,7 +190,7 @@ function custom_student_registration_form() {
     <section class="section col interested-modules">
         <h3 class="section-heading">Modules d'intérêt</h3>
 
-        <div id="subject_of_interest" class="checkbox-group">
+        <!-- <div id="subject_of_interest" class="checkbox-group">
             <label class="row"><input type="checkbox" name="subject_of_interest[]" value="Algebra"> Algèbre</label>
             <label class="row"><input type="checkbox" name="subject_of_interest[]" value="Geometry"> Géométrie</label>
             <label class="row"><input type="checkbox" name="subject_of_interest[]" value="Trigonometry">
@@ -159,6 +198,19 @@ function custom_student_registration_form() {
             <label class="row"><input type="checkbox" name="subject_of_interest[]" value="Calculus"> Calcul</label>
             <label class="row"><input type="checkbox" name="subject_of_interest[]" value="Statistics">
                 Statistiques</label>
+        </div> -->
+        <div id="subject_of_interest" class="checkbox-group">
+            <?php
+                global $wpdb;
+                $categories = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_categories");
+                if ($categories) {
+                    foreach ($categories as $category) {
+                        echo '<label class="row"><input type="checkbox" name="subject_of_interest[]" value="' . esc_attr($category->category) . '">' . esc_html($category->category) . '</label>';
+                    }
+                } else {
+                    echo '<option disabled>No category found</option>';
+                }
+            ?>
         </div>
     </section>
 

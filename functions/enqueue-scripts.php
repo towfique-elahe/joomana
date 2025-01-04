@@ -10,6 +10,9 @@ function joomana_register_styles() {
     // Enqueue Ionicons CSS
     wp_enqueue_style('ionicons', 'https://cdnjs.cloudflare.com/ajax/libs/ionicons/5.5.2/ionicons.min.css', [], null);
 
+    // Enqueue Font Awesome CSS
+    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', [], null);
+
     // Main theme stylesheet
     wp_enqueue_style('joomana-style', get_stylesheet_uri(), [], $version);
 
@@ -45,9 +48,6 @@ function joomana_register_scripts() {
 
     // Enqueue Ionicons JS (nomodule for older browsers)
     wp_enqueue_script('ionicons-nomodule', 'https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js', [], null, true);
-
-    // Enqueue Font Awesome CSS
-    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 
     // Enqueue custom JavaScript files
     $scripts = [
