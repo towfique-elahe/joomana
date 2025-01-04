@@ -587,7 +587,7 @@ form .form-error p {
 .calendar-header .button.reset:hover {
   color: var(--accent-color);
 }
-.calendar-header .speacial-heading {
+.calendar-header .special-heading {
   position: absolute;
   display: flex;
   align-items: center;
@@ -625,10 +625,17 @@ form .form-error p {
   color: var(--dark-text-color);
   font-weight: var(--accent-font-weight);
 }
+.calendar-table td,
+.time-table td {
+  color: var(--text-color) !important;
+}
 .calendar-table td:hover,
-.calendar-table .selected-date {
+.time-table td:hover,
+.calendar-table .selected-date,
+.time-table .selected-time {
   cursor: pointer;
   background-color: #ffddcc;
+  color: var(--dark-text-color);
   box-shadow: var(--box-shadow-light);
 }
 
@@ -639,13 +646,6 @@ form .form-error p {
 .time-table td {
   height: 50px;
   transition: ease 0.3s;
-}
-.time-table td:hover,
-.time-table .selected-time {
-  cursor: pointer;
-  background-color: #fc7837;
-  color: white;
-  box-shadow: var(--box-shadow-medium);
 }
 
 /* PORTAL Styles */

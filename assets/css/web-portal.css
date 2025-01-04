@@ -411,6 +411,42 @@ form .submit-button {
   padding: 0.5rem 1rem;
   border-radius: 0.3rem;
 }
+#courseDetails .calendar-table tr:first-of-type td {
+  background-color: #fcfcfc;
+  font-weight: var(--accent-font-weight);
+}
+#courseDetails .calendar-table tr td,
+#courseDetails .time-table tr td {
+  padding: 0;
+  cursor: initial;
+}
+#courseDetails .calendar-table tr td.selected-date,
+#courseDetails .time-table tr td.selected-time {
+  background-color: var(--accent-color);
+  color: #fff !important;
+}
+#courseDetails .time-table tr td {
+  width: 170px;
+  color: var(--text-color) !important;
+}
+#courseDetails .calendar-table tr td:hover,
+#courseDetails .time-table tr td:hover {
+  background: none;
+  box-shadow: none;
+}
+#courseDetails .calendar-table tr td.selected-date:hover,
+#courseDetails .time-table tr td.selected-time:hover {
+  background: var(--accent-color) !important;
+}
+#courseDetails .table .special-heading {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  border: var(--border);
+  color: var(--dark-text-color);
+  font-family: var(--secondary-font-family);
+  font-size: var(--secondary-font-size);
+  font-weight: var(--secondary-font-weight);
+}
 #courseDetails .course-info .course-image {
   width: 100%;
   border: var(--border);

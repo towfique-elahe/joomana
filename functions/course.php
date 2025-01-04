@@ -418,7 +418,7 @@ function render_course_details_section() {
         // Time slots in the format of the table
         $time_slots = [
             '8:00 AM - 10:00 AM', '10:00 AM - 12:00 PM', '12:00 PM - 2:00 PM',
-            '2:00 PM - 4:00 AM', '4:00 PM - 6:00 PM', '6:00 PM - 8:00 PM',
+            '2:00 PM - 4:00 PM', '4:00 PM - 6:00 PM', '6:00 PM - 8:00 PM',
             '8:00 PM - 10:00 PM', '10:00 PM - 12:00 AM', '12:00 AM - 2:00 AM',
             '2:00 AM - 4:00 AM', '4:00 AM - 6:00 AM', '6:00 AM - 8:00 AM'
         ];
@@ -444,14 +444,14 @@ function render_course_details_section() {
             <table class="table calendar-table">
                 <tbody>
                     <tr>
-                        <td>Vendredi</td>
-                        <td>Samedi</td>
-                        <td>Dimanche</td>
                         <td>Lundi</td>
                         <td>Mardi</td>
                         <td>Mercredi</td>
                         <td>Jeudi</td>
-                        <td rowspan="6" class="speacial-heading">Date de début</td>
+                        <td>Vendredi</td>
+                        <td>Samedi</td>
+                        <td>Dimanche</td>
+                        <td rowspan="6" class="special-heading">Date de début</td>
                     </tr>
                     <?php
                     // Generate the calendar for the selected month

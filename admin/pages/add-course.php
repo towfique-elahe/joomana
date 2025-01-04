@@ -379,10 +379,13 @@ ob_end_clean();
                                 <div class="buttons">
                                     <div class="custom-select-wrapper">
                                         <select id="yearSelect">
-                                            <option>2022</option>
-                                            <option>2023</option>
-                                            <option selected>2024</option>
-                                            <option>2025</option>
+                                            <option>2024</option>
+                                            <option selected>2025</option>
+                                            <option>2026</option>
+                                            <option>2027</option>
+                                            <option>2028</option>
+                                            <option>2029</option>
+                                            <option>2030</option>
                                         </select>
                                         <i class="fas fa-caret-down custom-arrow"></i>
                                     </div>
@@ -410,7 +413,7 @@ ob_end_clean();
                                         Reprogrammer</button>
                                 </div>
 
-                                <div class="speacial-heading">Date de début</div>
+                                <div class="special-heading">Date de début</div>
                             </div>
                             <table class="table calendar-table" id="calendarTable">
                                 <thead>

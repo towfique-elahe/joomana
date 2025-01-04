@@ -26,52 +26,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password_confirmation = isset($_POST['password_confirmation']) ? $_POST['password_confirmation'] : '';
 
     // Handle image upload
-    if (isset($_FILES['upload_image']) && !empty($_FILES['upload_image']['name'])) {
-        $file = $_FILES['upload_image'];
+    // if (isset($_FILES['upload_image']) && !empty($_FILES['upload_image']['name'])) {
+    //     $file = $_FILES['upload_image'];
         
-        // Set allowed file types
-        $allowed_file_types = array('image/jpeg', 'image/png');
+    //     $allowed_file_types = array('image/jpeg', 'image/png');
         
-        // Validate the file type
-        $file_type = wp_check_filetype($file['name']);
-        if (!in_array($file_type['type'], $allowed_file_types)) {
-            $error_message = 'Only JPEG and PNG images are allowed.';
-        } else {
-            // Set upload path
-            $upload_dir = wp_upload_dir();
-            $filename = sanitize_file_name($file['name']);
-            $upload_path = $upload_dir['path'] . '/' . $filename;
+    //     // Validate the file type
+    //     $file_type = wp_check_filetype($file['name']);
+    //     if (!in_array($file_type['type'], $allowed_file_types)) {
+    //         $error_message = 'Only JPEG and PNG images are allowed.';
+    //     } else {
+    //         $upload_dir = wp_upload_dir();
+    //         $filename = sanitize_file_name($file['name']);
+    //         $upload_path = $upload_dir['path'] . '/' . $filename;
 
-            // Move the uploaded file
-            if (move_uploaded_file($file['tmp_name'], $upload_path)) {
-                // Save the uploaded image URL to usermeta
-                $upload_url = $upload_dir['url'] . '/' . $filename;
-                update_user_meta($user_id, 'user_image', $upload_url);
-                $success_message = 'Image uploaded successfully!';
-            } else {
-                $error_message = 'Failed to upload image.';
-            }
-        }
-    }
+    //         if (move_uploaded_file($file['tmp_name'], $upload_path)) {
+    //             $upload_url = $upload_dir['url'] . '/' . $filename;
+    //             update_user_meta($user_id, 'user_image', $upload_url);
+    //             $success_message = 'Image uploaded successfully!';
+    //         } else {
+    //             $error_message = 'Failed to upload image.';
+    //         }
+    //     }
+    // }
 
     // Handle image deletion
-    if (isset($_POST['delete_image'])) {
-        // Get the profile image URL
-        $user_image_url = get_user_meta($user_id, 'user_image', true);
+    // if (isset($_POST['delete_image'])) {
+    //     $user_image_url = get_user_meta($user_id, 'user_image', true);
         
-        if ($user_image_url) {
-            // Remove the profile image from the uploads directory
-            $upload_dir = wp_upload_dir();
-            $image_path = str_replace($upload_dir['url'], $upload_dir['path'], $user_image_url);
+    //     if ($user_image_url) {
+    //         $upload_dir = wp_upload_dir();
+    //         $image_path = str_replace($upload_dir['url'], $upload_dir['path'], $user_image_url);
             
-            // Check if the file exists, then delete it
-            if (file_exists($image_path)) {
-                unlink($image_path); // Delete the image file
-                delete_user_meta($user_id, 'user_image'); // Delete the image from user meta
-                $success_message = 'Profile image deleted successfully.';
-            }
-        }
-    }
+    //         if (file_exists($image_path)) {
+    //             unlink($image_path);
+    //             delete_user_meta($user_id, 'user_image');
+    //             $success_message = 'Profile image deleted successfully.';
+    //         }
+    //     }
+    // }
 
     // Update user profile and password (same as your existing code)
     if (empty($error_message)) {
@@ -139,9 +132,8 @@ ob_end_clean();
                         <h3 class="section-heading">Renseignements Personnels</h3>
 
                         <div class="row">
-                            <div class="col img-col">
+                            <!-- <div class="col img-col">
                                 <div class="profile-card">
-                                    <!-- Display the profile image or default image if none exists -->
                                     <img alt=""
                                         src="<?php echo esc_url(get_user_meta($user_id, 'user_image', true) ?: get_template_directory_uri() . '/assets/image/user.png'); ?>" />
                                     <div class="overlay">
@@ -161,7 +153,7 @@ ob_end_clean();
                                 </div>
                                 <p class="text">(Images uniquement, JPEG/PNG, max 2 Mo)</p>
                                 <p class="image-file-name">Aucun fichier sélectionné</p>
-                            </div>
+                            </div> -->
 
                             <div class="col info-col">
                                 <div class="row">
