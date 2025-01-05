@@ -22,7 +22,6 @@ $teachers = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teachers");
 
 
 // Delete Logic
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
     global $wpdb;
 
@@ -30,12 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
     $delete_item_id = intval($_POST['delete_item_id']);
 
     if ($delete_item_id > 0) {
+        // Delete the teacher record from the custom table
         $deleted = $wpdb->delete($table_name, ['id' => $delete_item_id], ['%d']);
 
         if ($deleted) {
-            $success_message = 'Le niveau a été supprimé avec succès.';
+            // Attempt to delete the WordPress user with the same ID
+            if (wp_delete_user($delete_item_id)) {
+                $success_message = 'L\'enseignant et l\'utilisateur associé ont été supprimés avec succès.';
+            } else {
+                $error_message = 'L\'enseignant a été supprimé, mais l\'utilisateur associé n\'a pas pu être supprimé.';
+            }
         } else {
-            $error_message = 'Erreur lors de la suppression du niveau.';
+            $error_message = 'Erreur lors de la suppression de l\'enseignant.';
         }
 
         // Prevent form resubmission

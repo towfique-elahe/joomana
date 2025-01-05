@@ -833,8 +833,11 @@ function custom_teacher_registration_form() {
                     'created_at' => current_time('mysql'),
                 ]);
 
-                
                 $_SESSION['registration_success'] = 'Registration successful. Welcome to Joomana!';
+
+                // Redirect to the current page to prevent form resubmission
+                wp_safe_redirect($_SERVER['REQUEST_URI']);
+                exit;
             } else {
                 $_SESSION['registration_error'] = 'Failed to assign the teacher role. Registration aborted.';
             }
