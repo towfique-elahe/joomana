@@ -20,10 +20,10 @@ function create_students_table() {
         first_name VARCHAR(255) NOT NULL,
         last_name VARCHAR(255) NOT NULL,
         date_of_birth DATE NOT NULL,
-        gender ENUM('Male', 'Female', 'Other') NOT NULL,
+        gender ENUM('Masculin', 'Féminin', 'Autre') NOT NULL,
         school VARCHAR(255) NOT NULL,
-        grade_level VARCHAR(50) NOT NULL,
-        math_level VARCHAR(50) NOT NULL,
+        grade VARCHAR(50) NOT NULL,
+        level VARCHAR(50) NOT NULL,
         subject_of_interest TEXT NOT NULL,
         available_days TEXT NOT NULL,
         monday_timeslot TEXT NULL,
@@ -101,12 +101,12 @@ function custom_student_registration_form() {
                 <input type="date" id="date_of_birth" name="date_of_birth" required>
             </div>
             <div class="col">
-                <label for="topic">Sujet <span class="required">*</span></label>
+                <label for="gender">Sujet <span class="required">*</span></label>
                 <div class="custom-select-wrapper">
                     <select id="gender" name="gender" required>
                         <option value="" disabled selected>Sélectionnez le sexe</option>
-                        <option value="Mâle">Mâle</option>
-                        <option value="Femelle">Femelle</option>
+                        <option value="Masculin">Masculin</option>
+                        <option value="Féminin">Féminin</option>
                         <option value="Autre">Autre</option>
                     </select>
                     <!-- <i class="fas fa-chevron-down custom-arrow" style="color: #585858;"></i> -->
@@ -378,8 +378,8 @@ function handle_student_registration_form() {
         $date_of_birth = sanitize_text_field($_POST['date_of_birth']);
         $gender = sanitize_text_field($_POST['gender']);
         $school = sanitize_text_field($_POST['school']);
-        $grade_level = sanitize_text_field($_POST['grade_level']);
-        $math_level = sanitize_text_field($_POST['math_level']);
+        $grade = sanitize_text_field($_POST['grade']);
+        $level = sanitize_text_field($_POST['level']);
         $subject_of_interest = !empty($_POST['subject_of_interest']) ? implode(',', array_map('sanitize_text_field', $_POST['subject_of_interest'])) : '';
         $available_days = !empty($_POST['available_days']) ? implode(',', array_map('sanitize_text_field', $_POST['available_days'])) : '';
         $monday_timeslot = isset($_POST['monday_timeslot']) ? sanitize_text_field($_POST['monday_timeslot']) : null;
@@ -397,7 +397,7 @@ function handle_student_registration_form() {
 
         // Check required fields
         if (empty($first_name) || empty($last_name) || empty($date_of_birth) || empty($gender) || empty($school) ||
-            empty($grade_level) || empty($math_level) || empty($email) || empty($parent_consent) || empty($password)) {
+            empty($grade) || empty($level) || empty($email) || empty($parent_consent) || empty($password)) {
             $_SESSION['registration_error'] = 'All required fields must be filled.';
             return;
         }
@@ -452,8 +452,8 @@ function handle_student_registration_form() {
                 'date_of_birth' => $date_of_birth,
                 'gender' => $gender,
                 'school' => $school,
-                'grade_level' => $grade_level,
-                'math_level' => $math_level,
+                'grade' => $grade,
+                'level' => $level,
                 'subject_of_interest' => $subject_of_interest,
                 'available_days' => $available_days,
                 'monday_timeslot' => $monday_timeslot,
@@ -469,6 +469,10 @@ function handle_student_registration_form() {
 
             // Set success message
             $_SESSION['registration_success'] = 'Registration successful. Welcome!';
+
+            // Redirect to the current page to prevent form resubmission
+            wp_safe_redirect($_SERVER['REQUEST_URI']);
+            exit;
         } else {
             // If the role is not 'student', display an error (should not happen in this context)
             $_SESSION['registration_error'] = 'Failed to assign the student role. Registration aborted.';

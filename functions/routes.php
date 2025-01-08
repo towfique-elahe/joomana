@@ -9,8 +9,11 @@
 function admin_portal_rewrite_rules() {
     add_rewrite_rule('^admin/dashboard/?$', 'index.php?admin_page=dashboard', 'top');
     add_rewrite_rule('^admin/teacher-management/?$', 'index.php?admin_page=teacher-management', 'top');
+    add_rewrite_rule('^admin/teacher-management/teacher-details/?$', 'index.php?admin_page=teacher-details', 'top');
     add_rewrite_rule('^admin/student-management/?$', 'index.php?admin_page=student-management', 'top');
+    add_rewrite_rule('^admin/student-management/student-details/?$', 'index.php?admin_page=student-details', 'top');
     add_rewrite_rule('^admin/parent-management/?$', 'index.php?admin_page=parent-management', 'top');
+    add_rewrite_rule('^admin/parent-management/parent-details/?$', 'index.php?admin_page=parent-details', 'top');
     add_rewrite_rule('^admin/course-management/courses/?$', 'index.php?admin_page=course-management', 'top');
     add_rewrite_rule('^admin/course-management/courses/add-course/?$', 'index.php?admin_page=add-course', 'top');
     add_rewrite_rule('^admin/course-management/courses/edit-course/?$', 'index.php?admin_page=edit-course', 'top');

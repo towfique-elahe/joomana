@@ -196,6 +196,62 @@
   pointer-events: none; /* Prevent interaction with the icon */
 }
 
+/* student details */
+#adminStudentDetails .section {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+#adminStudentDetails .section.user-courses {
+  flex: 1.5;
+}
+#adminStudentDetails .profile-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#adminStudentDetails .profile-image {
+  width: 100%;
+  max-width: 10rem;
+  max-height: 10rem;
+  border: var(--border);
+  border-radius: 0.4rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+#adminStudentDetails .profile-name {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--secondary-font-size);
+  color: var(--accent-color);
+}
+#adminStudentDetails .profile-username {
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+  color: var(--text-color);
+}
+#adminStudentDetails .detail-row {
+  padding: 1rem 0;
+  border-bottom: var(--border);
+}
+#adminStudentDetails .detail-row:last-of-type {
+  border: none;
+}
+#adminStudentDetails .detail-label {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  color: var(--dark-text-color);
+}
+#adminStudentDetails .detail-value {
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+  color: var(--text-color);
+}
+
 /* parent management */
 #adminParentManagement .list th:nth-child(1),
 #adminParentManagement .list td:nth-child(1) {
