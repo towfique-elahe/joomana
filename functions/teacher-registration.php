@@ -16,7 +16,7 @@ function create_teachers_table() {
 
     $sql = "CREATE TABLE $table_name (
         id BIGINT(20) UNSIGNED NOT NULL,
-        status ENUM('in review', 'on hold', 'rejected', 'approved') NOT NULL DEFAULT 'in review',
+        status ENUM('En cours', 'En révision', 'Rejeté', 'Approuvé') NOT NULL DEFAULT 'En cours',
         first_name VARCHAR(255) NOT NULL,
         last_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL,

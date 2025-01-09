@@ -13,6 +13,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+$error_message = ''; // Initialize error message variable
+$success_message = ''; // Initialize success message variable
+
 // Check if the id is present in the URL
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -34,13 +37,50 @@ if (!$teacher) {
     wp_die("L'enseignant demandé n'a pas pu être trouvé.");
 }
 
+    // Handle form submission for updating the topic
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_teacher_status'])) {
+        // Sanitize user input
+        $new_status = isset($_POST['status']) ? sanitize_text_field($_POST['status']) : '';
+
+        if (!empty($new_status)) {
+            if (!$error_message) {
+                $data = array(
+                    'status' => $new_status,
+                );
+
+                // Update the topic in the database
+                $updated = $wpdb->update(
+                    $table_name,
+                    $data, // Column => Value
+                    array('id' => $id), // Where condition
+                    array('%s'), // Data type for each value (status)
+                    array('%d') // Data type for where condition
+                );
+
+                if ($updated === false) {
+                    // Handle potential database errors
+                    $error_message = 'Erreur: ' . esc_html($wpdb->last_error);
+                } else {
+                    // Set success message
+                    $success_message = 'Le statut a été mis à jour avec succès.';
+
+                    // Redirect to prevent duplicate submission
+                    wp_redirect(home_url('/admin/teacher-management/teacher-details/?id='.$id));
+                    exit;
+                }
+            }
+        } else {
+            $error_message = 'Veuillez choisir un statut valide.';
+        }
+    }
+
 ?>
 
 <div class="content-area">
     <div class="sidebar-container">
         <?php require_once(get_template_directory() . '/admin/templates/sidebar.php'); ?>
     </div>
-    <div id="adminStudentDetails" class="main-content">
+    <div id="adminTeacherDetails" class="main-content">
         <div class="content-header">
             <h2 class="content-title">Détails De L'enseignant</h2>
             <div class="content-breadcrumb">
@@ -57,88 +97,350 @@ if (!$teacher) {
             </div>
         </div>
 
-        <div class="content-section">
-            <div class="row">
-                <div class="col">
-                    <div class="section user-profile">
-                        <div class="profile-top">
-                            <img src="<?php echo !empty($teacher->image) ? esc_url($teacher->image) : esc_url(get_stylesheet_directory_uri() . '/assets/image/user.png'); ?>"
-                                alt="User Image" class="profile-image">
+        <div class="row content-section">
+            <div class="col left-content">
 
+                <!-- personal details -->
+                <div class="section user-profile">
+                    <div class="profile-top">
+                        <div class="col">
                             <h3 class="profile-name">
-                                <?php echo esc_html($teacher->first_name) . " " . esc_html($teacher->last_name); ?></h3>
-                            <p class="profile-username"><?php echo esc_html($wp_user->user_login); ?></p>
-                            <p class="profile-status"><?php echo esc_html($teacher->status); ?></p>
+                                <?php echo esc_html($teacher->first_name) . " " . esc_html($teacher->last_name); ?>
+                            </h3>
+                            <p class="profile-username">
+                                <?php echo esc_html($wp_user->user_login); ?>
+                            </p>
+                            <p class="status <?php echo strtolower(str_replace(' ', '-', $teacher->status)); ?>">
+                                <?php echo esc_html($teacher->status); ?>
+                            </p>
                         </div>
-                        <div class="profile-details">
-                            <div class="row detail-row">
-                                <span class="col detail-label">Email:</span>
-                                <span class="col detail-value"><?php echo esc_html($wp_user->user_email); ?></span>
-                            </div>
-                            <div class="row detail-row">
-                                <span class="col detail-label">Téléphone:</span>
-                                <span class="col detail-value"><?php echo esc_html($teacher->phone); ?></span>
-                            </div>
-                            <div class="row detail-row">
-                                <span class="col detail-label">Adresse:</span>
-                                <span
-                                    class="col detail-value"><?php echo esc_html($teacher->address) . ", " . esc_html($teacher->city) . ", " . esc_html($teacher->country) . "-" . esc_html($teacher->postal_code); ?></span>
-                            </div>
-                            <div class="row detail-row">
-                                <span class="col detail-label">Nom de l'entreprise:</span>
-                                <span class="col detail-value"><?php echo esc_html($teacher->company_name); ?></span>
-                            </div>
-                            <div class="row detail-row">
-                                <span class="col detail-label">Paiement total:</span>
-                                <span class="col detail-value">n/a</span>
-                            </div>
+                        <img src="<?php echo !empty($teacher->image) ? esc_url($teacher->image) : esc_url(get_stylesheet_directory_uri() . '/assets/image/user.png'); ?>"
+                            alt="User Image" class="profile-image">
+                    </div>
+                    <div class="profile-details">
+                        <div class="row detail-row">
+                            <span class="col detail-label">Email:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($wp_user->user_email); ?>
+                            </span>
+                        </div>
+                        <div class="row detail-row">
+                            <span class="col detail-label">Téléphone:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($teacher->phone); ?>
+                            </span>
+                        </div>
+                        <div class="row detail-row">
+                            <span class="col detail-label">Adresse:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($teacher->address); ?>
+                            </span>
+                        </div>
+                        <div class="row detail-row">
+                            <span class="col detail-label">ville/quartier:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($teacher->city); ?>
+                            </span>
+                        </div>
+                        <div class="row detail-row">
+                            <span class="col detail-label">Pays/Région:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($teacher->country) . " - " . esc_html($teacher->postal_code); ?>
+                            </span>
+                        </div>
+                        <div class="row detail-row">
+                            <span class="col detail-label">Entreprise:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($teacher->company_name); ?>
+                            </span>
+                        </div>
+                        <div class="row detail-row">
+                            <span class="col detail-label">Paiement total:</span>
+                            <span class="col detail-value">n/a</span>
                         </div>
                     </div>
-
-                    <div class="section">
-                        <h3 class="section-heading">Formation et qualifications</h3>
-                        <div class="profile-details">
-                            <div class="row detail-row">
-                                <span class="col detail-label">Dernier Degré:</span>
-                                <span class="col detail-value"><?php echo esc_html($teacher->degree); ?></span>
-                            </div>
-                            <div class="row detail-row">
-                                <span class="col detail-label">Institution d'obtention:</span>
-                                <span class="col detail-value"><?php echo esc_html($teacher->institute); ?></span>
-                            </div>
-                            <div class="row detail-row">
-                                <span class="col detail-label">Année d'obtention du diplôme:</span>
-                                <span class="col detail-value"><?php echo esc_html($teacher->graduation_year); ?></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section">
-                        <h3 class="section-heading">Vos Motivations</h3>
-                        <p class="para"><?php echo esc_html($teacher->motivation_of_joining); ?></p>
-                    </div>
-
                 </div>
 
-                <div class="col">
-                    <div class="section user-courses">
-                        <h3 class="section-heading">Statut de la demande</h3>
-
+                <!-- qualifications -->
+                <div class="section">
+                    <h3 class="section-heading">Formation et qualifications</h3>
+                    <div class="profile-details">
+                        <div class="row detail-row">
+                            <span class="col detail-label">Degré:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($teacher->degree); ?>
+                            </span>
+                        </div>
+                        <div class="row detail-row">
+                            <span class="col detail-label">Institution:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($teacher->institute); ?>
+                            </span>
+                        </div>
+                        <div class="row detail-row">
+                            <span class="col detail-label">Année:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($teacher->graduation_year); ?>
+                            </span>
+                        </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="section user-payments">
-                        <h3 class="section-heading">Paiements</h3>
-                        <!-- <div class="payment-list">
-                            <div class="payment-item">
-                                <div class="payment-date">20/01/2022</div>
-                                <div class="payment-details">
-                                    <h4 class="payment-course">Mathématiques</h4>
-                                    <span class="payment-amount">20.00</span>
-                                    <span class="payment-status">Payé</span>
-                                </div>
+            <div class="col right-content">
+                <div class="row">
+                    <div class="col">
+                        <!-- interested subjects -->
+                        <div class="section">
+                            <h3 class="section-heading">Sujets d'intérêt</h3>
+                            <?php 
+                            // Split the string into an array using commas as the delimiter
+                            $subjects = explode(',', $teacher->subjects_of_interest);
+            
+                            if (!empty($subjects)) {
+                                foreach ($subjects as $subject) {
+                            ?>
+                            <div class="detail-row">
+                                <span class="row detail-value">
+                                    <i class="far fa-check-circle"></i>
+                                    <?php echo esc_html(trim($subject)); ?>
+                                </span>
                             </div>
-                        </div> -->
+                            <?php
+                                }
+                            } else {
+                                echo 'Aucun sujet trouvé.';
+                            }
+                            ?>
+                        </div>
                     </div>
+
+                    <div class="col">
+                        <!-- update status -->
+                        <form action="" class="edit-form" method="post" enctype="multipart/form-data">
+                            <?php if ($error_message): ?>
+                            <div class="form-error">
+                                <p>
+                                    <?php echo esc_html($error_message); ?>
+                                </p>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if ($success_message): ?>
+                            <div class="form-success">
+                                <p>
+                                    <?php echo esc_html($success_message); ?>
+                                </p>
+                            </div>
+                            <?php endif; ?>
+
+                            <section class="section col">
+                                <h3 class="section-heading">Statut de la demande</h3>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="custom-select-wrapper">
+                                            <select id="status" name="status" required>
+                                                <?php
+                                                    // Get the current status
+                                                    $current_status = $teacher->status;
+                                                    $statuses = ["En cours", "En révision", "Rejeté", "Approuvé"];
+
+                                                    // Output the current status as the selected option
+                                                    echo '<option value="' . esc_attr($current_status) . '" selected>' . esc_html($current_status) . '</option>';
+
+                                                    // Filter and display other statuses
+                                                    foreach ($statuses as $status) {
+                                                        if ($status !== $current_status) {
+                                                            echo '<option value="' . esc_attr($status) . '">' . esc_html($status) . '</option>';
+                                                        }
+                                                    }
+                                                ?>
+                                            </select>
+                                            <i class="fas fa-chevron-down custom-arrow" style="color: #585858;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="submit-button" name="edit_teacher_status">Mise à
+                                    jour</button>
+                            </section>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <!-- motivation -->
+                        <div class="section">
+                            <h3 class="section-heading">Vos Motivations</h3>
+                            <div class="row detail-row">
+                                <span class="col detail-value">
+                                    <?php echo esc_html($teacher->motivation_of_joining); ?>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <!-- assigned courses -->
+                        <div class="assigned-courses">
+                            <h3 class="section-heading">Cours assignés</h3>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Titre</th>
+                                        <th>Statut</th>
+                                        <th>Date de début</th>
+                                        <th>Détails</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list">
+                                    <tr>
+                                        <td>Cours 1: Lorem, ipsum dolor...</td>
+                                        <td>Complété</td>
+                                        <td>Sep 29, 2024</td>
+                                        <td class="action-buttons">
+                                            <a href="#" class="action-button edit">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cours 2: Lorem, ipsum dolor...</td>
+                                        <td>Complété</td>
+                                        <td>Dec 16, 2024</td>
+                                        <td class="action-buttons">
+                                            <a href="#" class="action-button edit">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cours 3: Lorem, ipsum dolor...</td>
+                                        <td>En cours</td>
+                                        <td>Jan 11, 2025</td>
+                                        <td class="action-buttons">
+                                            <a href="#" class="action-button edit">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cours 4: Lorem, ipsum dolor...</td>
+                                        <td>En attente</td>
+                                        <td>Feb 12, 2025</td>
+                                        <td class="action-buttons">
+                                            <a href="#" class="action-button edit">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cours 5: Lorem, ipsum dolor...</td>
+                                        <td>En attente</td>
+                                        <td>Mar 1, 2025</td>
+                                        <td class="action-buttons">
+                                            <a href="#" class="action-button edit">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row content-section list">
+            <div class="col">
+                <!-- payments history -->
+                <div class="user-payments">
+                    <h3 class="section-heading">Historique des paiements</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Commande</th>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>Mode de paiement</th>
+                                <th>Invoice</th>
+                                <th>Détails</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list">
+                            <tr>
+                                <td>#1001</td>
+                                <td>Sep 29, 2024</td>
+                                <td class="payment">
+                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
+                                    5.00
+                                </td>
+                                <td>PAYPAL</td>
+                                <td>
+                                    <a href="#" class="invoice"><i class="fas fa-receipt"></i></a>
+                                </td>
+                                <td class="action-buttons">
+                                    <a href="#" class="action-button edit">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#1002</td>
+                                <td>Dec 3, 2024</td>
+                                <td class="payment">
+                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
+                                    10.00
+                                </td>
+                                <td>BANK TRANSFER</td>
+                                <td>
+                                    <a href="#" class="invoice"><i class="fas fa-receipt"></i></a>
+                                </td>
+                                <td class="action-buttons">
+                                    <a href="#" class="action-button edit">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#1003</td>
+                                <td>Jan 01, 2025</td>
+                                <td class="payment">
+                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
+                                    5.00
+                                </td>
+                                <td>STRIPE</td>
+                                <td>
+                                    <a href="#" class="invoice"><i class="fas fa-receipt"></i></a>
+                                </td>
+                                <td class="action-buttons">
+                                    <a href="#" class="action-button edit">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#1004</td>
+                                <td>Jan 10, 2025</td>
+                                <td class="payment">
+                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
+                                    10.00
+                                </td>
+                                <td>MASTER CARD</td>
+                                <td>
+                                    <a href="#" class="invoice"><i class="fas fa-receipt"></i></a>
+                                </td>
+                                <td class="action-buttons">
+                                    <a href="#" class="action-button edit">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

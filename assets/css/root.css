@@ -675,7 +675,7 @@ form .form-error p {
   margin-bottom: 1rem;
   background-color: var(--gray-background-color);
   border: var(--border);
-  border-radius: 0.5rem;
+  border-radius: 0.7rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -723,7 +723,7 @@ form .form-error p {
   padding: 1rem;
   background-color: var(--gray-background-color);
   border: var(--border);
-  border-radius: 0.5rem;
+  border-radius: 0.7rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

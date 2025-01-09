@@ -74,10 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                 <!-- Status Filter Buttons -->
                 <div class="status-filter">
                     <button onclick="filterStatus('all', this)" class="button all active">Tous</button>
-                    <button onclick="filterStatus('approved', this)" class="button approved">Approuvé</button>
-                    <button onclick="filterStatus('in-review', this)" class="button in-review">En revue</button>
-                    <button onclick="filterStatus('on-hold', this)" class="button on-hold">En attente</button>
-                    <button onclick="filterStatus('rejected', this)" class="button rejected">Rejeté</button>
+                    <button onclick="filterStatus('approuvé', this)" class="button approuvé">Approuvé</button>
+                    <button onclick="filterStatus('en-cours', this)" class="button en-cours">En Cours</button>
+                    <button onclick="filterStatus('en-révision', this)" class="button en-révision">En Révision</button>
+                    <button onclick="filterStatus('rejeté', this)" class="button rejeté">Rejeté</button>
                 </div>
 
                 <div class="filter-bar">
@@ -103,49 +103,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
 
                     <?php if (!empty($teachers)) : ?>
                     <?php foreach ($teachers as $teacher) : ?>
-                    <?php
-                $skills = $teacher->skills ?? 'n/a';
-                $courses = $teacher->assigned_courses ?? 'n/a';
-                $payment = $teacher->total_payment ?? 0;
-                $status = $teacher->status;
-                $status_in_french = '';
-                switch ($status) {
-                    case 'in review':
-                        $status_in_french = 'En revue';
-                        break;
-                    case 'on hold':
-                        $status_in_french = 'En attente';
-                        break;
-                    case 'rejected':
-                        $status_in_french = 'Rejeté';
-                        break;
-                    case 'approved':
-                        $status_in_french = 'Approuvé';
-                        break;
-                    default:
-                        $status_in_french = 'n/a';
-                        break;
-                }
-            ?>
-                    <tr class="teacher-row" data-status="<?php echo strtolower(str_replace(' ', '-', $status)); ?>">
+                    <tr class="teacher-row"
+                        data-status="<?php echo strtolower(str_replace(' ', '-', $teacher->status)); ?>">
                         <td class="name">
                             <a href="#">
                                 <?php echo esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name); ?>
                             </a>
                         </td>
-                        <td>
-                            <?php echo esc_html($skills); ?>
-                        </td>
-                        <td>
-                            <?php echo esc_html($courses); ?>
-                        </td>
+                        <td>n/a</td>
+                        <td>n/a</td>
                         <td class="payment">
                             <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                            <?php echo esc_html($payment); ?>
+                            0
                         </td>
                         <td>
-                            <span class="status <?php echo strtolower(str_replace(' ', '-', $status)); ?>">
-                                <?php echo esc_html($status_in_french); ?>
+                            <span class="status <?php echo strtolower(str_replace(' ', '-', $teacher->status)); ?>">
+                                <?php echo esc_html($teacher->status); ?>
                             </span>
                         </td>
                         <td class="action-buttons">
