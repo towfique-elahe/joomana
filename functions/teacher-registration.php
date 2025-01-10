@@ -448,29 +448,17 @@ function custom_teacher_registration_form() {
         <div class="row">
             <div class="col">
                 <div id="subjects_of_interest" class="checkbox-group">
-                    <label class="row">
-                        <input type="checkbox" name="subjects_of_interest[]" value="Classical Maths">
-                        Mathématiques classiques
-                    </label>
-                    <label class="row">
-                        <input type="checkbox" name="subjects_of_interest[]" value="Math & Programming"> Mathématiques
-                        et programmation
-                    </label>
-                    <label class="row">
-                        <input type="checkbox" name="subjects_of_interest[]" value="Math & AI"> Mathématiques et IA
-                    </label>
-                    <label class="row">
-                        <input type="checkbox" name="subjects_of_interest[]" value="Math & Cybersecurity"> Mathématiques
-                        et cybersécurité
-                    </label>
-                    <label class="row">
-                        <input type="checkbox" name="subjects_of_interest[]" value="Maths & Ecology"> Mathématiques et
-                        écologie
-                    </label>
-                    <label class="row">
-                        <input type="checkbox" name="subjects_of_interest[]" value="Math & Financial Education">
-                        Mathématiques et éducation financière
-                    </label>
+                    <?php
+                        global $wpdb;
+                        $categories = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_categories");
+                        if ($categories) {
+                            foreach ($categories as $category) {
+                                echo '<label class="row"><input type="checkbox" name="subjects_of_interest[]" value="' . esc_attr($category->category) . '">' . esc_html($category->category) . '</label>';
+                            }
+                        } else {
+                            echo '<option disabled>No Sujets found</option>';
+                        }
+                    ?>
                 </div>
             </div>
         </div>
