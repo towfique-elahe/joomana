@@ -29,18 +29,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
     $delete_item_id = intval($_POST['delete_item_id']);
 
     if ($delete_item_id > 0) {
-        // Delete the teacher record from the custom table
-        $deleted = $wpdb->delete($table_name, ['id' => $delete_item_id], ['%d']);
+        // Retrieve the teacher record from the custom table to get the file paths
+        $teacher = $wpdb->get_row("SELECT * FROM $table_name WHERE id = $delete_item_id");
 
-        if ($deleted) {
-            // Attempt to delete the WordPress user with the same ID
-            if (wp_delete_user($delete_item_id)) {
-                $success_message = 'L\'enseignant et l\'utilisateur associé ont été supprimés avec succès.';
+        if ($teacher) {
+            // Delete the associated files from WordPress media
+            $file_keys = [
+                'upload_cv',
+                'upload_doc1',
+                'upload_doc2',
+                'upload_doc3',
+                'upload_doc4',
+                'upload_doc5',
+                'upload_video'
+            ];
+
+            // Loop through each file and delete the media
+            foreach ($file_keys as $file_key) {
+                if (!empty($teacher->$file_key)) {
+                    // Get attachment ID based on file URL
+                    $file_url = $teacher->$file_key;
+                    $attachment_id = attachment_url_to_postid($file_url);
+                    
+                    if ($attachment_id) {
+                        // Delete the media file from the WordPress uploads
+                        wp_delete_attachment($attachment_id, true);  // Pass 'true' to force delete the file from the server
+                    }
+                }
+            }
+
+            // Delete the teacher record from the custom table
+            $deleted = $wpdb->delete($table_name, ['id' => $delete_item_id], ['%d']);
+
+            if ($deleted) {
+                // Attempt to delete the WordPress user with the same ID
+                if (wp_delete_user($delete_item_id)) {
+                    $success_message = 'L\'enseignant et l\'utilisateur associé ont été supprimés avec succès, ainsi que les fichiers.';
+                } else {
+                    $error_message = 'L\'enseignant a été supprimé, mais l\'utilisateur associé n\'a pas pu être supprimé.';
+                }
             } else {
-                $error_message = 'L\'enseignant a été supprimé, mais l\'utilisateur associé n\'a pas pu être supprimé.';
+                $error_message = 'Erreur lors de la suppression de l\'enseignant.';
             }
         } else {
-            $error_message = 'Erreur lors de la suppression de l\'enseignant.';
+            $error_message = 'Aucun enseignant trouvé avec cet ID.';
         }
 
         // Prevent form resubmission
@@ -138,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <?php endforeach; ?>
                     <?php else : ?>
                     <tr>
-                        <td colspan="7">Aucun professeur trouvé.</td>
+                        <td colspan="7" class="no-data">Aucun professeur trouvé.</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>
