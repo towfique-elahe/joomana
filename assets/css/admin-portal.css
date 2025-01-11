@@ -226,6 +226,49 @@
   font-size: var(--text-font-size);
   color: var(--text-color);
 }
+#adminTeacherDetails .docs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+#adminTeacherDetails .doc {
+  text-decoration: none;
+  background-color: #ffdccb;
+  color: var(--dark-text-color);
+  width: 100%;
+  max-width: 15rem;
+  padding: 1rem 1.5rem;
+  border-radius: 0.3rem;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  text-transform: capitalize;
+  text-align: center;
+  transition: ease 0.3s;
+}
+#adminTeacherDetails .doc:hover {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+#adminTeacherDetails .no-data {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+  text-align: center;
+}
+#adminTeacherDetails .video {
+  width: 100%;
+  border-radius: 0.3rem;
+  opacity: 0.7;
+  transition: ease 0.3s;
+}
+#adminTeacherDetails .video:hover {
+  opacity: 1;
+}
 #adminTeacherDetails .table {
   width: 100%;
 }

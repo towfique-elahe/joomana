@@ -58,7 +58,7 @@ require_once(get_template_directory() . '/admin/templates/header.php');
                         $approved_count = $wpdb->get_var(
                             $wpdb->prepare(
                                 "SELECT COUNT(*) FROM $table_name WHERE status = %s",
-                                'approved'
+                                'Approuvé'
                             )
                         );
                         return intval($approved_count);
@@ -83,7 +83,7 @@ require_once(get_template_directory() . '/admin/templates/header.php');
                         $in_review_count = $wpdb->get_var(
                             $wpdb->prepare(
                                 "SELECT COUNT(*) FROM $table_name WHERE status = %s",
-                                'in review'
+                                'En cours'
                             )
                         );
                         return intval($in_review_count);

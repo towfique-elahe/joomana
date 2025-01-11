@@ -283,71 +283,88 @@ if (!$teacher) {
 
                 <div class="row">
                     <div class="col">
-                        <!-- assigned courses -->
-                        <div class="assigned-courses">
-                            <h3 class="section-heading">Cours assignés</h3>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Titre</th>
-                                        <th>Statut</th>
-                                        <th>Date de début</th>
-                                        <th>Détails</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="list">
-                                    <tr>
-                                        <td>Cours 1: Lorem, ipsum dolor...</td>
-                                        <td>Complété</td>
-                                        <td>Sep 29, 2024</td>
-                                        <td class="action-buttons">
-                                            <a href="#" class="action-button edit">
-                                                <i class="fas fa-info-circle"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Cours 2: Lorem, ipsum dolor...</td>
-                                        <td>Complété</td>
-                                        <td>Dec 16, 2024</td>
-                                        <td class="action-buttons">
-                                            <a href="#" class="action-button edit">
-                                                <i class="fas fa-info-circle"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Cours 3: Lorem, ipsum dolor...</td>
-                                        <td>En cours</td>
-                                        <td>Jan 11, 2025</td>
-                                        <td class="action-buttons">
-                                            <a href="#" class="action-button edit">
-                                                <i class="fas fa-info-circle"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Cours 4: Lorem, ipsum dolor...</td>
-                                        <td>En attente</td>
-                                        <td>Feb 12, 2025</td>
-                                        <td class="action-buttons">
-                                            <a href="#" class="action-button edit">
-                                                <i class="fas fa-info-circle"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Cours 5: Lorem, ipsum dolor...</td>
-                                        <td>En attente</td>
-                                        <td>Mar 1, 2025</td>
-                                        <td class="action-buttons">
-                                            <a href="#" class="action-button edit">
-                                                <i class="fas fa-info-circle"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <!-- cv -->
+                        <div class="section">
+                            <h3 class="section-heading">CV mis à jour</h3>
+                            <?php if (!empty($teacher->upload_cv)) : ?>
+                            <div class="docs">
+                                <a href="<?php echo esc_url($teacher->upload_cv); ?>" target="_blank" class="doc">
+                                    <i class="fas fa-paperclip"></i> CV
+                                </a>
+                            </div>
+                            <?php else : ?>
+                            <div class="docs">
+                                <p class="no-data">Aucun CV téléchargé</p>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- other docs -->
+                        <div class="section">
+                            <h3 class="section-heading">Autres documents</h3>
+
+                            <?php if (!empty($teacher->upload_doc1)) : ?>
+                            <div class="docs">
+                                <a href="<?php echo esc_url($teacher->upload_doc1); ?>" target="_blank" class="doc">
+                                    <i class="fas fa-paperclip"></i> Document 1
+                                </a>
+                            </div>
+                            <?php else : ?>
+                            <div class="docs">
+                                <p class="no-data">Aucun document téléchargé</p>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($teacher->upload_doc2)) : ?>
+                            <div class="docs">
+                                <a href="<?php echo esc_url($teacher->upload_doc2); ?>" target="_blank" class="doc">
+                                    <i class="fas fa-paperclip"></i> Document 2
+                                </a>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($teacher->upload_doc3)) : ?>
+                            <div class="docs">
+                                <a href="<?php echo esc_url($teacher->upload_doc3); ?>" target="_blank" class="doc">
+                                    <i class="fas fa-paperclip"></i> Document 3
+                                </a>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($teacher->upload_doc4)) : ?>
+                            <div class="docs">
+                                <a href="<?php echo esc_url($teacher->upload_doc4); ?>" target="_blank" class="doc">
+                                    <i class="fas fa-paperclip"></i> Document 4
+                                </a>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($teacher->upload_doc5)) : ?>
+                            <div class="docs">
+                                <a href="<?php echo esc_url($teacher->upload_doc5); ?>" target="_blank" class="doc">
+                                    <i class="fas fa-paperclip"></i> Document 5
+                                </a>
+                            </div>
+                            <?php endif; ?>
+
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <!-- intro video -->
+                        <div class="section">
+                            <h3 class="section-heading">Vidéo d'introduction</h3>
+
+                            <?php if (!empty($teacher->upload_video)) : ?>
+                            <div class="docs">
+                                <video src="<?php echo esc_url($teacher->upload_video); ?>" controls
+                                    class="video"></video>
+                            </div>
+                            <?php else : ?>
+                            <div class="docs">
+                                <p class="no-data">Vidéo non téléchargée</p>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -356,6 +373,73 @@ if (!$teacher) {
 
         <div class="row content-section list">
             <div class="col">
+                <!-- assigned courses -->
+                <div class="assigned-courses">
+                    <h3 class="section-heading">Cours assignés</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Statut</th>
+                                <th>Date de début</th>
+                                <th>Détails</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list">
+                            <tr>
+                                <td>Cours 1: Lorem, ipsum dolor...</td>
+                                <td>Complété</td>
+                                <td>Sep 29, 2024</td>
+                                <td class="action-buttons">
+                                    <a href="#" class="action-button edit">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cours 2: Lorem, ipsum dolor...</td>
+                                <td>Complété</td>
+                                <td>Dec 16, 2024</td>
+                                <td class="action-buttons">
+                                    <a href="#" class="action-button edit">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cours 3: Lorem, ipsum dolor...</td>
+                                <td>En cours</td>
+                                <td>Jan 11, 2025</td>
+                                <td class="action-buttons">
+                                    <a href="#" class="action-button edit">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cours 4: Lorem, ipsum dolor...</td>
+                                <td>En attente</td>
+                                <td>Feb 12, 2025</td>
+                                <td class="action-buttons">
+                                    <a href="#" class="action-button edit">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cours 5: Lorem, ipsum dolor...</td>
+                                <td>En attente</td>
+                                <td>Mar 1, 2025</td>
+                                <td class="action-buttons">
+                                    <a href="#" class="action-button edit">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
                 <!-- payments history -->
                 <div class="user-payments">
                     <h3 class="section-heading">Historique des paiements</h3>
