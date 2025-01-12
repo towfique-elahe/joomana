@@ -1,0 +1,46 @@
+/* woocommerce empty cart page */
+#wooEmptyCart.woo-empty-cart {
+  justify-content: center;
+  align-items: center;
+  gap: 5rem;
+}
+#wooEmptyCart .woo-empty-cart-image {
+  width: 100%;
+  max-width: 20rem;
+}
+#wooEmptyCart .woo-empty-cart-heading {
+  color: var(--accent-color);
+  font-family: var(--accent-font-family);
+  font-size: var(--secondary-font-size);
+  font-weight: var(--accent-font-weight);
+  margin-bottom: 2rem;
+}
+#wooEmptyCart .woo-empty-cart-action-button {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  font-family: var(--accent-font-family);
+  font-size: var(--accent-font-size);
+  font-weight: var(--accent-font-weight);
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 0.3rem;
+  transition: 0.3s ease;
+}
+#wooEmptyCart .woo-empty-cart-action-button:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+/* woocommerce cart page */
+#wooCart .table th {
+  border: none;
+}
+#wooCart td.product-name {
+  color: var(--primary-color);
+  font-weight: var(--accent-font-weight);
+}
+#wooCart .product-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -20,6 +20,7 @@ function joomana_register_styles() {
     $styles = [
         'joomana-root-style'          => 'assets/css/root.css',
         'joomana-web-portal-style'     => 'assets/css/web-portal.css',
+        'joomana-woocommerce-style'     => 'assets/css/woocommerce.css',
     ];
 
     foreach ($styles as $handle => $path) {
