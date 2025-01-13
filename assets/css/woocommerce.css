@@ -44,3 +44,147 @@
   align-items: center;
   justify-content: center;
 }
+
+/* woocommerce notices */
+.woocommerce-info {
+  background-color: #f7f9ff;
+  border: var(--border);
+  border-radius: 0.3rem;
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+}
+.woocommerce-info::before {
+  color: var(--primary-color);
+  margin-top: 2px;
+}
+.woocommerce-info a {
+  color: var(--primary-color);
+  font-family: var(--accent-font-family);
+  font-size: var(--accent-font-size);
+  font-weight: var(--accent-font-weight);
+}
+.woocommerce-error {
+  background-color: #fff1f1;
+  border: var(--border);
+  border-radius: 0.3rem;
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+}
+.woocommerce-error::before {
+  color: crimson;
+  margin-top: 2px;
+}
+.woocommerce-message {
+  background-color: #fbfff5;
+  border: var(--border);
+  border-radius: 0.3rem;
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+  outline: none;
+  animation: hideMessage 3s forwards;
+  transition: ease 0.3s;
+}
+@keyframes hideMessage {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    display: none;
+  }
+}
+.woocommerce-message::before {
+  color: rgb(149, 199, 12);
+  margin-top: 2px;
+}
+.woocommerce-message .wc-forward {
+  display: none !important;
+}
+
+/* woocommerce checkout */
+.woocommerce-checkout-heading {
+  color: var(--dark-text-color);
+  font-family: var(--secondary-font-family);
+  font-size: var(--secondary-font-size);
+  font-weight: var(--secondary-font-weight);
+  border-bottom: var(--border);
+  border-color: var(--primary-color);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+.woocommerce-checkout label {
+  margin-bottom: 1px;
+  color: var(--text-color) !important;
+  font-family: var(--text-font-family) !important;
+  font-size: var(--text-font-size) !important;
+  font-weight: var(--text-font-weight) !important;
+}
+.woocommerce-checkout input,
+.woocommerce-checkout textarea {
+  color: var(--text-color) !important;
+  font-family: var(--text-font-family) !important;
+  font-size: var(--text-font-size) !important;
+  font-weight: var(--text-font-weight) !important;
+  border: var(--border) !important;
+  border-radius: 0.3rem !important;
+  outline: none;
+  padding: 0.6rem 1rem !important;
+  resize: vertical;
+}
+.woocommerce-checkout input:focus,
+.woocommerce-checkout textarea:focus {
+  border-color: var(--accent-color) !important;
+}
+.woocommerce-checkout .select2-selection {
+  height: 40px;
+  border: var(--border) !important;
+  border-radius: 5px !important;
+  outline: none;
+  cursor: pointer;
+}
+.woocommerce-checkout .select2-selection__rendered {
+  height: 40px;
+  color: var(--text-color) !important;
+  font-family: var(--text-font-family) !important;
+  font-size: var(--text-font-size) !important;
+  font-weight: var(--text-font-weight) !important;
+  outline: none;
+  padding: 0.3rem 1rem !important;
+  cursor: pointer;
+}
+.woocommerce-checkout .select2-selection__arrow {
+  margin-top: 5px;
+}
+.woocommerce-checkout .select2-dropdown {
+  border: var(--border);
+  border-top: none;
+}
+.woocommerce-checkout .woocommerce-checkout-review-order-table th,
+.woocommerce-checkout .woocommerce-checkout-review-order-table td {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+}
+.woocommerce-checkout .woocommerce-checkout-review-order-table td.product-name {
+  color: var(--primary-color);
+}
+.woocommerce-checkout .order-total .woocommerce-Price-amount {
+  color: var(--primary-color);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: 2rem;
+}
+.woocommerce-checkout .order-total .woocommerce-Price-currencySymbol {
+  color: var(--accent-color);
+  font-size: 1rem;
+}
