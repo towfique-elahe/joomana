@@ -5,47 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
-
-// Student's Database Table
-
-function create_students_table() {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'students'; // Table name with prefix
-    $charset_collate = $wpdb->get_charset_collate();
-
-    $sql = "CREATE TABLE $table_name (
-        id BIGINT(20) UNSIGNED NOT NULL,
-        image VARCHAR(255) DEFAULT NULL,
-        first_name VARCHAR(255) NOT NULL,
-        last_name VARCHAR(255) NOT NULL,
-        date_of_birth DATE NOT NULL,
-        gender ENUM('Masculin', 'Féminin', 'Autre') NOT NULL,
-        school VARCHAR(255) NOT NULL,
-        grade VARCHAR(50) NOT NULL,
-        level VARCHAR(50) NOT NULL,
-        subject_of_interest TEXT NOT NULL,
-        available_days TEXT NOT NULL,
-        monday_timeslot TEXT NULL,
-        tuesday_timeslot TEXT NULL,
-        wednesday_timeslot TEXT NULL,
-        thursday_timeslot TEXT NULL,
-        friday_timeslot TEXT NULL,
-        saturday_timeslot TEXT NULL,
-        sunday_timeslot TEXT NULL,
-        parent_consent TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
-    ) $charset_collate;";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
-add_action('after_setup_theme', 'create_students_table');
-
-
-
-
 // Student Registration Form
 
 // shortcode [student_registration_form]

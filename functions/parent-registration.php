@@ -5,41 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
-
-// Parent Database Table
-
-function create_parents_table() {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'parents'; // Table name with prefix
-    $charset_collate = $wpdb->get_charset_collate();
-
-    $sql = "CREATE TABLE $table_name (
-        id BIGINT(20) UNSIGNED NOT NULL,
-        first_name VARCHAR(255) NOT NULL,
-        last_name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL,
-        phone VARCHAR(20) NOT NULL,
-        address TEXT NOT NULL,
-        city VARCHAR(100) NOT NULL,
-        zipcode VARCHAR(20) NOT NULL,
-        country VARCHAR(100) NOT NULL,
-        image VARCHAR(255) NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
-    ) $charset_collate;";
-    
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
-add_action('after_setup_theme', 'create_parents_table');
-
-
-
-
-
-
-
 // Parent Registration Form
 
 // shortcode [parent_registration_form]

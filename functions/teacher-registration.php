@@ -5,62 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
-
-// Teacher's Database Table
-
-function create_teachers_table() {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'teachers'; // Table name with prefix
-    $charset_collate = $wpdb->get_charset_collate();
-
-    $sql = "CREATE TABLE $table_name (
-        id BIGINT(20) UNSIGNED NOT NULL,
-        status ENUM('En cours', 'En révision', 'Rejeté', 'Approuvé') NOT NULL DEFAULT 'En cours',
-        first_name VARCHAR(255) NOT NULL,
-        last_name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL,
-        company_name VARCHAR(255) NULL,
-        country VARCHAR(255) NOT NULL,
-        address TEXT NOT NULL,
-        city VARCHAR(255) NOT NULL,
-        postal_code VARCHAR(50) NOT NULL,
-        phone VARCHAR(20) NOT NULL,
-        degree VARCHAR(255) NOT NULL,
-        institute VARCHAR(255) NOT NULL,
-        graduation_year YEAR NOT NULL,
-        subjects_of_interest TEXT NOT NULL,
-        motivation_of_joining TEXT NOT NULL,
-        available_days TEXT NOT NULL,
-        monday_timeslot TEXT NULL,
-        tuesday_timeslot TEXT NULL,
-        wednesday_timeslot TEXT NULL,
-        thursday_timeslot TEXT NULL,
-        friday_timeslot TEXT NULL,
-        saturday_timeslot TEXT NULL,
-        sunday_timeslot TEXT NULL,
-        upload_cv VARCHAR(255) NULL,
-        upload_doc1 VARCHAR(255) NULL,
-        upload_doc2 VARCHAR(255) NULL,
-        upload_doc3 VARCHAR(255) NULL,
-        upload_doc4 VARCHAR(255) NULL,
-        upload_doc5 VARCHAR(255) NULL,
-        upload_video VARCHAR(255) NULL,
-        signature TEXT NOT NULL,
-        signature_date DATE NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
-    ) $charset_collate;";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
-add_action('after_setup_theme', 'create_teachers_table');
-
-
-
-
-
 // Teacher Registration Form
 
 // shortcode [teacher_registration_form]
