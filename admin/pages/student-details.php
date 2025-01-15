@@ -24,10 +24,12 @@ if ($id > 0) {
 }
 
 global $wpdb;
-$table_name = $wpdb->prefix . 'students';
+$student_table = $wpdb->prefix . 'students';
+$payment_table = $wpdb->prefix . 'payments'; 
 
 // Fetch the details of the student using the ID
-$student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $id));
+$student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $id));
+$payments = $wpdb->get_results($wpdb->prepare("SELECT * FROM $payment_table WHERE user_id = %d", $id));
 
 if (!$student) {
     // Handle case when the student does not exist
@@ -115,20 +117,59 @@ if (!$student) {
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row list">
                 <div class="col">
-                    <div class="section user-payments">
-                        <h3 class="section-heading">Paiements</h3>
-                        <!-- <div class="payment-list">
-                            <div class="payment-item">
-                                <div class="payment-date">20/01/2022</div>
-                                <div class="payment-details">
-                                    <h4 class="payment-course">Mathématiques</h4>
-                                    <span class="payment-amount">20.00</span>
-                                    <span class="payment-status">Payé</span>
-                                </div>
-                            </div>
-                        </div> -->
+                    <!-- payments history -->
+                    <div class="user-payments">
+                        <h3 class="section-heading">Historique des paiements</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Commande</th>
+                                    <th>Crédit</th>
+                                    <th>Prix ​​total</th>
+                                    <th>Statut</th>
+                                    <th>Mode de paiement</th>
+                                    <th>Date</th>
+                                    <th>Invoice</th>
+                                </tr>
+                            </thead>
+                            <?php 
+                                    if ($payments) {
+                                        // Start the table body and prepare an array for rows
+                                        $rows = [];
+                                    
+                                        // Loop through the fetched payments and prepare the rows
+                                        foreach ($payments as $payment) {
+                                            $rows[] = sprintf(
+                                                '<tr>
+                                                    <td>%s</td>
+                                                    <td class="credit">%d</td>
+                                                    <td class="payment">
+                                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i> %s
+                                                    </td>
+                                                    <td>%s</td>
+                                                    <td>%s</td>
+                                                    <td>%s</td>
+                                                    <td><a href="%s" class="invoice"><i class="fas fa-receipt"></i></a></td>
+                                                </tr>',
+                                                esc_html($payment->invoice_number),
+                                                esc_html($payment->credit),
+                                                esc_html($payment->amount),
+                                                esc_html($payment->status),
+                                                esc_html($payment->payment_method),
+                                                esc_html(date('M d, Y', strtotime($payment->created_at))),
+                                                esc_url(home_url('/admin/student-management/student-invoice/?id=' . $payment->id))
+                                            );
+                                        }
+                                    
+                                        // Output all rows in one go
+                                        echo '<tbody id="list">' . implode('', $rows) . '</tbody>';
+                                    } else {
+                                        echo '<tr><td colspan="5" class="no-data">No payments found.</td></tr>';
+                                    }
+                                ?>
+                        </table>
                     </div>
                 </div>
             </div>

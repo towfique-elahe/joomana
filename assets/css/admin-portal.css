@@ -410,6 +410,25 @@
   font-size: var(--text-font-size);
   color: var(--text-color);
 }
+#adminStudentDetails .table {
+  width: 100%;
+}
+#adminStudentDetails .table th,
+#adminStudentDetails .table td {
+  padding: 1rem;
+}
+#adminStudentDetails .table th:first-of-type,
+#adminStudentDetails .table td:first-of-type {
+  text-align: left;
+}
+#adminStudentDetails .table th:last-of-type,
+#adminStudentDetails .table td:last-of-type {
+  width: 5rem;
+}
+#adminStudentDetails .table .credit,
+#adminStudentDetails .table .invoice {
+  color: var(--primary-color);
+}
 
 /* parent management */
 #adminParentManagement .list th:nth-child(1),

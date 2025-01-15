@@ -15,6 +15,7 @@ function create_custom_tables() {
     $parents_table = $wpdb->prefix . 'parents';
     $teachers_table = $wpdb->prefix . 'teachers';
     $payments_table = $wpdb->prefix . 'payments';
+    $teacher_payments_table = $wpdb->prefix . 'teacher_payments';
 
     // course categories table
     $course_categories_sql = "CREATE TABLE $course_categories_table (
@@ -166,13 +167,28 @@ function create_custom_tables() {
 
     // payments table
     $payments_sql = "CREATE TABLE $payments_table (
-        invoice_number VARCHAR(20) NOT NULL,
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        invoice_number VARCHAR(255) NOT NULL,
         user_id BIGINT(20) UNSIGNED NOT NULL,
         credit DECIMAL(10) NOT NULL,
+        currency VARCHAR(10) NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        payment_method VARCHAR(50) NOT NULL,
+        status ENUM('En attente', 'Complété', 'Échoué') NOT NULL DEFAULT 'En attente',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        FOREIGN KEY (user_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
+    ) $charset_collate;";
+
+    // teacher payments table
+    $teacher_payments_sql = "CREATE TABLE $teacher_payments_table (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        invoice_number VARCHAR(255) NOT NULL,
+        user_id BIGINT(20) UNSIGNED NOT NULL,
         amount DECIMAL(10,2) NOT NULL,
         status ENUM('En attente', 'Complété', 'Échoué') NOT NULL DEFAULT 'En attente',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (invoice_number),
+        PRIMARY KEY (id),
         FOREIGN KEY (user_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
     ) $charset_collate;";
 
@@ -187,5 +203,6 @@ function create_custom_tables() {
     dbDelta($parents_sql);
     dbDelta($teachers_sql);
     dbDelta($payments_sql);
+    dbDelta($teacher_payments_sql);
 }
 add_action('after_setup_theme', 'create_custom_tables');

@@ -2,8 +2,6 @@
 
 // function for custom routing
 
-
-
 // Admin Portal Routes
 
 function admin_portal_rewrite_rules() {
@@ -12,6 +10,7 @@ function admin_portal_rewrite_rules() {
     add_rewrite_rule('^admin/teacher-management/teacher-details/?$', 'index.php?admin_page=teacher-details', 'top');
     add_rewrite_rule('^admin/student-management/?$', 'index.php?admin_page=student-management', 'top');
     add_rewrite_rule('^admin/student-management/student-details/?$', 'index.php?admin_page=student-details', 'top');
+    add_rewrite_rule('^admin/student-management/student-invoice/?$', 'index.php?admin_page=student-invoice', 'top');
     add_rewrite_rule('^admin/parent-management/?$', 'index.php?admin_page=parent-management', 'top');
     add_rewrite_rule('^admin/parent-management/parent-details/?$', 'index.php?admin_page=parent-details', 'top');
     add_rewrite_rule('^admin/course-management/courses/?$', 'index.php?admin_page=course-management', 'top');
