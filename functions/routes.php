@@ -11,8 +11,11 @@ function admin_portal_rewrite_rules() {
     add_rewrite_rule('^admin/student-management/?$', 'index.php?admin_page=student-management', 'top');
     add_rewrite_rule('^admin/student-management/student-details/?$', 'index.php?admin_page=student-details', 'top');
     add_rewrite_rule('^admin/student-management/student-invoice/?$', 'index.php?admin_page=student-invoice', 'top');
+    add_rewrite_rule('^admin/student-management/student-invoice/pdf/?$', 'index.php?admin_page=student-invoice-pdf', 'top');
     add_rewrite_rule('^admin/parent-management/?$', 'index.php?admin_page=parent-management', 'top');
     add_rewrite_rule('^admin/parent-management/parent-details/?$', 'index.php?admin_page=parent-details', 'top');
+    add_rewrite_rule('^admin/parent-management/parent-invoice/?$', 'index.php?admin_page=parent-invoice', 'top');
+    add_rewrite_rule('^admin/parent-management/parent-invoice/pdf/?$', 'index.php?admin_page=parent-invoice-pdf', 'top');
     add_rewrite_rule('^admin/course-management/courses/?$', 'index.php?admin_page=course-management', 'top');
     add_rewrite_rule('^admin/course-management/courses/add-course/?$', 'index.php?admin_page=add-course', 'top');
     add_rewrite_rule('^admin/course-management/courses/edit-course/?$', 'index.php?admin_page=edit-course', 'top');
@@ -25,6 +28,10 @@ function admin_portal_rewrite_rules() {
     add_rewrite_rule('^admin/course-management/levels/?$', 'index.php?admin_page=course-levels', 'top');
     add_rewrite_rule('^admin/course-management/levels/edit-level/?$', 'index.php?admin_page=edit-course-level', 'top');
     add_rewrite_rule('^admin/payments/?$', 'index.php?admin_page=payments', 'top');
+    add_rewrite_rule('^admin/payments/parent-invoice/?$', 'index.php?admin_page=parent-invoice', 'top');
+    add_rewrite_rule('^admin/payments/parent-invoice/pdf/?$', 'index.php?admin_page=parent-invoice-pdf', 'top');
+    add_rewrite_rule('^admin/payments/student-invoice/?$', 'index.php?admin_page=student-invoice', 'top');
+    add_rewrite_rule('^admin/payments/student-invoice/pdf/?$', 'index.php?admin_page=student-invoice-pdf', 'top');
     add_rewrite_rule('^admin/teacher-payments/?$', 'index.php?admin_page=teacher-payments', 'top');
     add_rewrite_rule('^admin/settings/?$', 'index.php?admin_page=settings', 'top');
 }

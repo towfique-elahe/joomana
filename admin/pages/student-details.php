@@ -30,6 +30,12 @@ $payment_table = $wpdb->prefix . 'payments';
 // Fetch the details of the student using the ID
 $student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $id));
 $payments = $wpdb->get_results($wpdb->prepare("SELECT * FROM $payment_table WHERE user_id = %d", $id));
+$studentTotalPayment = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT SUM(amount) FROM $payment_table WHERE user_id = %d",
+        $id
+    )
+);
 
 if (!$student) {
     // Handle case when the student does not exist
@@ -67,33 +73,54 @@ if (!$student) {
                             alt="User Image" class="profile-image">
 
                         <h3 class="profile-name">
-                            <?php echo esc_html($student->first_name) . " " . esc_html($student->last_name); ?></h3>
-                        <p class="profile-username"><?php echo esc_html($wp_user->user_login); ?></p>
+                            <?php echo esc_html($student->first_name) . " " . esc_html($student->last_name); ?>
+                        </h3>
+                        <p class="profile-username">
+                            <?php echo esc_html($wp_user->user_login); ?>
+                        </p>
                     </div>
                     <div class="profile-details">
                         <div class="row detail-row">
                             <span class="col detail-label">Email:</span>
-                            <span class="col detail-value"><?php echo esc_html($wp_user->user_email); ?></span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($wp_user->user_email); ?>
+                            </span>
                         </div>
                         <div class="row detail-row">
                             <span class="col detail-label">Date de naissance:</span>
-                            <span class="col detail-value"><?php echo esc_html($student->date_of_birth); ?></span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($student->date_of_birth); ?>
+                            </span>
                         </div>
                         <div class="row detail-row">
                             <span class="col detail-label">Genre:</span>
-                            <span class="col detail-value"><?php echo esc_html($student->gender); ?></span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($student->gender); ?>
+                            </span>
                         </div>
                         <div class="row detail-row">
                             <span class="col detail-label">Grade:</span>
-                            <span class="col detail-value"><?php echo esc_html($student->grade); ?></span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($student->grade); ?>
+                            </span>
                         </div>
                         <div class="row detail-row">
                             <span class="col detail-label">Niveau:</span>
-                            <span class="col detail-value"><?php echo esc_html($student->level); ?></span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($student->level); ?>
+                            </span>
                         </div>
                         <div class="row detail-row">
                             <span class="col detail-label">Paiement total:</span>
-                            <span class="col detail-value">n/a</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($studentTotalPayment); ?>
+                            </span>
+                        </div>
+                        <div class="row detail-row">
+                            <span class="col detail-label">Crédit disponible:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($student->credit); ?>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -151,7 +178,12 @@ if (!$student) {
                                                     <td>%s</td>
                                                     <td>%s</td>
                                                     <td>%s</td>
-                                                    <td><a href="%s" class="invoice"><i class="fas fa-receipt"></i></a></td>
+                                                    <td>
+                                                        <div class="action-buttons">
+                                                            <a href="%s" target="_blank" class="invoice"><i class="fas fa-receipt"></i></a>
+                                                            <a href="%s" target="_blank" class="pdf"><i class="fas fa-file-pdf"></i></a>
+                                                        </div>
+                                                    </td>
                                                 </tr>',
                                                 esc_html($payment->invoice_number),
                                                 esc_html($payment->credit),
@@ -159,14 +191,15 @@ if (!$student) {
                                                 esc_html($payment->status),
                                                 esc_html($payment->payment_method),
                                                 esc_html(date('M d, Y', strtotime($payment->created_at))),
-                                                esc_url(home_url('/admin/student-management/student-invoice/?id=' . $payment->id))
+                                                esc_url(home_url('/admin/student-management/student-invoice/?id=' . $payment->id)),
+                                                esc_url(home_url('/admin/student-management/student-invoice/pdf/?id=' . $payment->id))
                                             );
                                         }
                                     
                                         // Output all rows in one go
                                         echo '<tbody id="list">' . implode('', $rows) . '</tbody>';
                                     } else {
-                                        echo '<tr><td colspan="5" class="no-data">No payments found.</td></tr>';
+                                        echo '<tr><td colspan="7" class="no-data">No payments found.</td></tr>';
                                     }
                                 ?>
                         </table>

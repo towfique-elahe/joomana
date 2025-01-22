@@ -46,9 +46,9 @@ function update_user_credits_on_order_complete($order_id) {
     // Get the user roles
     $role = $user->roles;
 
-    // Check if the role is 'student' or 'parent'
-    if (!in_array('student', $role)) {
-        error_log("User ID: $user_id has an unsupported role: $role");
+    // Check if the role is either 'student' or 'parent'
+    if (!in_array('student', $role) && !in_array('parent', $role)) {
+        error_log("User ID: $user_id has an unsupported role: " . implode(', ', $role));
         return;
     }
 

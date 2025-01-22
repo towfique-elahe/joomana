@@ -429,6 +429,18 @@
 #adminStudentDetails .table .invoice {
   color: var(--primary-color);
 }
+#adminStudentDetails .table .pdf {
+  color: crimson;
+}
+#adminStudentDetails .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+#adminStudentDetails .table .action-buttons a {
+  font-size: 1.2rem;
+}
 
 /* parent management */
 #adminParentManagement .list th:nth-child(1),
