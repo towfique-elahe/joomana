@@ -98,7 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                             ?>
                     <tr>
                         <td class="name">
-                            <a href="#">
+                            <a
+                                href="<?php echo esc_url(home_url('/admin/parent-management/parent-details/?id=' . $parent->id)); ?>">
                                 <?php echo esc_html($parent->first_name) . ' ' . esc_html($parent->last_name); ?>
                             </a>
                         </td>

@@ -126,7 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <tr data-grade="<?php echo strtolower($student->grade); ?>"
                         data-level="<?php echo strtolower($student->level); ?>">
                         <td class="name">
-                            <a href="<?php echo esc_url(get_author_posts_url($student->id)); ?>">
+                            <a
+                                href="<?php echo esc_url(home_url('/admin/student-management/student-details/?id=' . $student->id)); ?>">
                                 <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
                             </a>
                         </td>

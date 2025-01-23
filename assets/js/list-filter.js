@@ -1,12 +1,14 @@
-// Function to filter the list by name
+// Function to filter the list by name and invoice number
 function filterUser() {
     const input = document.querySelector('.search-bar input');
     const filter = input.value.toLowerCase();
     const rows = document.querySelectorAll('#list tr');
 
     rows.forEach(row => {
-        const name = row.querySelector('.name a').textContent.toLowerCase();
-        if (name.includes(filter)) {
+        const name = row.querySelector('.name a')?.textContent.toLowerCase() || '';
+        const invoiceNumber = row.querySelector('.invoice-number')?.textContent.toLowerCase() || '';
+
+        if (name.includes(filter) || invoiceNumber.includes(filter)) {
             row.style.display = '';
         } else {
             row.style.display = 'none';

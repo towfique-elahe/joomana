@@ -138,7 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <tr class="teacher-row"
                         data-status="<?php echo strtolower(str_replace(' ', '-', $teacher->status)); ?>">
                         <td class="name">
-                            <a href="#">
+                            <a
+                                href="<?php echo esc_url(home_url('/admin/teacher-management/teacher-details/?id=' . $teacher->id)); ?>">
                                 <?php echo esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name); ?>
                             </a>
                         </td>

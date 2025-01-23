@@ -736,3 +736,35 @@
   font-size: 0.85rem;
   cursor: pointer;
 }
+
+/* payments page */
+#adminPayments .filter-container {
+  flex-direction: row-reverse;
+}
+#adminPayments .list th:nth-child(1),
+#adminPayments .list td:nth-child(1) {
+  text-align: left;
+}
+#adminPayments .list th:nth-child(2),
+#adminPayments .list td:nth-child(2) {
+  text-align: left;
+}
+#adminPayments .table th:last-child,
+#adminPayments .table td:last-child {
+  width: 7rem;
+}
+#adminPayments .table .invoice {
+  color: var(--primary-color);
+}
+#adminPayments .table .pdf {
+  color: crimson;
+}
+#adminPayments .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+#adminPayments .table .action-buttons a {
+  font-size: 1.2rem;
+}

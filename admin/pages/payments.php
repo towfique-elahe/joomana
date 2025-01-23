@@ -42,7 +42,7 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}payments");
                 <div class="filter-bar">
                     <div class="search-bar">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" placeholder="Rechercher Un Parent" onkeyup="filterUser()">
+                        <input type="text" placeholder="Recherche De Paiement" onkeyup="filterUser()">
                     </div>
                 </div>
             </div>
@@ -54,8 +54,8 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}payments");
                         <th>Nom</th>
                         <th>Crédit</th>
                         <th>Montant</th>
-                        <th>Devise</th>
                         <th>Méthode</th>
+                        <th>Date</th>
                         <th>Invoice</th>
                     </tr>
                 </thead>
@@ -67,13 +67,30 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}payments");
                             $user_roles = $user->roles;
                     ?>
                     <tr>
-                        <td>
+                        <td class="invoice-number">
                             <?php echo esc_html($payment->invoice_number); ?>
                         </td>
                         <td class="name">
-                            <a href="#">
+                            <?php
+                                // Assuming $user_roles contains the roles of the current user
+                                if (in_array('parent', $user_roles)) {
+                                // If the user has the 'parent' role
+                            ?>
+                            <a
+                                href="<?php echo esc_url(home_url('/admin/parent-management/parent-details/?id=' . $user->id)); ?>">
                                 <?php echo esc_html($user->first_name) . ' ' . esc_html($user->last_name); ?>
                             </a>
+                            <?php
+                                } elseif (in_array('student', $user_roles)) {
+                                // If the user has the 'student' role
+                            ?>
+                            <a
+                                href="<?php echo esc_url(home_url('/admin/student-management/student-details/?id=' . $user->id)); ?>">
+                                <?php echo esc_html($user->first_name) . ' ' . esc_html($user->last_name); ?>
+                            </a>
+                            <?php
+                                }
+                            ?>
                         </td>
                         <td>
                             <?php echo esc_html($payment->credit); ?>
@@ -83,10 +100,10 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}payments");
                             <?php echo esc_html($payment->amount); ?>
                         </td>
                         <td>
-                            <?php echo esc_html($payment->currency); ?>
+                            <?php echo esc_html($payment->payment_method); ?>
                         </td>
                         <td>
-                            <?php echo esc_html($payment->payment_method); ?>
+                            <?php echo esc_html(date('M d, Y', strtotime($payment->created_at))); ?>
                         </td>
                         <td>
                             <?php
