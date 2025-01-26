@@ -33,6 +33,7 @@ function admin_portal_rewrite_rules() {
     add_rewrite_rule('^admin/payments/student-invoice/?$', 'index.php?admin_page=student-invoice', 'top');
     add_rewrite_rule('^admin/payments/student-invoice/pdf/?$', 'index.php?admin_page=student-invoice-pdf', 'top');
     add_rewrite_rule('^admin/teacher-payments/?$', 'index.php?admin_page=teacher-payments', 'top');
+    add_rewrite_rule('^admin/teacher-payments/make-payment/?$', 'index.php?admin_page=make-teacher-payment', 'top');
     add_rewrite_rule('^admin/settings/?$', 'index.php?admin_page=settings', 'top');
 }
 add_action('init', 'admin_portal_rewrite_rules');

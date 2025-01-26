@@ -443,35 +443,41 @@ if (!$teacher) {
                 </div>
 
                 <!-- bank details -->
+                <?php
+                    if (!empty($bankinfo)) {
+                 ?>
                 <div class="bank-details">
                     <h3 class="section-heading">Coordonnées Bancaires</h3>
                     <table class="table">
                         <tr>
-                            <td>Nom de la banque</td>
+                            <th>Nom de la banque</th>
                             <td><?= $bankinfo->bank_name ?></td>
                         </tr>
                         <tr>
-                            <td>Numéro de compte</td>
+                            <th>Numéro de compte</th>
                             <td><?= $bankinfo->account_number ?></td>
                         </tr>
                         <tr>
-                            <td>Titulaire du compte</ttdh>
+                            <th>Titulaire du compte</th>
                             <td><?= $bankinfo->account_holder ?></td>
                         </tr>
                         <tr>
-                            <td>Type de compte</th>
+                            <th>Type de compte</th>
                             <td><?= $bankinfo->account_type ?></td>
                         </tr>
                         <tr>
-                            <td>Code BIC/SWIFT</td>
+                            <th>Code BIC/SWIFT</th>
                             <td><?= $bankinfo->swift_code ?></td>
                         </tr>
                         <tr>
-                            <td>Adresse de la banque</td>
+                            <th>Adresse de la banque</th>
                             <td><?= $bankinfo->bank_address ?></td>
                         </tr>
                     </table>
                 </div>
+                <?php
+                   } 
+                 ?>
 
                 <!-- payments history -->
                 <div class="user-payments">

@@ -287,6 +287,22 @@
 #adminTeacherDetails .table .invoice {
   color: var(--accent-color);
 }
+#adminTeacherDetails .bank-details .table th,
+#adminTeacherDetails .bank-details .table td {
+  border-radius: 0;
+}
+#adminTeacherDetails .bank-details .table tr:first-of-type th {
+  border-top-left-radius: 0.5rem;
+}
+#adminTeacherDetails .bank-details .table tr:first-of-type td {
+  border-top-right-radius: 0.5rem;
+}
+#adminTeacherDetails .bank-details .table tr:last-of-type th {
+  border-bottom-left-radius: 0.5rem;
+}
+#adminTeacherDetails .bank-details .table tr:last-of-type td {
+  border-bottom-right-radius: 0.5rem;
+}
 
 /* student management */
 #adminStudentManagement .list th:nth-child(1),
