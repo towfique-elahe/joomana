@@ -14,6 +14,7 @@ function create_custom_tables() {
     $students_table = $wpdb->prefix . 'students';
     $parents_table = $wpdb->prefix . 'parents';
     $teachers_table = $wpdb->prefix . 'teachers';
+    $teacher_bank_details = $wpdb->prefix . 'teacher_bank_details ';
     $payments_table = $wpdb->prefix . 'payments';
     $teacher_payments_table = $wpdb->prefix . 'teacher_payments';
 
@@ -165,6 +166,22 @@ function create_custom_tables() {
         FOREIGN KEY (id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
     ) $charset_collate;";
 
+    // teacher_bank_details table
+    $teacher_bank_details_sql = "CREATE TABLE $teacher_bank_details (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        teacher_id BIGINT(20) UNSIGNED NOT NULL,
+        bank_name VARCHAR(255) NOT NULL,
+        account_number VARCHAR(50) NOT NULL,
+        account_holder VARCHAR(255) NOT NULL,
+        account_type VARCHAR(50) NOT NULL,
+        swift_code VARCHAR(50) NOT NULL,
+        bank_address TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
+    ) $charset_collate;";
+
     // payments table
     $payments_sql = "CREATE TABLE $payments_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -202,6 +219,7 @@ function create_custom_tables() {
     dbDelta($students_sql);
     dbDelta($parents_sql);
     dbDelta($teachers_sql);
+    dbDelta($teacher_bank_details_sql);
     dbDelta($payments_sql);
     dbDelta($teacher_payments_sql);
 }

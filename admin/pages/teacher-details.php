@@ -27,10 +27,12 @@ if ($id > 0) {
 }
 
 global $wpdb;
-$table_name = $wpdb->prefix . 'teachers';
+$teacher_table = $wpdb->prefix . 'teachers';
+$teacher_bankinfo_table = $wpdb->prefix . 'teacher_bank_details ';
 
 // Fetch the details of the teacher using the ID
-$teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $id));
+$teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $id));
+$bankinfo = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_bankinfo_table WHERE teacher_id = %d", $id));
 
 if (!$teacher) {
     // Handle case when the teacher does not exist
@@ -50,7 +52,7 @@ if (!$teacher) {
 
                 // Update the topic in the database
                 $updated = $wpdb->update(
-                    $table_name,
+                    $teacher_table,
                     $data, // Column => Value
                     array('id' => $id), // Where condition
                     array('%s'), // Data type for each value (status)
@@ -437,6 +439,37 @@ if (!$teacher) {
                                 </td>
                             </tr>
                         </tbody>
+                    </table>
+                </div>
+
+                <!-- bank details -->
+                <div class="bank-details">
+                    <h3 class="section-heading">Coordonnées Bancaires</h3>
+                    <table class="table">
+                        <tr>
+                            <td>Nom de la banque</td>
+                            <td><?= $bankinfo->bank_name ?></td>
+                        </tr>
+                        <tr>
+                            <td>Numéro de compte</td>
+                            <td><?= $bankinfo->account_number ?></td>
+                        </tr>
+                        <tr>
+                            <td>Titulaire du compte</ttdh>
+                            <td><?= $bankinfo->account_holder ?></td>
+                        </tr>
+                        <tr>
+                            <td>Type de compte</th>
+                            <td><?= $bankinfo->account_type ?></td>
+                        </tr>
+                        <tr>
+                            <td>Code BIC/SWIFT</td>
+                            <td><?= $bankinfo->swift_code ?></td>
+                        </tr>
+                        <tr>
+                            <td>Adresse de la banque</td>
+                            <td><?= $bankinfo->bank_address ?></td>
+                        </tr>
                     </table>
                 </div>
 
