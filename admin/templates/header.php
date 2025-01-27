@@ -67,7 +67,7 @@
                     ?>
                 </div>
                 <a href="<?php echo home_url('/admin/settings/'); ?>" class="user-image">
-                    <img src="<?php echo get_template_directory_uri() . '/assets/image/user.png'; ?>" alt="">
+                    <img src="<?php echo get_template_directory_uri() . '/assets/image/admin.png'; ?>" alt="">
                 </a>
             </div>
         </header>

@@ -303,6 +303,25 @@
 #adminTeacherDetails .bank-details .table tr:last-of-type td {
   border-bottom-right-radius: 0.5rem;
 }
+#adminTeacherDetails .user-payments .table th:last-child,
+#adminTeacherDetails .user-payments .table td:last-child {
+  width: 7rem;
+}
+#adminTeacherDetails .user-payments .table .invoice {
+  color: var(--primary-color);
+}
+#adminTeacherDetails .user-payments .table .pdf {
+  color: crimson;
+}
+#adminTeacherDetails .user-payments .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+#adminTeacherDetails .user-payments .table .action-buttons a {
+  font-size: 1.2rem;
+}
 
 /* student management */
 #adminStudentManagement .list th:nth-child(1),
@@ -783,4 +802,62 @@
 }
 #adminPayments .table .action-buttons a {
   font-size: 1.2rem;
+}
+
+/* teacher payments page */
+#adminTeacherPayment .table th,
+#adminTeacherPayment .table td {
+  padding: 1rem;
+}
+#adminTeacherPayment .table th:first-of-type,
+#adminTeacherPayment .table td:first-of-type {
+  text-align: left;
+}
+#adminTeacherPayment .table th:last-of-type,
+#adminTeacherPayment .table td:last-of-type {
+  width: 5rem;
+}
+#adminTeacherPayment .table .invoice {
+  color: var(--primary-color);
+}
+#adminTeacherPayment .table .pdf {
+  color: crimson;
+}
+#adminTeacherPayment .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+#adminTeacherPayment .table .action-buttons a {
+  font-size: 1.2rem;
+}
+
+/* make teacher payment page */
+#adminMakeTeacherPayment .bank-details .table {
+  width: 100%;
+}
+#adminMakeTeacherPayment .table th {
+  text-align: left;
+  width: 20rem;
+  border-radius: 0;
+}
+#adminMakeTeacherPayment .table tr:first-of-type th {
+  border-top-left-radius: 0.5rem;
+}
+#adminMakeTeacherPayment .table tr:last-of-type th {
+  border-bottom-left-radius: 0.5rem;
+}
+#adminMakeTeacherPayment .table td {
+  text-align: left;
+  padding-left: 2rem;
+}
+#adminMakeTeacherPayment .table tr:first-of-type td {
+  border-top-right-radius: 0.5rem;
+}
+#adminMakeTeacherPayment .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
 }

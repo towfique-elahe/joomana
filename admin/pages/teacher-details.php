@@ -29,10 +29,17 @@ if ($id > 0) {
 global $wpdb;
 $teacher_table = $wpdb->prefix . 'teachers';
 $teacher_bankinfo_table = $wpdb->prefix . 'teacher_bank_details ';
+$teacher_payments_table = $wpdb->prefix . 'teacher_payments ';
 
 // Fetch the details of the teacher using the ID
 $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $id));
 $bankinfo = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_bankinfo_table WHERE teacher_id = %d", $id));
+$payments = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT * FROM $teacher_payments_table WHERE user_id = %d",
+        $id
+    )
+);
 
 if (!$teacher) {
     // Handle case when the teacher does not exist
@@ -485,83 +492,53 @@ if (!$teacher) {
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Commande</th>
-                                <th>Date</th>
+                                <th>Numéro de facture</th>
                                 <th>Montant</th>
-                                <th>Mode de paiement</th>
+                                <th>Exigible</th>
+                                <th>Méthode</th>
+                                <th>Date</th>
                                 <th>Invoice</th>
-                                <th>Détails</th>
                             </tr>
                         </thead>
                         <tbody id="list">
+                            <?php if (!empty($payments)) : ?>
+                            <?php 
+                        foreach ($payments as $payment) : 
+                            $user = get_user_by('id', $payment->user_id);
+                    ?>
                             <tr>
-                                <td>#1001</td>
-                                <td>Sep 29, 2024</td>
+                                <td class="invoice-number">
+                                    <?php echo esc_html($payment->invoice_number); ?>
+                                </td>
                                 <td class="payment">
                                     <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                                    5.00
+                                    <?php echo esc_html($payment->deposit); ?>
                                 </td>
-                                <td>PAYPAL</td>
-                                <td>
-                                    <a href="#" class="invoice"><i class="fas fa-receipt"></i></a>
-                                </td>
-                                <td class="action-buttons">
-                                    <a href="#" class="action-button edit">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#1002</td>
-                                <td>Dec 3, 2024</td>
                                 <td class="payment">
                                     <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                                    10.00
+                                    <?php echo esc_html($payment->due); ?>
                                 </td>
-                                <td>BANK TRANSFER</td>
                                 <td>
-                                    <a href="#" class="invoice"><i class="fas fa-receipt"></i></a>
+                                    <?php echo esc_html($payment->payment_method); ?>
                                 </td>
-                                <td class="action-buttons">
-                                    <a href="#" class="action-button edit">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
+                                <td>
+                                    <?php echo esc_html(date('M d, Y', strtotime($payment->created_at))); ?>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="<?php echo esc_url(home_url('/admin/teacher-payments/invoice/?id=' . $payment->id)); ?>"
+                                            target="_blank" class="invoice"><i class="fas fa-receipt"></i></a>
+                                        <a href="<?php echo esc_url(home_url('/admin/teacher-payments/invoice/pdf/?id=' . $payment->id)); ?>"
+                                            target="_blank" class="pdf"><i class="fas fa-file-pdf"></i></a>
+                                    </div>
                                 </td>
                             </tr>
+                            <?php endforeach; ?>
+                            <?php else : ?>
                             <tr>
-                                <td>#1003</td>
-                                <td>Jan 01, 2025</td>
-                                <td class="payment">
-                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                                    5.00
-                                </td>
-                                <td>STRIPE</td>
-                                <td>
-                                    <a href="#" class="invoice"><i class="fas fa-receipt"></i></a>
-                                </td>
-                                <td class="action-buttons">
-                                    <a href="#" class="action-button edit">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                </td>
+                                <td colspan="7">Aucun paiement trouvé.</td>
                             </tr>
-                            <tr>
-                                <td>#1004</td>
-                                <td>Jan 10, 2025</td>
-                                <td class="payment">
-                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                                    10.00
-                                </td>
-                                <td>MASTER CARD</td>
-                                <td>
-                                    <a href="#" class="invoice"><i class="fas fa-receipt"></i></a>
-                                </td>
-                                <td class="action-buttons">
-                                    <a href="#" class="action-button edit">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                </td>
-                            </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>

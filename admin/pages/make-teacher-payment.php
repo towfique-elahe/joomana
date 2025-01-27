@@ -121,7 +121,7 @@ ob_end_clean();
                     if ($teachers) {
                         echo '<form method="post">';
                         echo '<select id="teacher-select" name="teacher-select" class="form-control" onchange="this.form.submit()">';
-                        echo '<option value="" disabled>Choisir un enseignant</option>'; // Default placeholder option
+                        echo '<option value="" disabled selected>Choisir un enseignant</option>'; // Default placeholder option
 
                         foreach ($teachers as $teacher_option) {
                             $teacher_name = esc_html($teacher_option->first_name . ' ' . $teacher_option->last_name);
@@ -215,7 +215,7 @@ ob_end_clean();
                             <tr>
                                 <th>Dépôt</th>
                                 <td>
-                                    <input type="number" name="deposit" id="" min="" max="">
+                                    <input type="number" name="deposit" id="deposit" min="5" max="" required>
                                 </td>
                             </tr>
                             <tr>
@@ -230,7 +230,9 @@ ob_end_clean();
                         <input type="hidden" name="currency" value="EUR">
                         <input type="hidden" name="payment_method" value="BANK">
                         <input type="hidden" name="status" value="Complété">
-                        <button type="submit" class="button" name="make_payment">Effectuer le dépôt</button>
+                        <div class="action-buttons">
+                            <button type="submit" class="submit-button" name="make_payment">Effectuer le dépôt</button>
+                        </div>
                     </form>
                 </div>
 

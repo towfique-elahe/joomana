@@ -108,9 +108,9 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments");
                                 // If the user has the 'teacher' role
                             ?>
                             <div class="action-buttons">
-                                <a href="<?php echo esc_url(home_url('/admin/payments/teacher-invoice/?id=' . $payment->id)); ?>"
+                                <a href="<?php echo esc_url(home_url('/admin/teacher-payments/invoice/?id=' . $payment->id)); ?>"
                                     target="_blank" class="invoice"><i class="fas fa-receipt"></i></a>
-                                <a href="<?php echo esc_url(home_url('/admin/payments/teacher-invoice/pdf/?id=' . $payment->id)); ?>"
+                                <a href="<?php echo esc_url(home_url('/admin/teacher-payments/invoice/pdf/?id=' . $payment->id)); ?>"
                                     target="_blank" class="pdf"><i class="fas fa-file-pdf"></i></a>
                             </div>
                             <?php
