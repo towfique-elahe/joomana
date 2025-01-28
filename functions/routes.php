@@ -163,6 +163,8 @@ function student_portal_rewrite_rules() {
     add_rewrite_rule('^student/progress/?$', 'index.php?student_page=progress', 'top');
     add_rewrite_rule('^student/credit-management/?$', 'index.php?student_page=credit-management', 'top');
     add_rewrite_rule('^student/payments/?$', 'index.php?student_page=payments', 'top');
+    add_rewrite_rule('^student/payments/invoice/?$', 'index.php?student_page=invoice', 'top');
+    add_rewrite_rule('^student/payments/invoice/pdf/?$', 'index.php?student_page=invoice-pdf', 'top');
     add_rewrite_rule('^student/settings/?$', 'index.php?student_page=settings', 'top');
 }
 add_action('init', 'student_portal_rewrite_rules');

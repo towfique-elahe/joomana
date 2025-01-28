@@ -1,0 +1,31 @@
+/* payments page */
+#studentPayments .filter-container {
+  flex-direction: row-reverse;
+}
+#studentPayments .list th:nth-child(1),
+#studentPayments .list td:nth-child(1) {
+  text-align: left;
+}
+#studentPayments .list th:nth-child(2),
+#studentPayments .list td:nth-child(2) {
+  text-align: left;
+}
+#studentPayments .table th:last-child,
+#studentPayments .table td:last-child {
+  width: 7rem;
+}
+#studentPayments .table .invoice {
+  color: var(--primary-color);
+}
+#studentPayments .table .pdf {
+  color: crimson;
+}
+#studentPayments .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+#studentPayments .table .action-buttons a {
+  font-size: 1.2rem;
+}
