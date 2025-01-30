@@ -197,3 +197,45 @@ function restrict_student_pages() {
     }
 }
 add_action('template_redirect', 'restrict_student_pages');
+
+
+
+// Course Portal Routes
+
+function course_portal_rewrite_rules() {
+    add_rewrite_rule('^course/details/?$', 'index.php?course_page=details', 'top');
+    add_rewrite_rule('^course/resources/?$', 'index.php?course_page=resources', 'top');
+    add_rewrite_rule('^course/submissions/?$', 'index.php?course_page=submissions', 'top');
+    add_rewrite_rule('^course/communication/?$', 'index.php?course_page=communication', 'top');
+    add_rewrite_rule('^course/teacher-evaluation/?$', 'index.php?course_page=teacher-evaluation', 'top');
+}
+add_action('init', 'course_portal_rewrite_rules');
+
+// Add 'course_page' to query vars
+function course_portal_query_vars($vars) {
+    $vars[] = 'course_page';
+    return $vars;
+}
+add_filter('query_vars', 'course_portal_query_vars');
+
+// Load custom course portal templates
+function load_course_portal_templates($template) {
+    $course_page = get_query_var('course_page');
+    if ($course_page) {
+        $path = get_template_directory() . "/course/pages/{$course_page}.php";
+        if (file_exists($path)) {
+            return $path;
+        }
+    }
+    return $template;
+}
+add_filter('template_include', 'load_course_portal_templates');
+
+// Restrict course portal pages (optional, if you want to limit access)
+function restrict_course_pages() {
+    if (get_query_var('course_page') && !current_user_can('student') && !current_user_can('teacher')) {
+        wp_redirect(wp_login_url());
+        exit;
+    }
+}
+add_action('template_redirect', 'restrict_course_pages');

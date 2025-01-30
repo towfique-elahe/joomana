@@ -13,6 +13,9 @@ function set_order_to_completed_and_log_payment($order_id) {
     // Define the payments table name
     $payments_table = $wpdb->prefix . 'payments';
 
+    // Define the credits table name
+    $credits_table = $wpdb->prefix . 'credits';
+
     // Get the order object
     $order = wc_get_order($order_id);
 
@@ -70,6 +73,25 @@ function set_order_to_completed_and_log_payment($order_id) {
             '%f', // amount
             '%s', // payment_method
             '%s', // status
+            '%s', // created_at
+        ]
+    );
+
+    // Insert data into the credits table
+    $wpdb->insert(
+        $credits_table,
+        [
+            'user_id' => $user_id,
+            'credit' => $total_credit, // Total credit from all products in the order
+            'transaction_type' => 'Crédité', // Set transaction_type to 'Crédité'
+            'transaction_reason' => 'Crédit acheté', // Set transaction_reason to 'Crédité'
+            'created_at' => current_time('mysql'), // Current timestamp
+        ],
+        [
+            '%d', // user_id
+            '%f', // credit
+            '%s', // transaction_type
+            '%s', // transaction_reason
             '%s', // created_at
         ]
     );

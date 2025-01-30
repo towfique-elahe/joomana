@@ -1,13 +1,17 @@
+/* credit management page */
+#studentCredit .table {
+  width: 100%;
+}
+#studentCredit .table .credit {
+  color: var(--accent-color);
+}
+
 /* payments page */
 #studentPayments .filter-container {
   flex-direction: row-reverse;
 }
 #studentPayments .list th:nth-child(1),
 #studentPayments .list td:nth-child(1) {
-  text-align: left;
-}
-#studentPayments .list th:nth-child(2),
-#studentPayments .list td:nth-child(2) {
   text-align: left;
 }
 #studentPayments .table th:last-child,
