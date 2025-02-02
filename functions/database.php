@@ -11,6 +11,8 @@ function create_custom_tables() {
     $course_grades_table = $wpdb->prefix . 'course_grades';
     $course_levels_table = $wpdb->prefix . 'course_levels';
     $courses_table = $wpdb->prefix . 'courses';
+    $student_courses_table = $wpdb->prefix . 'student_courses';
+    $teacher_courses_table = $wpdb->prefix . 'teacher_courses';
     $students_table = $wpdb->prefix . 'students';
     $parents_table = $wpdb->prefix . 'parents';
     $teachers_table = $wpdb->prefix . 'teachers';
@@ -79,6 +81,30 @@ function create_custom_tables() {
         required_credit DECIMAL(10) NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    // student courses table
+    $student_courses_sql = "CREATE TABLE $student_courses_table (
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    student_id BIGINT(20) UNSIGNED NOT NULL,
+    course_id BIGINT(20) UNSIGNED NOT NULL,
+    teacher_id BIGINT(20) UNSIGNED NOT NULL,
+    enrollment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (student_id) REFERENCES {$wpdb->prefix}students(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE,
+    FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE
+    ) $charset_collate;";
+
+    // teacher courses table
+    $teacher_courses_sql = "CREATE TABLE $teacher_courses_table (
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    teacher_id BIGINT(20) UNSIGNED NOT NULL,
+    course_id BIGINT(20) UNSIGNED NOT NULL,
+    assigned_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE
     ) $charset_collate;";
 
     // students table
@@ -234,6 +260,8 @@ function create_custom_tables() {
     dbDelta($course_grades_sql);
     dbDelta($course_levels_sql);
     dbDelta($courses_sql);
+    dbDelta($student_courses_sql);
+    dbDelta($teacher_courses_sql);
     dbDelta($students_sql);
     dbDelta($parents_sql);
     dbDelta($teachers_sql);

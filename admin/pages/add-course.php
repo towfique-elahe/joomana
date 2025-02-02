@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
     $max_student_groups = intval($_POST['max_student_groups']);
     $max_teachers = intval($_POST['max_teachers']);
     $duration = intval($_POST['duration']);
+    $required_credit = intval($_POST['required_credit']);
     $start_date = sanitize_text_field($_POST['start_date']);
     $time_slot = sanitize_text_field($_POST['time_slot']);
     $assigned_teachers = isset($_POST['assigned_teachers']) ? json_encode($_POST['assigned_teachers']) : '';
@@ -94,19 +95,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
                 'max_student_groups'   => $max_student_groups,
                 'max_teachers'         => $max_teachers,
                 'duration'             => $duration,
+                'required_credit'      => $required_credit,
                 'start_date'           => $start_date,
                 'time_slot'            => $time_slot,
                 'assigned_teachers'    => $assigned_teachers,
                 'image'                => $uploaded_image_path,
             ],
             [
-                '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s',
+                '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s',
             ]
         );
-
+    
         if ($inserted === false) {
             $error_message = 'Erreur: ' . esc_html($wpdb->last_error);
         } else {
+            $course_id = $wpdb->insert_id; // Get the ID of the newly inserted course
+    
+            // Assign teachers to the course
+            if (!empty($assigned_teachers)) {
+                $assigned_teachers = json_decode($assigned_teachers, true); // Decode the JSON array
+                foreach ($assigned_teachers as $teacher_id) {
+                    $wpdb->insert(
+                        $wpdb->prefix . 'teacher_courses',
+                        [
+                            'teacher_id' => $teacher_id,
+                            'course_id'  => $course_id,
+                        ],
+                        [
+                            '%d', '%d',
+                        ]
+                    );
+                }
+            }
+    
             $success_message = 'Le cours a été ajouté avec succès.';
             wp_redirect(home_url('/admin/course-management/courses/'));
             exit;
@@ -306,27 +327,38 @@ ob_end_clean();
 
                     <div class="row">
                         <div class="col">
-                            <label for="max_students_per_group">Nombre maximal d'étudiants/groupe</label>
+                            <label for="max_students_per_group">Nombre maximal d'étudiants/groupe <span
+                                    class="required">*</span></label>
                             <input type="number" id="max_students_per_group" name="max_students_per_group" min="1"
-                                placeholder="6">
+                                placeholder="6" required>
                         </div>
 
                         <div class="col">
-                            <label for="max_student_groups">Nombre maximal de groupes d'étudiants</label>
+                            <label for="max_student_groups">Nombre maximal de groupes d'étudiants <span
+                                    class="required">*</span></label>
                             <input type="number" id="max_student_groups" name="max_student_groups" min="1"
-                                placeholder="25">
+                                placeholder="25" required>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col">
-                            <label for="max_teachers">Max enseignants</label>
-                            <input type="number" id="max_teachers" name="max_teachers" min="1" placeholder="25">
+                            <label for="max_teachers">Max enseignants <span class="required">*</span></label>
+                            <input type="number" id="max_teachers" name="max_teachers" min="1" placeholder="25"
+                                required>
                         </div>
 
                         <div class="col">
-                            <label for="duration">Durée (en heure)</label>
-                            <input type="number" id="duration" name="duration" min="1" placeholder="2">
+                            <label for="duration">Durée (en heure) <span class="required">*</span></label>
+                            <input type="number" id="duration" name="duration" min="1" placeholder="2" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="required_credit">Crédit <span class="required">*</span></label>
+                            <input type="number" id="required_credit" name="required_credit" min="1" placeholder="2"
+                                required>
                         </div>
                     </div>
 
