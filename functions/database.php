@@ -85,26 +85,28 @@ function create_custom_tables() {
 
     // student courses table
     $student_courses_sql = "CREATE TABLE $student_courses_table (
-    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    student_id BIGINT(20) UNSIGNED NOT NULL,
-    course_id BIGINT(20) UNSIGNED NOT NULL,
-    teacher_id BIGINT(20) UNSIGNED NOT NULL,
-    enrollment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    FOREIGN KEY (student_id) REFERENCES {$wpdb->prefix}students(id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE,
-    FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        student_id BIGINT(20) UNSIGNED NOT NULL,
+        course_id BIGINT(20) UNSIGNED NOT NULL,
+        teacher_id BIGINT(20) UNSIGNED NOT NULL,
+        status ENUM('En cours', 'Complété') NOT NULL DEFAULT 'En cours',
+        enrollment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        FOREIGN KEY (student_id) REFERENCES {$wpdb->prefix}students(id) ON DELETE CASCADE,
+        FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE,
+        FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE
     ) $charset_collate;";
 
     // teacher courses table
     $teacher_courses_sql = "CREATE TABLE $teacher_courses_table (
-    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-    teacher_id BIGINT(20) UNSIGNED NOT NULL,
-    course_id BIGINT(20) UNSIGNED NOT NULL,
-    assigned_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        teacher_id BIGINT(20) UNSIGNED NOT NULL,
+        course_id BIGINT(20) UNSIGNED NOT NULL,
+        status ENUM('En cours', 'Complété') NOT NULL DEFAULT 'En cours',
+        assigned_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE,
+        FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE
     ) $charset_collate;";
 
     // students table

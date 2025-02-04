@@ -78,3 +78,29 @@ function role_based_redirect($redirect_to, $request, $user) {
     return home_url('/login/');
 }
 add_filter('login_redirect', 'role_based_redirect', 10, 3);
+
+
+
+
+
+// Redirect logged in users based on their roles
+
+add_action('template_redirect', function () {
+    if (is_page('login') && is_user_logged_in()) {
+        $user = wp_get_current_user();
+        if (in_array('administrator', $user->roles)) {
+            wp_redirect(home_url('/wp-admin/'));
+        } elseif (in_array('admin', $user->roles)) {
+            wp_redirect(home_url('/admin/dashboard/'));
+        } elseif (in_array('teacher', $user->roles)) {
+            wp_redirect(home_url('/teacher/dashboard/'));
+        } elseif (in_array('parent', $user->roles)) {
+            wp_redirect(home_url('/parent/dashboard/'));
+        } elseif (in_array('student', $user->roles)) {
+            wp_redirect(home_url('/student/dashboard/'));
+        } else {
+            wp_redirect(home_url());
+        }
+        exit;
+    }
+});

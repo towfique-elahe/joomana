@@ -26,6 +26,7 @@
 <script src="<?php echo get_template_directory_uri() . '/assets/js/list-filter.js'; ?>"></script>
 <script src="<?php echo get_template_directory_uri() . '/assets/js/modal.js'; ?>"></script>
 <script src="<?php echo get_template_directory_uri() . '/assets/js/custom-calender.js'; ?>"></script>
+<script src="<?php echo get_template_directory_uri() . '/assets/js/tab.js'; ?>"></script>
 
 </body>
 

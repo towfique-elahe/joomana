@@ -30,7 +30,7 @@ function course_categories_section() {
             <h4><?php echo esc_html($category->category); ?></h4>
             <p class="course-count"><?php echo esc_html($course_count); ?> Cours</p>
             <a class="course-button"
-                href="<?php echo site_url('/available-courses/?category=' . urlencode($category->category)); ?>">Voir
+                href="<?php echo site_url('/topics/?category=' . urlencode($category->category)); ?>">Voir
                 les cours</a>
         </div>
         <?php endforeach; ?>
@@ -57,7 +57,14 @@ add_shortcode('course_categories', 'course_categories_section');
 // shortcode [course_filter_page]
 
 function course_filter_page_shortcode() {
-ob_start();
+    session_start();
+
+    if (isset($_GET['category'])) {
+        $_SESSION['category'] = urldecode($_GET['category']);
+    }
+
+    $selected_category = isset($_SESSION['category']) ? $_SESSION['category'] : '';
+    ob_start();
 ?>
 <!-- Filter Section -->
 <div class="course-category-filtering row">
@@ -75,7 +82,8 @@ ob_start();
                     // Check if categories are available
                     if ($categories) {
                         foreach ($categories as $category) {
-                            echo '<label><input type="checkbox" class="filter" data-filter="category" value="' . esc_attr($category->category) . '">' . esc_html($category->category) . '</label>';
+                            $is_checked = ($selected_category === $category->category) ? 'checked' : '';
+                            echo '<label><input type="checkbox" class="filter" data-filter="category" value="' . esc_attr($category->category) . '" ' . $is_checked . '>' . esc_html($category->category) . '</label>';
                         }
                     } else {
                         echo '<option disabled>No categories found</option>';
@@ -171,37 +179,42 @@ document.addEventListener("DOMContentLoaded", function() {
     const filters = document.querySelectorAll(".filter");
     const cards = document.querySelectorAll(".course-card");
 
-    filters.forEach(filter => {
-        filter.addEventListener("change", () => {
-            const activeFilters = {};
-            filters.forEach(f => {
-                if (f.checked) {
-                    const filterType = f.dataset.filter;
-                    if (!activeFilters[filterType]) {
-                        activeFilters[filterType] = [];
-                    }
-                    activeFilters[filterType].push(f.value);
+    // Function to apply filters
+    function applyFilters() {
+        const activeFilters = {};
+        filters.forEach(f => {
+            if (f.checked) {
+                const filterType = f.dataset.filter;
+                if (!activeFilters[filterType]) {
+                    activeFilters[filterType] = [];
                 }
-            });
-
-            cards.forEach(card => {
-                let visible = true;
-                for (let type in activeFilters) {
-                    // Split card's data attribute values into an array (handles multiple values)
-                    const cardValues = card.dataset[type] ? card.dataset[type].split(
-                        ",") : [];
-
-                    // Check if any active filter matches the card's values
-                    if (!activeFilters[type].some(filterValue => cardValues.includes(
-                            filterValue))) {
-                        visible = false;
-                        break;
-                    }
-                }
-                card.style.display = visible ? "block" : "none";
-            });
+                activeFilters[filterType].push(f.value);
+            }
         });
+
+        cards.forEach(card => {
+            let visible = true;
+            for (let type in activeFilters) {
+                // Split card's data attribute values into an array (handles multiple values)
+                const cardValues = card.dataset[type] ? card.dataset[type].split(",") : [];
+
+                // Check if any active filter matches the card's values
+                if (!activeFilters[type].some(filterValue => cardValues.includes(filterValue))) {
+                    visible = false;
+                    break;
+                }
+            }
+            card.style.display = visible ? "block" : "none";
+        });
+    }
+
+    // Attach event listeners to filters
+    filters.forEach(filter => {
+        filter.addEventListener("change", applyFilters);
     });
+
+    // Trigger filtering on page load if a category is preselected
+    applyFilters();
 });
 </script>
 
