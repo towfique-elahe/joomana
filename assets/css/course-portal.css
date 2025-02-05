@@ -1,0 +1,101 @@
+/* course details page */
+#courseDetails .course-details {
+  align-items: flex-start;
+}
+#courseDetails .course-info {
+  flex: 2;
+  background-color: #fff;
+  border: var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem 2rem 1.5rem;
+}
+#courseDetails .course-title {
+  font-size: 1.5rem;
+  font-family: var(--accent-font-family);
+  font-weight: var(--secondary-font-weight);
+  color: var(--dark-text-color);
+}
+#courseDetails .schedule-title,
+#courseDetails .teacher-title,
+#courseDetails .meeting-title,
+#courseDetails .list-title {
+  width: 100%;
+  font-size: 1.2rem;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  color: var(--dark-text-color);
+  border-bottom: var(--border);
+  margin-top: 1rem;
+  padding-bottom: 0.5rem;
+}
+#courseDetails .class-schedule ul {
+  list-style: none;
+}
+#courseDetails .class-schedule li,
+#courseDetails .teacher-name,
+#courseDetails .student-name {
+  font-size: var(--accent-font-size);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  color: var(--dark-text-color);
+}
+#courseDetails .class-schedule .value,
+#courseDetails .teacher-data,
+#courseDetails .student-data {
+  font-size: var(--text-font-size);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  color: var(--text-color);
+}
+#courseDetails .teacher-image {
+  width: 10rem;
+  height: 10rem;
+  object-fit: cover;
+  border: var(--border);
+  border-radius: 0.5rem;
+}
+#courseDetails .meeting-details {
+  align-items: flex-start;
+}
+#courseDetails .meeting-details .button {
+  text-decoration: none;
+  font-size: var(--accent-font-size);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 1rem 2rem;
+  border-radius: 0.3rem;
+  transition: ease 0.3s;
+}
+#courseDetails .meeting-details .button:hover {
+  opacity: 0.8;
+}
+#courseDetails .student-list {
+  flex: 1;
+  background-color: #fff;
+  border: var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem 2rem 1.5rem;
+}
+#courseDetails .student-list .list {
+  list-style: none;
+}
+#courseDetails .list-title {
+  margin: 0;
+}
+#courseDetails .list-item {
+  border-bottom: var(--border);
+  padding-bottom: 0.7rem;
+}
+#courseDetails .list-item:last-of-type {
+  border: none;
+  padding: none;
+}
+#courseDetails .student-list .student-image {
+  width: 4rem;
+  height: 4rem;
+  object-fit: cover;
+  border: var(--border);
+  border-radius: 0.3rem;
+}

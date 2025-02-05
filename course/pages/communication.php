@@ -14,7 +14,7 @@ require_once(get_template_directory() . '/course/templates/header.php');
     <div class="sidebar-container">
         <?php require_once(get_template_directory() . '/course/templates/sidebar.php'); ?>
     </div>
-    <div id="courseDetails" class="main-content">
+    <div id="courseCommunication" class="main-content">
         <div class="content-header">
             <h2 class="content-title">Communication</h2>
             <div class="content-breadcrumb">
@@ -46,6 +46,10 @@ require_once(get_template_directory() . '/course/templates/header.php');
                 </span>
                 <span class="active">Communication</span>
             </div>
+        </div>
+
+        <div class="content-section">
+
         </div>
 
     </div>
