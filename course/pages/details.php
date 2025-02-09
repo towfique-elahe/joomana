@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 $user = wp_get_current_user();
 $default_user_image = esc_url(get_stylesheet_directory_uri() . '/assets/image/user.png');
 
-// Fetch course details
+// Get course_id from session
 if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
 
     // Check the user's role and redirect accordingly
@@ -33,8 +33,8 @@ if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
         exit;
     }
 }
-
 $course_id = intval($_GET['course_id']);
+
 global $wpdb;
 $courses_table = $wpdb->prefix . 'courses';
 $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $courses_table WHERE id = %d", $course_id));

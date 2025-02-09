@@ -66,13 +66,6 @@ document.addEventListener("DOMContentLoaded", function () {
             // Collect all assigned teacher IDs
             const assignedTeachers = selectedTeachers.querySelectorAll("input[name='assigned_teachers[]']");
             const teacherIds = Array.from(assignedTeachers).map(input => input.value);
-
-            // Add the assigned teachers to the form data
-            const hiddenInput = document.createElement("input");
-            hiddenInput.type = "hidden";
-            hiddenInput.name = "assigned_teachers";
-            hiddenInput.value = JSON.stringify(teacherIds);
-            form.appendChild(hiddenInput);
         });
     }
 });

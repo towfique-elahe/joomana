@@ -13,11 +13,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-ob_start();
-
-$error_message = ''; // Initialize error message variable
-$success_message = ''; // Initialize success message variable
-
 // Fetch course details
 if (!isset($_GET['edit_item_id']) || empty($_GET['edit_item_id'])) {
     wp_redirect(home_url('/admin/course-management/courses/'));
@@ -33,6 +28,11 @@ if (!$course) {
     wp_redirect(home_url('/admin/course-management/courses/'));
     exit;
 }
+
+ob_start();
+
+$error_message = ''; // Initialize error message variable
+$success_message = ''; // Initialize success message variable
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_course'])) {
     // Sanitize user inputs
@@ -116,12 +116,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_course'])) {
             ['%d']
         );
 
-        if ($updated === false) {
-            $error_message = 'Erreur: ' . esc_html($wpdb->last_error);
-        } else {
-            $success_message = 'Le cours a été mis à jour avec succès.';
-            wp_redirect(home_url('/admin/course-management/courses/'));
+        // if ($updated === false) {
+        //     $error_message = 'Erreur: ' . esc_html($wpdb->last_error);
+        // } else {
+        //     $success_message = 'Le cours a été mis à jour avec succès.';
+        //     wp_redirect(home_url('/admin/course-management/courses/'));
+        //     exit;
+        // }
+
+        if ($updated !== false) {
+            // Delete existing teacher associations
+            $wpdb->delete(
+                $wpdb->prefix . 'teacher_courses',
+                ['course_id' => $course_id],
+                ['%d']
+            );
+    
+            // Insert new teacher associations
+            $assigned_teachers_array = isset($_POST['assigned_teachers']) ? 
+                array_map('intval', (array)$_POST['assigned_teachers']) : 
+                [];
+    
+            $max_teachers = intval($_POST['max_teachers']);
+            $total_teachers = count($assigned_teachers_array);
+    
+            for ($i = 0; $i < min($total_teachers, $max_teachers); $i++) {
+                $teacher_id = $assigned_teachers_array[$i];
+                $group_number = $i + 1;
+    
+                $wpdb->insert(
+                    $wpdb->prefix . 'teacher_courses',
+                    [
+                        'teacher_id' => $teacher_id,
+                        'course_id' => $course_id,
+                        'group_number' => $group_number
+                    ],
+                    ['%d', '%d', '%d']
+                );
+            }
+    
+            wp_redirect(home_url('/admin/course-management/courses/?success=updated'));
             exit;
+        } else {
+            $error_message = 'Erreur lors de la mise à jour : ' . $wpdb->last_error;
         }
     }
 }
@@ -466,6 +503,5 @@ ob_end_clean();
 </div>
 
 <?php
+ob_end_clean();
 require_once(get_template_directory() . '/admin/templates/footer.php');
-ob_end_flush();
-?>

@@ -38,7 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
     $required_credit = intval($_POST['required_credit']);
     $start_date = sanitize_text_field($_POST['start_date']);
     $time_slot = sanitize_text_field($_POST['time_slot']);
-    $assigned_teachers = isset($_POST['assigned_teachers']) ? json_encode($_POST['assigned_teachers']) : '';
+    // Retrieve the array of teacher IDs submitted via "assigned_teachers[]"
+    $assigned_teachers_array = isset($_POST['assigned_teachers']) ? $_POST['assigned_teachers'] : array();
+
+    // (Optional) If you want to store the teacher assignments as a JSON string in the courses table:
+    $assigned_teachers_json = json_encode($assigned_teachers_array);
 
     // Handle image upload
     $uploaded_image_path = '';
@@ -83,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
         // Insert course into the database
         $table_name = $wpdb->prefix . 'courses';
         $inserted = $wpdb->insert(
-            $table_name,
+            $wpdb->prefix . 'courses',
             [
                 'title'                => $title,
                 'description'          => $description,
@@ -98,36 +102,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
                 'required_credit'      => $required_credit,
                 'start_date'           => $start_date,
                 'time_slot'            => $time_slot,
-                'assigned_teachers'    => $assigned_teachers,
+                'assigned_teachers'    => $assigned_teachers_json,
                 'image'                => $uploaded_image_path,
             ],
             [
                 '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s',
             ]
         );
+        
+        // Get course ID AFTER successful insertion
+        if ($inserted === false) {
+            error_log("Error inserting course: " . $wpdb->last_error);
+            exit("Error inserting course: " . esc_html($wpdb->last_error)); // Stop execution if failed
+        }
+        
+        $course_id = $wpdb->insert_id;
     
         if ($inserted === false) {
             $error_message = 'Erreur: ' . esc_html($wpdb->last_error);
         } else {
-            $course_id = $wpdb->insert_id; // Get the ID of the newly inserted course
-    
             // Assign teachers to the course
-            if (!empty($assigned_teachers)) {
-                $assigned_teachers = json_decode($assigned_teachers, true); // Decode the JSON array
-                foreach ($assigned_teachers as $teacher_id) {
-                    $wpdb->insert(
-                        $wpdb->prefix . 'teacher_courses',
-                        [
-                            'teacher_id' => $teacher_id,
-                            'course_id'  => $course_id,
-                        ],
-                        [
-                            '%d', '%d',
-                        ]
-                    );
+            if ($course_id) {
+                if (!empty($assigned_teachers_array) && is_array($assigned_teachers_array)) {
+                    $total_teachers = count($assigned_teachers_array);
+                    for ($i = 0; $i < min($total_teachers, $max_teachers); $i++) {
+                        $teacher_id = intval($assigned_teachers_array[$i]);
+                        $group_number = $i + 1; // For group numbering
+                
+                        $insert_teacher = $wpdb->insert(
+                            $wpdb->prefix . 'teacher_courses',
+                            [
+                                'teacher_id'   => $teacher_id,
+                                'course_id'    => $course_id,
+                                'group_number' => $group_number,
+                            ],
+                            [ '%d', '%d', '%d' ]
+                        );
+                
+                        if ($insert_teacher === false) {
+                            error_log("Error inserting teacher-course relation: " . $wpdb->last_error);
+                        // } else {
+                        //     error_log("Inserted: Teacher ID - $teacher_id, Course ID - $course_id, Group - $group_number");
+                        // }
+                    }
                 }
+            } else {
+                error_log("Error: Course ID not retrieved after insertion!");
             }
-    
+
             $success_message = 'Le cours a été ajouté avec succès.';
             wp_redirect(home_url('/admin/course-management/courses/'));
             exit;

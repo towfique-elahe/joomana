@@ -7,22 +7,22 @@
 <div class="sidebar">
     <ul class="sidebar-items">
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/details/'); ?>">
+            <a href="<?php echo home_url('/course/details/?course_id=' . $course_id); ?>">
                 <i class="fas fa-book"></i> Détails du cours
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/resources/'); ?>">
+            <a href="<?php echo home_url('/course/resources/?course_id=' . $course_id); ?>">
                 <i class="fas fa-folder-open"></i> Ressources
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/submissions/'); ?>">
+            <a href="<?php echo home_url('/course/submissions/?course_id=' . $course_id); ?>">
                 <i class="fas fa-tasks"></i> Soumission
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/communication/'); ?>">
+            <a href="<?php echo home_url('/course/communication/?course_id=' . $course_id); ?>">
                 <i class="fas fa-comment-alt"></i> Communication
             </a>
         </li>
@@ -30,7 +30,7 @@
             if (current_user_can('student')) {
         ?>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/teacher-evaluation/'); ?>">
+            <a href="<?php echo home_url('/course/teacher-evaluation/?course_id=' . $course_id); ?>">
                 <i class="fas fa-star-half-alt"></i> Évaluation
             </a>
         </li>

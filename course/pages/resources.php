@@ -8,6 +8,33 @@ $pageTitle = 'Ressources';
 
 require_once(get_template_directory() . '/course/templates/header.php');
 
+// Exit if accessed directly
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// Get the current user
+$user = wp_get_current_user();
+$default_user_image = esc_url(get_stylesheet_directory_uri() . '/assets/image/user.png');
+
+// Get course_id from session
+if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
+
+    // Check the user's role and redirect accordingly
+    if (in_array('student', (array) $user->roles)) {
+        wp_redirect(home_url('/student/course-management/'));
+        exit;
+    } elseif (in_array('teacher', (array) $user->roles)) {
+        wp_redirect(home_url('/teacher/course-management/'));
+        exit;
+    } else {
+        // Default redirection for other roles or if no role is matched
+        wp_redirect(home_url());
+        exit;
+    }
+}
+$course_id = intval($_GET['course_id']);
+
 ?>
 
 <div class="content-area">

@@ -223,7 +223,7 @@ function enroll_student_in_course($course_id, $student_id) {
         return new WP_Error('course_not_found', 'Course not found.');
     }
 
-    // Check if the student already enrolled in this course
+    // Check if the student is already enrolled in this course
     $is_enrolled = $wpdb->get_var(
         $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d", $student_id, $course_id)
     );
@@ -246,9 +246,9 @@ function enroll_student_in_course($course_id, $student_id) {
         $wpdb->prepare("UPDATE {$wpdb->prefix}students SET credit = credit - %f WHERE id = %d", $course->required_credit, $student_id)
     );
 
-    // Get all teachers assigned to the course
+    // Get all teachers assigned to this course along with their groups
     $teachers = $wpdb->get_results(
-        $wpdb->prepare("SELECT teacher_id FROM {$wpdb->prefix}teacher_courses WHERE course_id = %d", $course_id)
+        $wpdb->prepare("SELECT teacher_id, group_number FROM {$wpdb->prefix}teacher_courses WHERE course_id = %d", $course_id)
     );
 
     if (empty($teachers)) {
@@ -259,8 +259,13 @@ function enroll_student_in_course($course_id, $student_id) {
     $assigned = false;
 
     foreach ($teachers as $teacher) {
+        // Count students in the current group
         $student_count = $wpdb->get_var(
-            $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}student_courses WHERE teacher_id = %d AND course_id = %d", $teacher->teacher_id, $course_id)
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->prefix}student_courses 
+                 WHERE teacher_id = %d AND course_id = %d AND group_number = %d",
+                $teacher->teacher_id, $course_id, $teacher->group_number
+            )
         );
 
         if ($student_count < $course->max_students_per_group) {
@@ -268,10 +273,12 @@ function enroll_student_in_course($course_id, $student_id) {
             $wpdb->insert(
                 "{$wpdb->prefix}student_courses",
                 array(
-                    'student_id' => $student_id,
-                    'course_id' => $course_id,
-                    'teacher_id' => $teacher->teacher_id
-                )
+                    'student_id'   => $student_id,
+                    'course_id'    => $course_id,
+                    'teacher_id'   => $teacher->teacher_id,
+                    'group_number' => $teacher->group_number
+                ),
+                array('%d', '%d', '%d', '%d')
             );
             $assigned = true;
             break;
@@ -279,15 +286,17 @@ function enroll_student_in_course($course_id, $student_id) {
     }
 
     if (!$assigned) {
-        // If no group has space, assign to the first teacher (or any other logic you prefer)
+        // If no group has space, assign to the first teacher's group
         $first_teacher = $teachers[0];
         $wpdb->insert(
             "{$wpdb->prefix}student_courses",
             array(
-                'student_id' => $student_id,
-                'course_id' => $course_id,
-                'teacher_id' => $first_teacher->teacher_id
-            )
+                'student_id'   => $student_id,
+                'course_id'    => $course_id,
+                'teacher_id'   => $first_teacher->teacher_id,
+                'group_number' => $first_teacher->group_number
+            ),
+            array('%d', '%d', '%d', '%d')
         );
     }
 

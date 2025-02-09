@@ -1,27 +1,40 @@
 <?php
-
-// Custom Database Tables --------------------------------
+/**
+ * Custom Database Tables Setup
+**/
 
 function create_custom_tables() {
     global $wpdb;
+
+    // Set your current custom schema version.
+    $custom_tables_version = '1.0.1';
+    $installed_version = get_option('custom_tables_version');
+
+    // If the version is already current, do nothing.
+    if ( $installed_version === $custom_tables_version ) {
+        return;
+    }
+
     $charset_collate = $wpdb->get_charset_collate();
 
-    $course_categories_table = $wpdb->prefix . 'course_categories';
-    $course_topics_table = $wpdb->prefix . 'course_topics';
-    $course_grades_table = $wpdb->prefix . 'course_grades';
-    $course_levels_table = $wpdb->prefix . 'course_levels';
-    $courses_table = $wpdb->prefix . 'courses';
-    $student_courses_table = $wpdb->prefix . 'student_courses';
-    $teacher_courses_table = $wpdb->prefix . 'teacher_courses';
-    $students_table = $wpdb->prefix . 'students';
-    $parents_table = $wpdb->prefix . 'parents';
-    $teachers_table = $wpdb->prefix . 'teachers';
-    $teacher_bank_details = $wpdb->prefix . 'teacher_bank_details ';
-    $credits_table = $wpdb->prefix . 'credits';
-    $payments_table = $wpdb->prefix . 'payments';
-    $teacher_payments_table = $wpdb->prefix . 'teacher_payments';
+    // Table names.
+    $course_categories_table   = $wpdb->prefix . 'course_categories';
+    $course_topics_table       = $wpdb->prefix . 'course_topics';
+    $course_grades_table       = $wpdb->prefix . 'course_grades';
+    $course_levels_table       = $wpdb->prefix . 'course_levels';
+    $courses_table             = $wpdb->prefix . 'courses';
+    $communications_table      = $wpdb->prefix . 'communications';
+    $student_courses_table     = $wpdb->prefix . 'student_courses';
+    $teacher_courses_table     = $wpdb->prefix . 'teacher_courses';
+    $students_table            = $wpdb->prefix . 'students';
+    $parents_table             = $wpdb->prefix . 'parents';
+    $teachers_table            = $wpdb->prefix . 'teachers';
+    $teacher_bank_details      = $wpdb->prefix . 'teacher_bank_details';
+    $credits_table             = $wpdb->prefix . 'credits';
+    $payments_table            = $wpdb->prefix . 'payments';
+    $teacher_payments_table    = $wpdb->prefix . 'teacher_payments';
 
-    // course categories table
+    // SQL for each table.
     $course_categories_sql = "CREATE TABLE $course_categories_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         category VARCHAR(255) NOT NULL,
@@ -31,7 +44,6 @@ function create_custom_tables() {
         PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // course topics table
     $course_topics_sql = "CREATE TABLE $course_topics_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         topic VARCHAR(255) NOT NULL,
@@ -44,7 +56,6 @@ function create_custom_tables() {
         PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // course grades table
     $course_grades_sql = "CREATE TABLE $course_grades_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         grade VARCHAR(255) NOT NULL,
@@ -52,7 +63,6 @@ function create_custom_tables() {
         PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // course levels table
     $course_levels_sql = "CREATE TABLE $course_levels_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         level VARCHAR(255) NOT NULL,
@@ -60,7 +70,6 @@ function create_custom_tables() {
         PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // courses table
     $courses_sql = "CREATE TABLE $courses_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         title VARCHAR(255) NOT NULL,
@@ -83,33 +92,37 @@ function create_custom_tables() {
         PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // student courses table
+    $communications_sql = "CREATE TABLE $communications_table (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        course_id BIGINT(20) UNSIGNED NOT NULL,
+        user_id BIGINT(20) UNSIGNED NOT NULL,
+        group_number INT(11) NOT NULL,
+        message TEXT NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
     $student_courses_sql = "CREATE TABLE $student_courses_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        group_number INT(11) NOT NULL, 
         student_id BIGINT(20) UNSIGNED NOT NULL,
         course_id BIGINT(20) UNSIGNED NOT NULL,
         teacher_id BIGINT(20) UNSIGNED NOT NULL,
         status ENUM('En cours', 'Complété') NOT NULL DEFAULT 'En cours',
         enrollment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        FOREIGN KEY (student_id) REFERENCES {$wpdb->prefix}students(id) ON DELETE CASCADE,
-        FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE,
-        FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // teacher courses table
     $teacher_courses_sql = "CREATE TABLE $teacher_courses_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        group_number INT(11) NOT NULL,
         teacher_id BIGINT(20) UNSIGNED NOT NULL,
         course_id BIGINT(20) UNSIGNED NOT NULL,
         status ENUM('En cours', 'Complété') NOT NULL DEFAULT 'En cours',
         assigned_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE,
-        FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // students table
     $students_sql = "CREATE TABLE $students_table (
         id BIGINT(20) UNSIGNED NOT NULL,
         first_name VARCHAR(255) NOT NULL,
@@ -133,10 +146,9 @@ function create_custom_tables() {
         image VARCHAR(255) DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // parents table
     $parents_sql = "CREATE TABLE $parents_table (
         id BIGINT(20) UNSIGNED NOT NULL,
         first_name VARCHAR(255) NOT NULL,
@@ -151,10 +163,9 @@ function create_custom_tables() {
         credit DECIMAL(10) NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // teachers table
     $teachers_sql = "CREATE TABLE $teachers_table (
         id BIGINT(20) UNSIGNED NOT NULL,
         status ENUM('En cours', 'En révision', 'Rejeté', 'Approuvé') NOT NULL DEFAULT 'En cours',
@@ -193,10 +204,9 @@ function create_custom_tables() {
         due DECIMAL(10,2) NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // teacher_bank_details table
     $teacher_bank_details_sql = "CREATE TABLE $teacher_bank_details (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         teacher_id BIGINT(20) UNSIGNED NOT NULL,
@@ -208,11 +218,9 @@ function create_custom_tables() {
         bank_address TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // Improved credits table
     $credits_sql = "CREATE TABLE $credits_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id BIGINT(20) UNSIGNED NOT NULL,
@@ -220,12 +228,9 @@ function create_custom_tables() {
         transaction_type ENUM('Crédité', 'Débité') NOT NULL,
         transaction_reason ENUM('Crédit acheté', 'Cours acheté', 'Autre') NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        INDEX (user_id),
-        FOREIGN KEY (user_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // payments table
     $payments_sql = "CREATE TABLE $payments_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         invoice_number VARCHAR(255) NOT NULL,
@@ -236,11 +241,9 @@ function create_custom_tables() {
         payment_method VARCHAR(50) NOT NULL,
         status ENUM('En attente', 'Complété', 'Échoué') NOT NULL DEFAULT 'En attente',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        FOREIGN KEY (user_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
-    // teacher payments table
     $teacher_payments_sql = "CREATE TABLE $teacher_payments_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         invoice_number VARCHAR(255) NOT NULL,
@@ -251,17 +254,17 @@ function create_custom_tables() {
         payment_method VARCHAR(50) NOT NULL,
         status ENUM('En attente', 'Complété', 'Échoué') NOT NULL DEFAULT 'En attente',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        FOREIGN KEY (user_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
-
+    // Run the table creation/upgrades.
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($course_categories_sql);
     dbDelta($course_topics_sql);
     dbDelta($course_grades_sql);
     dbDelta($course_levels_sql);
     dbDelta($courses_sql);
+    dbDelta($communications_sql);
     dbDelta($student_courses_sql);
     dbDelta($teacher_courses_sql);
     dbDelta($students_sql);
@@ -271,5 +274,50 @@ function create_custom_tables() {
     dbDelta($credits_sql);
     dbDelta($payments_sql);
     dbDelta($teacher_payments_sql);
+
+    // Add foreign keys after tables are created.
+    add_foreign_keys();
+
+    // Update the stored version to indicate that our tables are current.
+    update_option('custom_tables_version', $custom_tables_version);
 }
 add_action('after_setup_theme', 'create_custom_tables');
+
+
+// Function to add foreign keys.
+function add_foreign_keys() {
+    global $wpdb;
+
+    $constraints = [
+        "{$wpdb->prefix}communications" => [
+            "fk_communications_user_id"   => "ALTER TABLE {$wpdb->prefix}communications ADD CONSTRAINT fk_communications_user_id FOREIGN KEY (user_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE;",
+            "fk_communications_course_id" => "ALTER TABLE {$wpdb->prefix}communications ADD CONSTRAINT fk_communications_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}student_courses" => [
+            "fk_student_courses_student_id"  => "ALTER TABLE {$wpdb->prefix}student_courses ADD CONSTRAINT fk_student_courses_student_id FOREIGN KEY (student_id) REFERENCES {$wpdb->prefix}students(id) ON DELETE CASCADE;",
+            "fk_student_courses_course_id"   => "ALTER TABLE {$wpdb->prefix}student_courses ADD CONSTRAINT fk_student_courses_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;",
+            "fk_student_courses_teacher_id"  => "ALTER TABLE {$wpdb->prefix}student_courses ADD CONSTRAINT fk_student_courses_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}teacher_courses" => [
+            "fk_teacher_courses_teacher_id"  => "ALTER TABLE {$wpdb->prefix}teacher_courses ADD CONSTRAINT fk_teacher_courses_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;",
+            "fk_teacher_courses_course_id"   => "ALTER TABLE {$wpdb->prefix}teacher_courses ADD CONSTRAINT fk_teacher_courses_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
+        ]
+    ];
+
+    foreach ($constraints as $table => $foreign_keys) {
+        foreach ($foreign_keys as $constraint_name => $query) {
+            // Check if the constraint already exists.
+            $exists = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s AND CONSTRAINT_NAME = %s",
+                    $table,
+                    $constraint_name
+                )
+            );
+
+            if ( ! $exists ) {
+                $wpdb->query($query);
+            }
+        }
+    }
+}
