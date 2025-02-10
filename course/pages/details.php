@@ -54,8 +54,7 @@ if (!$course) {
     }
 }
 
-
-
+// for student users only
 if (in_array('student', (array) $user->roles)) {
     // Query the custom table to get the student's teacher_id
     $student_courses_table  = $wpdb->prefix . 'student_courses'; // Ensure the table name is correct
@@ -94,6 +93,38 @@ if (in_array('student', (array) $user->roles)) {
     }
 }
 
+// for teacher users only
+if (in_array('teacher', (array) $user->roles)) {
+    // Query the custom table to get the student's teacher_id
+    $student_courses_table  = $wpdb->prefix . 'student_courses'; // Ensure the table name is correct
+    $teacher_id = $user->id;
+
+    // Fetch the teacher's details using the teacher_id for the student
+    $teacher_table = $wpdb->prefix. 'teachers';
+    $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $teacher_id));
+
+    // Fetch all student IDs enrolled in the course for the given teacher group
+    $enrolled_student_ids = $wpdb->get_col(
+        $wpdb->prepare(
+            "SELECT student_id FROM $student_courses_table WHERE course_id = %d AND teacher_id = %d",
+            $course_id,
+            $teacher_id
+        )
+    );
+
+    // Check if any student IDs were found
+    if (!empty($enrolled_student_ids)) {
+        // Fetch student details from the students table
+        $students_table = $wpdb->prefix . 'students';
+        $student_ids_placeholder = implode(',', array_map('intval', $enrolled_student_ids)); // Sanitize IDs
+
+        $enrolled_students = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM $students_table WHERE id IN ($student_ids_placeholder)"
+            )
+        );
+    }
+}
 
 ?>
 
@@ -163,6 +194,9 @@ if (in_array('student', (array) $user->roles)) {
                                 </ul>
                             </div>
 
+                            <?php
+                                if (in_array('student', (array) $user->roles)) {
+                            ?>
                             <!-- teacher details -->
                             <div class="col teacher-details">
                                 <h4 class="teacher-title">Détails de l'enseignant</h4>
@@ -188,13 +222,22 @@ if (in_array('student', (array) $user->roles)) {
                                 </div>
 
                             </div>
+                            <?php
+                                }
+                            ?>
 
+                            <?php
+                                if (in_array('student', (array) $user->roles)) {
+                            ?>
                             <!-- meeting details -->
                             <div class="col meeting-details">
                                 <h4 class="meeting-title">Réunion Zoom</h4>
 
                                 <a href="" class="button">Rejoindre</a>
                             </div>
+                            <?php
+                                }
+                            ?>
 
                         </div>
 

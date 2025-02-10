@@ -1,0 +1,125 @@
+/* course management page */
+#teacherCourses .tab-content .tab-pane {
+  display: none;
+}
+#teacherCourses .tab-content .tab-pane.show.active {
+  display: block;
+}
+#teacherCourses .nav-tabs {
+  display: flex;
+  gap: 1rem;
+}
+#teacherCourses .nav-tabs .nav-link {
+  background-color: rgb(241, 241, 241);
+  color: var(--text-color);
+  text-decoration: none;
+  text-transform: capitalize;
+  font-family: var(--accent-font-family);
+  font-size: var(--accent-font-size);
+  font-weight: var(--accent-font-weight);
+  padding: 0.5rem 1rem;
+  border-bottom: var(--border);
+  border-radius: 0.3rem 0.3rem 0 0;
+  transition: 0.3s;
+}
+#teacherCourses .nav-tabs .nav-link.active {
+  background-color: #fff;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+#teacherCourses .courses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+#teacherCourses .course-card {
+  background: #fff;
+  border: var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  width: calc(25% - 0.5rem);
+  display: flex;
+  flex-direction: column;
+}
+#teacherCourses .course-image {
+  width: 100%;
+  height: 12rem;
+  object-fit: cover;
+  border-bottom: var(--border);
+}
+#teacherCourses .course-tag {
+  display: inline;
+  width: fit-content;
+  margin: 1rem;
+  padding: 0.5rem 1rem;
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-size: 0.9rem;
+  font-weight: var(--accent-font-weight);
+  border: var(--border);
+  border-radius: 0.3rem;
+}
+#teacherCourses .course-tag.in-progress {
+  background-color: #e8f9ff;
+  color: #155e95;
+  border-color: #155e95;
+}
+#teacherCourses .course-tag.completed {
+  background-color: #eafaea;
+  color: #6e8e59;
+  border-color: #6e8e59;
+}
+#teacherCourses .course-title {
+  margin: 0 15px;
+  height: 50px;
+  color: var(--dark-text-color) !important;
+  font-family: var(--accent-font-family) !important;
+  font-size: var(--accent-font-size) !important;
+  font-weight: var(--accent-font-weight) !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+#teacherCourses .course-info {
+  margin: 0 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+#teacherCourses .course-info p {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+}
+#teacherCourses .course-footer {
+  margin: 2rem 1rem 1.5rem 1rem;
+  display: flex;
+}
+#teacherCourses .course-price {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+}
+#teacherCourses .course-price .amount {
+  font-family: var(--accent-font-family);
+  font-size: 24px;
+  font-weight: var(--accent-font-weight);
+  color: var(--accent-color);
+}
+#teacherCourses .course-btn {
+  width: 100%;
+  text-align: center;
+  padding: 8px 16px;
+  background-color: var(--primary-color);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-family: var(--accent-font-family) !important;
+  font-size: var(--accent-font-size) !important;
+  font-weight: var(--accent-font-weight) !important;
+  transition: 0.3s ease;
+}
+#teacherCourses .course-btn:hover {
+  background-color: var(--accent-color);
+}

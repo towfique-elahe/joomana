@@ -19,14 +19,17 @@
             }
         ?>
     </title>
-    <?php wp_head(); ?>
+    <?php if (has_site_icon()): ?>
+    <link rel="icon" href="<?php echo esc_url(get_site_icon_url()); ?>" type="image/png">
+    <?php endif; ?>
+    <link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/root.css'; ?>">
+    <link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/teacher-portal.css'; ?>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
     * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        color: var(--text-color);
-        font-family: var(--text-font-family);
     }
 
     html {
@@ -52,15 +55,28 @@
             <div class="user">
                 <div class="greeting">
                     <?php
-                    if (is_user_logged_in()) {
-                        $current_user = wp_get_current_user();
-                        $first_name = $current_user->user_firstname;
-                        $last_name = $current_user->user_lastname;
-                        $full_name = trim($first_name . ' ' . $last_name);
-                        echo 'Bonjour, <span class="user-name">' . esc_html($full_name) . '!</span>';
-                    } else {
-                        echo 'Bonjour, Invité!';
-                    }
+                        if (is_user_logged_in()) {
+                            $current_user = wp_get_current_user();
+                            $first_name = $current_user->user_firstname;
+                            $last_name = $current_user->user_lastname;
+                            $full_name = trim($first_name . ' ' . $last_name);
+                        } else {
+                            $full_name = 'Invité';
+                        }
+
+                        // Get the current hour
+                        $current_hour = (int) date('H');
+
+                        // Determine the greeting based on the time of day
+                        if ($current_hour >= 5 && $current_hour < 12) {
+                            $greeting = 'Bonjour';
+                        } elseif ($current_hour >= 12 && $current_hour < 18) {
+                            $greeting = 'Bon après-midi';
+                        } else {
+                            $greeting = 'Bonsoir';
+                        }
+
+                        echo $greeting . ', <span class="user-name">' . esc_html($full_name) . '!</span>';
                     ?>
                 </div>
                 <a href="<?php echo home_url('/parent/settings/'); ?>" class="user-image">

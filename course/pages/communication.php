@@ -87,7 +87,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['chat_message'] ) ) 
  * Messages are ordered by timestamp (oldest first).
  */
 $messages = $wpdb->get_results( $wpdb->prepare(
-	"SELECT * FROM {$wpdb->prefix}communications WHERE course_id = %d AND group_number = %d ORDER BY timestamp ASC",
+	"SELECT * FROM {$wpdb->prefix}communications WHERE course_id = %d AND group_number = %d ORDER BY timestamp DESC",
 	$course_id,
 	$group_number
 ) );
@@ -124,25 +124,73 @@ $messages = $wpdb->get_results( $wpdb->prepare(
         </div>
 
         <div class="content-section">
-            <div class="chat-container">
-                <h3>Group Conversation (Group <?php echo esc_html( $group_number ); ?>)</h3>
-                <div id="chat-messages">
+            <div class="chat-container row">
+
+                <div id="chat-messages" class="chat-messages col">
                     <?php
-					if ( ! empty( $messages ) ) {
-						foreach ( $messages as $msg ) {
-							$msg_user = get_userdata( $msg->user_id );
-							echo "<p><strong>" . esc_html( $msg_user->display_name ) . ":</strong> " . esc_html( $msg->message ) . "</p>";
+						if ( ! empty( $messages ) ) {
+							foreach ( $messages as $msg ) {
+								$msg_wp_user = get_userdata( $msg->user_id );
+
+								if ( in_array( 'student', (array) $msg_wp_user->roles ) ) {
+									global $wpdb;
+									$student_table = $wpdb->prefix . 'students';
+									$msg_user = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $msg_wp_user->id));
+									$msg_user_role = 'student';
+								}
+								if ( in_array( 'teacher', (array) $msg_wp_user->roles ) ) {
+									global $wpdb;
+									$teacher_table = $wpdb->prefix . 'teachers';
+									$msg_user = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $msg_wp_user->id));
+									$msg_user_role = 'teacher';
+								}
+
+								// Convert message timestamp to WordPress timezone
+								$message_time = strtotime( get_date_from_gmt( $msg->timestamp, 'Y-m-d H:i:s' ) );
+								$current_time = current_time( 'timestamp' ); // WordPress local time
+								
+								// Calculate the time difference
+								$time_ago = human_time_diff( $message_time, $current_time ) . ' ago';
+
+								// Format the date and time (e.g., Feb 10, 2025 - 01:57 AM)
+								$formatted_time = date( 'M d, Y - h:i A', $message_time );
+
+								// Add 'current-user' class if the message is from the logged-in user
+								$chat_class = ($msg->user_id == $user->id) ? 'current-user' : '';
+					?>
+                    <div class="row chat <?= esc_attr($msg_user_role); ?> <?= esc_attr($chat_class); ?>">
+                        <div class="chat-user">
+                            <img src="<?php echo !empty($msg_user->image) ? esc_url($msg_user->image) : esc_url($default_user_image); ?>"
+                                alt="" class="user-image">
+                        </div>
+                        <div class="chat-message">
+                            <h5 class="user-name">
+                                <?= esc_html($msg_user->first_name) . ' ' . esc_html($msg_user->last_name); ?>
+                            </h5>
+                            <p class="message-text">
+                                <?= esc_html($msg->message); ?>
+                            </p>
+                            <p class="message-time">
+                                <?= esc_html( $time_ago . ' | ' . $formatted_time ) ?>
+                            </p>
+                        </div>
+
+                    </div>
+                    <?php
 						}
 					} else {
-						echo "<p>No conversation messages yet.</p>";
+						echo "<p class='no-data'>No conversation messages yet.</p>";
 					}
 					?>
                 </div>
-                <form method="POST" action="">
-                    <textarea name="chat_message" placeholder="Type your message..."></textarea>
-                    <button type="submit">Send Message</button>
+
+                <form method="POST" action="" class="form col">
+                    <textarea name="chat_message" placeholder="Laisser les commentaires..." rows="5"></textarea>
+                    <button type="submit">Envoyer <i class="fas fa-paper-plane"></i></button>
                 </form>
+
             </div>
+
         </div>
 
     </div>

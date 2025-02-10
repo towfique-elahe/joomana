@@ -99,3 +99,108 @@
   border: var(--border);
   border-radius: 0.3rem;
 }
+
+/* communication page */
+#courseCommunication .chat-container {
+  gap: 2rem;
+}
+#courseCommunication .chat-messages {
+  flex: 1.5;
+  gap: 2rem;
+}
+#courseCommunication .chat {
+  align-items: flex-end;
+}
+#courseCommunication .chat.current-user {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+#courseCommunication .chat-user {
+  background-color: crimson;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: var(--border);
+}
+#courseCommunication .student .chat-user {
+  border-color: var(--primary-color);
+}
+#courseCommunication .teacher .chat-user {
+  border-color: var(--accent-color);
+}
+#courseCommunication .chat-user .user-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#courseCommunication .chat-message {
+  max-width: 70%;
+  background-color: var(--gray-background-color);
+  padding: 0.5rem;
+  border: var(--border);
+  border-radius: 0.5rem;
+}
+#courseCommunication .current-user.student .chat-message {
+  background-color: #f2f5ff;
+}
+#courseCommunication .current-user.teacher .chat-message {
+  background-color: #fff6f2;
+}
+#courseCommunication .chat .user-name {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+#courseCommunication .chat.student .user-name {
+  color: var(--primary-color);
+}
+#courseCommunication .chat.teacher .user-name {
+  color: var(--accent-color);
+}
+#courseCommunication .chat .message-text {
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+  color: var(--dark-text-color);
+}
+#courseCommunication .chat .message-time {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+#courseCommunication .form {
+  align-items: flex-end;
+}
+#courseCommunication .form textarea {
+  width: 100%;
+  padding: 1rem 1.5rem !important;
+  border: var(--border) !important;
+  border-radius: 0.5rem !important;
+  resize: vertical;
+}
+#courseCommunication .form button {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  padding: 1rem 3rem;
+  background-color: var(--primary-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#courseCommunication .form button:hover {
+  background-color: var(--accent-color);
+}

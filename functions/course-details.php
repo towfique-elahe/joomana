@@ -210,7 +210,8 @@ function render_course_details_section() {
 }
 add_shortcode('course_details', 'render_course_details_section');
 
-// Enrollment Function
+
+// Student Enrollment Function
 function enroll_student_in_course($course_id, $student_id) {
     global $wpdb;
 
@@ -246,9 +247,9 @@ function enroll_student_in_course($course_id, $student_id) {
         $wpdb->prepare("UPDATE {$wpdb->prefix}students SET credit = credit - %f WHERE id = %d", $course->required_credit, $student_id)
     );
 
-    // Get all teachers assigned to this course along with their groups
+    // Get all teachers assigned to this course along with their groups, ordered by group_number
     $teachers = $wpdb->get_results(
-        $wpdb->prepare("SELECT teacher_id, group_number FROM {$wpdb->prefix}teacher_courses WHERE course_id = %d", $course_id)
+        $wpdb->prepare("SELECT teacher_id, group_number FROM {$wpdb->prefix}teacher_courses WHERE course_id = %d ORDER BY group_number ASC", $course_id)
     );
 
     if (empty($teachers)) {
@@ -286,18 +287,8 @@ function enroll_student_in_course($course_id, $student_id) {
     }
 
     if (!$assigned) {
-        // If no group has space, assign to the first teacher's group
-        $first_teacher = $teachers[0];
-        $wpdb->insert(
-            "{$wpdb->prefix}student_courses",
-            array(
-                'student_id'   => $student_id,
-                'course_id'    => $course_id,
-                'teacher_id'   => $first_teacher->teacher_id,
-                'group_number' => $first_teacher->group_number
-            ),
-            array('%d', '%d', '%d', '%d')
-        );
+        // If no group has space, return an error or handle it as per your requirement
+        return new WP_Error('no_available_groups', 'All groups are full. Cannot enroll the student.');
     }
 
     return true;
