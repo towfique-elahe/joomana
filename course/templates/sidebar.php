@@ -11,6 +11,15 @@
                 <i class="fas fa-book"></i> Détails du cours
             </a>
         </li>
+        <?php 
+            if (current_user_can('teacher')) {
+        ?>
+        <li class="sidebar-item">
+            <a href="<?php echo home_url('/course/student-management/?course_id=' . $course_id); ?>">
+                <i class="fas fa-graduation-cap"></i> Gestion étudiants
+            </a>
+        </li>
+        <?php } ?>
         <li class="sidebar-item">
             <a href="<?php echo home_url('/course/resources/?course_id=' . $course_id); ?>">
                 <i class="fas fa-folder-open"></i> Ressources

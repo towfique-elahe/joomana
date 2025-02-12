@@ -247,6 +247,27 @@ function enroll_student_in_course($course_id, $student_id) {
         $wpdb->prepare("UPDATE {$wpdb->prefix}students SET credit = credit - %f WHERE id = %d", $course->required_credit, $student_id)
     );
 
+    // Insert data into the credits table
+    $credits_table = $wpdb->prefix . 'credits';
+    $total_credit = $course->required_credit;
+    $wpdb->insert(
+        $credits_table,
+        [
+            'user_id' => $student_id,
+            'credit' => $total_credit, // Total credit from all products in the order
+            'transaction_type' => 'Débité', // Set transaction_type to 'Débité'
+            'transaction_reason' => 'Cours acheté', // Set transaction_reason to 'Débité'
+            'created_at' => current_time('mysql'), // Current timestamp
+        ],
+        [
+            '%d', // user_id
+            '%f', // credit
+            '%s', // transaction_type
+            '%s', // transaction_reason
+            '%s', // created_at
+        ]
+    );
+
     // Get all teachers assigned to this course along with their groups, ordered by group_number
     $teachers = $wpdb->get_results(
         $wpdb->prepare("SELECT teacher_id, group_number FROM {$wpdb->prefix}teacher_courses WHERE course_id = %d ORDER BY group_number ASC", $course_id)

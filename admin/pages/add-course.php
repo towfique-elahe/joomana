@@ -141,9 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
                 
                         if ($insert_teacher === false) {
                             error_log("Error inserting teacher-course relation: " . $wpdb->last_error);
-                        // } else {
-                        //     error_log("Inserted: Teacher ID - $teacher_id, Course ID - $course_id, Group - $group_number");
-                        // }
+                        }
                     }
                 }
             } else {

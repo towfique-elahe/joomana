@@ -77,6 +77,9 @@ function teacher_portal_rewrite_rules() {
     add_rewrite_rule('^teacher/student-management/?$', 'index.php?teacher_page=student-management', 'top');
     add_rewrite_rule('^teacher/resources/?$', 'index.php?teacher_page=resources', 'top');
     add_rewrite_rule('^teacher/revenues/?$', 'index.php?teacher_page=revenues', 'top');
+    add_rewrite_rule('^teacher/revenues/bank-details/?$', 'index.php?teacher_page=bank-details', 'top');
+    add_rewrite_rule('^teacher/revenues/invoice/?$', 'index.php?teacher_page=invoice', 'top');
+    add_rewrite_rule('^teacher/revenues/invoice/pdf/?$', 'index.php?teacher_page=invoice-pdf', 'top');
     add_rewrite_rule('^teacher/settings/?$', 'index.php?teacher_page=settings', 'top');
 }
 add_action('init', 'teacher_portal_rewrite_rules');
@@ -204,6 +207,7 @@ add_action('template_redirect', 'restrict_student_pages');
 
 function course_portal_rewrite_rules() {
     add_rewrite_rule('^course/details/?$', 'index.php?course_page=details', 'top');
+    add_rewrite_rule('^course/student-management/?$', 'index.php?course_page=student-management', 'top');
     add_rewrite_rule('^course/resources/?$', 'index.php?course_page=resources', 'top');
     add_rewrite_rule('^course/submissions/?$', 'index.php?course_page=submissions', 'top');
     add_rewrite_rule('^course/communication/?$', 'index.php?course_page=communication', 'top');

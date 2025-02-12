@@ -100,6 +100,30 @@
   border-radius: 0.3rem;
 }
 
+/* student management page */
+#courseStudentManagement .table th,
+#courseStudentManagement .table td {
+  padding: 1rem;
+}
+#courseStudentManagement .table th:first-of-type,
+#courseStudentManagement .table td:first-of-type {
+  text-align: left;
+}
+#courseStudentManagement .table th:last-of-type,
+#courseStudentManagement .table td:last-of-type {
+  width: 5rem;
+}
+#courseStudentManagement .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+#courseStudentManagement .table .action-buttons a {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+}
+
 /* communication page */
 #courseCommunication .chat-container {
   gap: 2rem;

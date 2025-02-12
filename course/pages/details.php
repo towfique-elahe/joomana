@@ -269,10 +269,10 @@ if (in_array('teacher', (array) $user->roles)) {
                                 <?php
                                             }
                                         } else {
-                                            echo "No student details found for the enrolled students.";
+                                            echo "Aucun détail étudiant n'a été trouvé pour les étudiants inscrits.";
                                         }
                                     } else {
-                                        echo "No students enrolled in this course for the given teacher.";
+                                        echo "Pourtant, aucun étudiant n'est inscrit à ce cours pour vous.";
                                     }
 
                                 ?>

@@ -123,3 +123,61 @@
 #teacherCourses .course-btn:hover {
   background-color: var(--accent-color);
 }
+
+/* revenues page */
+#teacherRevenue .table th,
+#teacherRevenue .table td {
+  padding: 1rem;
+}
+#teacherRevenue .table th:first-of-type,
+#teacherRevenue .table td:first-of-type {
+  text-align: left;
+}
+#teacherRevenue .table th:last-of-type,
+#teacherRevenue .table td:last-of-type {
+  width: 5rem;
+}
+#teacherRevenue .table .invoice {
+  color: var(--primary-color);
+}
+#teacherRevenue .table .pdf {
+  color: crimson;
+}
+#teacherRevenue .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+#teacherRevenue .table .action-buttons a {
+  font-size: 1.2rem;
+}
+
+/* bank details page */
+#teacherBankDetails .bank-details .table {
+  width: 100%;
+}
+#teacherBankDetails .table th {
+  text-align: left;
+  width: 20rem;
+  border-radius: 0;
+}
+#teacherBankDetails .table tr:first-of-type th {
+  border-top-left-radius: 0.5rem;
+}
+#teacherBankDetails .table tr:last-of-type th {
+  border-bottom-left-radius: 0.5rem;
+}
+#teacherBankDetails .table td {
+  text-align: left;
+  padding-left: 2rem;
+}
+#teacherBankDetails .table tr:first-of-type td {
+  border-top-right-radius: 0.5rem;
+}
+#teacherBankDetails .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}

@@ -12,11 +12,6 @@
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/teacher/student-management/'); ?>">
-                <i class="fas fa-graduation-cap"></i> Gestion étudiants
-            </a>
-        </li>
-        <li class="sidebar-item">
             <a href="<?php echo home_url('/teacher/course-management/'); ?>">
                 <i class="fas fa-book"></i> Gestion des cours
             </a>

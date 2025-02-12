@@ -57,7 +57,6 @@ add_shortcode('course_categories', 'course_categories_section');
 // shortcode [course_filter_page]
 
 function course_filter_page_shortcode() {
-    session_start();
 
     if (isset($_GET['category'])) {
         $_SESSION['category'] = urldecode($_GET['category']);
