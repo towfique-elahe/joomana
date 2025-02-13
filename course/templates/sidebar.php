@@ -22,7 +22,7 @@
         <?php } ?>
         <li class="sidebar-item">
             <a href="<?php echo home_url('/course/resources/?course_id=' . $course_id); ?>">
-                <i class="fas fa-folder-open"></i> Ressources
+                <i class="fas fa-folder-open"></i> Resources
             </a>
         </li>
         <li class="sidebar-item">

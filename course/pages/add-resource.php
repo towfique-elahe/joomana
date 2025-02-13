@@ -75,7 +75,7 @@ if (in_array('teacher', (array) $user->roles)) {
     <div class="sidebar-container">
         <?php require_once(get_template_directory() . '/course/templates/sidebar.php'); ?>
     </div>
-    <div id="courseStudentManagement" class="main-content">
+    <div id="courseAddResource" class="main-content">
         <div class="content-header">
             <h2 class="content-title">Gestion étudiants</h2>
             <div class="content-breadcrumb">
@@ -87,66 +87,7 @@ if (in_array('teacher', (array) $user->roles)) {
             </div>
         </div>
 
-        <div class="content-section list">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Nom d'étudiant</th>
-                        <th>Grade</th>
-                        <th>Niveau</th>
-                        <th>Détails</th>
-                    </tr>
-                </thead>
-                <tbody id="list">
-                    <?php
-                        // Check if any student IDs were found
-                        if (!empty($enrolled_student_ids)) {
-                            // Output or process the enrolled students
-                            if (!empty($enrolled_students)) {
-                                foreach ($enrolled_students as $student) {
-                    ?>
-                    <tr>
-                        <td class="name">
-                            <a
-                                href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id)); ?>">
-                                <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
-                            </a>
-                        </td>
-                        <td>
-                            <?php echo esc_html($student->grade); ?>
-                        </td>
-                        <td>
-                            <?php echo esc_html($student->level); ?>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <a
-                                    href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id)); ?>">
-                                    <i class="fas fa-info-circle"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php
-                                }
-                            } else {
-                    ?>
-                    <tr>
-                        <td colspan="4">Aucun détail étudiant n'a été trouvé pour les étudiants inscrits.</td>
-                    </tr>
-                    <?php
-                                }
-                            } else {
-                    ?>
-                    <tr>
-                        <td colspan="4">Pourtant, aucun étudiant n'est inscrit à ce cours pour vous.</td>
-                    </tr>
-                    <?php
-                        }
-                    ?>
-                </tbody>
-            </table>
-        </div>
+
     </div>
 </div>
 

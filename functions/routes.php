@@ -208,7 +208,9 @@ add_action('template_redirect', 'restrict_student_pages');
 function course_portal_rewrite_rules() {
     add_rewrite_rule('^course/details/?$', 'index.php?course_page=details', 'top');
     add_rewrite_rule('^course/student-management/?$', 'index.php?course_page=student-management', 'top');
+    add_rewrite_rule('^course/student-management/student-details/?$', 'index.php?course_page=student-details', 'top');
     add_rewrite_rule('^course/resources/?$', 'index.php?course_page=resources', 'top');
+    add_rewrite_rule('^course/resources/add-resource/?$', 'index.php?course_page=add-resource', 'top');
     add_rewrite_rule('^course/submissions/?$', 'index.php?course_page=submissions', 'top');
     add_rewrite_rule('^course/communication/?$', 'index.php?course_page=communication', 'top');
     add_rewrite_rule('^course/teacher-evaluation/?$', 'index.php?course_page=teacher-evaluation', 'top');
