@@ -1,37 +1,43 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('modal');
-    const confirmButton = document.getElementById('confirmBtn');
-    const cancelButton = document.getElementById('cancelBtn');
-    const closeModalButton = document.querySelector('.modal-close');
+    const modals = document.querySelectorAll('.modal');
+    let activeModal = null;
     let formToSubmit = null;
 
     // Open modal
     document.querySelectorAll('.open-modal').forEach(button => {
         button.addEventListener('click', function() {
-            formToSubmit = this.closest('form');
-            modal.style.display = 'block';
+            const modalId = this.dataset.modal;
+            activeModal = document.getElementById(modalId);
+            if (activeModal) {
+                activeModal.style.display = 'block';
+                formToSubmit = this.closest('form');
+            }
         });
     });
 
     // Close modal
     const closeModal = () => {
-        modal.style.display = 'none';
-        formToSubmit = null;
+        if (activeModal) {
+            activeModal.style.display = 'none';
+            activeModal = null;
+            formToSubmit = null;
+        }
     };
 
-    closeModalButton.addEventListener('click', closeModal);
-    cancelButton.addEventListener('click', closeModal);
+    document.querySelectorAll('.modal-close, .close-modal').forEach(btn => {
+        btn.addEventListener('click', closeModal);
+    });
 
-    // Confirm delete
-    confirmButton.addEventListener('click', function() {
+    // Confirm cancel
+    document.getElementById('confirmCancel')?.addEventListener('click', function() {
         if (formToSubmit) {
             formToSubmit.submit();
         }
     });
 
-    // Close modal when clicking outside of it
+    // Close when clicking outside
     window.addEventListener('click', function(event) {
-        if (event.target === modal) {
+        if (event.target.classList.contains('modal')) {
             closeModal();
         }
     });

@@ -31,6 +31,24 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 $student_id = intval($_GET['id']);
 
+// Get course_id from session
+if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
+
+    // Check the user's role and redirect accordingly
+    if (in_array('student', (array) $user->roles)) {
+        wp_redirect(home_url('/student/course-management/'));
+        exit;
+    } elseif (in_array('teacher', (array) $user->roles)) {
+        wp_redirect(home_url('/teacher/course-management/'));
+        exit;
+    } else {
+        // Default redirection for other roles or if no role is matched
+        wp_redirect(home_url());
+        exit;
+    }
+}
+$course_id = intval($_GET['course_id']);
+
 global $wpdb;
 
 // for teacher users only
@@ -79,9 +97,6 @@ if (in_array('teacher', (array) $user->roles)) {
                         <h3 class="profile-name">
                             <?php echo esc_html($student->first_name) . " " . esc_html($student->last_name); ?>
                         </h3>
-                        <p class="profile-username">
-                            <?php echo esc_html($wp_user->user_login); ?>
-                        </p>
                     </div>
                     <div class="profile-details">
                         <div class="row detail-row">

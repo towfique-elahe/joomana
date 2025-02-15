@@ -18,6 +18,7 @@
 #courseDetails .schedule-title,
 #courseDetails .teacher-title,
 #courseDetails .meeting-title,
+#courseDetails .settings-title,
 #courseDetails .list-title {
   width: 100%;
   font-size: 1.2rem;
@@ -57,8 +58,42 @@
 #courseDetails .meeting-details {
   align-items: flex-start;
 }
-#courseDetails .meeting-details .button {
+#courseDetails .meeting-link-container {
+  background-color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  border-radius: 0.3rem;
+}
+#courseDetails .meeting-link {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+}
+#courseDetails .meeting-link-copy {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#courseDetails .meeting-link-copy:hover {
+  color: var(--primary-color);
+}
+#courseDetails .settings .buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+#courseDetails .meeting-details .button,
+#courseDetails .settings .button {
+  outline: none;
+  border: var(--border);
+  cursor: pointer;
   text-decoration: none;
+  text-transform: capitalize;
   font-size: var(--accent-font-size);
   font-family: var(--accent-font-family);
   font-weight: var(--accent-font-weight);
@@ -67,8 +102,21 @@
   padding: 1rem 2rem;
   border-radius: 0.3rem;
   transition: ease 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
-#courseDetails .meeting-details .button:hover {
+#courseDetails .settings .button {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+#courseDetails .settings .button.cancel {
+  background-color: rgb(255, 224, 230);
+  color: crimson;
+}
+#courseDetails .meeting-details .button:hover,
+#courseDetails .settings .button:hover {
   opacity: 0.8;
 }
 #courseDetails .student-list {
@@ -122,6 +170,61 @@
 #courseStudentManagement .table .action-buttons a {
   font-size: 1.2rem;
   color: var(--primary-color);
+}
+
+/* student details page */
+#courseStudentDetails .content-section {
+  flex-direction: row !important;
+  align-items: flex-start;
+}
+#courseStudentDetails .section {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+#courseStudentDetails .section.user-profile {
+  width: 100%;
+  max-width: 40rem;
+}
+#courseStudentDetails .profile-top {
+  display: flex;
+  align-items: center;
+  gap: 5.5rem;
+  margin-bottom: 1rem;
+}
+#courseStudentDetails .profile-image {
+  width: 100%;
+  max-width: 10rem;
+  max-height: 10rem;
+  border: var(--border);
+  border-radius: 0.5rem;
+}
+#courseStudentDetails .profile-name {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--secondary-font-size);
+  color: var(--accent-color);
+}
+#courseStudentDetails .detail-row {
+  padding: 1rem 0;
+  border-bottom: var(--border);
+}
+#courseStudentDetails .detail-row:last-of-type {
+  border: none;
+}
+#courseStudentDetails .detail-label {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  color: var(--dark-text-color);
+  text-transform: capitalize;
+}
+#courseStudentDetails .detail-value {
+  flex: 1.5;
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+  color: var(--text-color);
 }
 
 /* communication page */
@@ -227,4 +330,47 @@
 }
 #courseCommunication .form button:hover {
   background-color: var(--accent-color);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 5px;
+}
+
+.modal-close {
+  float: right;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }

@@ -121,7 +121,7 @@ if (in_array('teacher', (array) $user->roles)) {
                         <td>
                             <div class="action-buttons">
                                 <a
-                                    href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id)); ?>">
+                                    href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id . '&course_id=' . $course_id)); ?>">
                                     <i class="fas fa-info-circle"></i>
                                 </a>
                             </div>

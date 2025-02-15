@@ -227,13 +227,40 @@ if (in_array('teacher', (array) $user->roles)) {
                             ?>
 
                             <?php
-                                if (in_array('student', (array) $user->roles)) {
+                                if (in_array('teacher', (array) $user->roles)) {
                             ?>
                             <!-- meeting details -->
                             <div class="col meeting-details">
                                 <h4 class="meeting-title">Réunion Zoom</h4>
+                                <div class="meeting-link-container">
+                                    <p class="meeting-link">[Pas encore attribué.]</p>
+                                    <button class="meeting-link-copy">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <a href="" class="button">
+                                    <i class="fas fa-external-link-square-alt"></i> Rejoindre
+                                </a>
+                            </div>
 
-                                <a href="" class="button">Rejoindre</a>
+                            <!-- settings -->
+                            <div class="col settings">
+                                <h4 class="settings-title">Paramètres</h4>
+                                <div class="buttons">
+                                    <button type="button" class="button add-link open-modal" data-modal="addLinkModal">
+                                        <i class="fas fa-plus"></i> ajouter un nouveau lien de classe
+                                    </button>
+                                    <button type="button" class="button reprogram open-modal"
+                                        data-modal="reprogramModal">
+                                        <i class="fas fa-sync-alt"></i> Reprogrammer
+                                    </button>
+                                    <form method="post" class="delete-form">
+                                        <input type="hidden" name="cancel_course_id" value="<?php echo $course_id; ?>">
+                                        <button type="button" class="button cancel open-modal" data-modal="cancelModal">
+                                            <i class="fas fa-times"></i> Annuler
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                             <?php
                                 }
@@ -280,11 +307,78 @@ if (in_array('teacher', (array) $user->roles)) {
                             </ul>
 
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- Add Link Modal -->
+<div id="addLinkModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h4 class="modal-heading">Ajouter un lien de classe</h4>
+        <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
+            <input type="hidden" name="action" value="add_zoom_link">
+            <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+            <div class="form-group">
+                <label for="zoom_link">Lien Zoom</label>
+                <input type="url" name="zoom_link" id="zoom_link" required>
+            </div>
+            <div class="modal-actions">
+                <button type="submit" class="modal-button confirm">Ajouter</button>
+                <button type="button" class="modal-button cancel close-modal">Annuler</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reprogrammer Modal -->
+<div id="reprogramModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h4 class="modal-heading">Reprogrammer le cours</h4>
+        <form method="post" action="">
+            <input type="hidden" name="action" value="reschedule_course">
+            <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+            <div class="form-group">
+                <label for="new_date">Nouvelle date</label>
+                <input type="date" name="new_date" id="new_date" required>
+            </div>
+            <div class="form-group">
+                <label for="new_time">Nouvel horaire</label>
+                <input type="time" name="new_time" id="new_time" required>
+            </div>
+            <div class="modal-actions">
+                <button type="submit" class="modal-button confirm">Reprogrammer</button>
+                <button type="button" class="modal-button cancel close-modal">Annuler</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Cancel Modal -->
+<div id="cancelModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h4 class="modal-heading">
+            <i class="fas fa-exclamation-triangle" style="color: crimson"></i> Avertissement
+        </h4>
+        <p class="modal-info">Etes-vous sûr de vouloir annuler le cours ?</p>
+        <form action="" method="post">
+            <input type="hidden" name="action" value="cancel_class">
+            <div class="form-group">
+                <label for="new_time">Raison</label>
+                <textarea name="reason" id="reason" required></textarea>
+            </div>
+            <div class="modal-actions">
+                <button id="confirmCancel" class="modal-button delete">Confirmer</button>
+                <button class="modal-button cancel close-modal">Annuler</button>
+            </div>
+        </form>
     </div>
 </div>
 
