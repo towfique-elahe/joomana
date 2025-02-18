@@ -349,6 +349,77 @@
 #courseResources .download-button:hover {
   opacity: 1;
 }
+/* add resource modal */
+#addResource .modal-content {
+  background-color: var(--gray-background-color);
+  margin: 5% auto;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 45rem;
+  position: relative;
+}
+#addResource .modal-heading {
+  width: 100%;
+  text-align: center;
+}
+#addResource form,
+#addResource .upload-file-button,
+#addResource .upload-file-label {
+  width: 100% !important;
+}
+#addResource .section {
+  border: none;
+  padding: 0;
+  justify-content: flex-start;
+}
+#addResource label {
+  text-align: left;
+}
+#addResource .upload-file-button {
+  width: fit-content;
+  background-color: #fdf2ef;
+  border-radius: 5px;
+}
+#addResource .upload-file-button:hover {
+  background-color: var(--accent-color);
+}
+#addResource .upload-file-label {
+  width: 300px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--accent-color);
+  font-family: var(--accent-font-family);
+  font-size: var(--accent-font-size);
+  font-weight: var(--accent-font-weight);
+}
+#addResource .upload-file-button:hover .upload-file-label {
+  color: white;
+}
+#addResource .upload-file-label ion-icon {
+  color: var(--accent-color);
+  font-size: 20px;
+}
+#addResource .upload-file-button:hover ion-icon {
+  color: white;
+}
+#addResource .upload-file-input {
+  display: none; /* Hidden input */
+}
+#addResource .file-name {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+}
+#addResource .modal-button.confirm {
+  background-color: var(--primary-color);
+  color: white;
+}
 
 /* communication page */
 #courseCommunication .chat-container {

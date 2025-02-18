@@ -370,7 +370,9 @@ if (in_array('teacher', (array) $user->roles)) {
 <!-- Add Resource Modal -->
 <div id="addResource" class="modal">
     <div class="modal-content">
-        <span class="modal-close">&times;</span>
+        <span class="modal-close">
+            <i class="fas fa-times"></i>
+        </span>
         <h4 class="modal-heading">Ajouter un fichier de ressources</h4>
 
         <form method="post" action="" class="form add-resource-form" enctype="multipart/form-data">
@@ -399,17 +401,18 @@ if (in_array('teacher', (array) $user->roles)) {
                         <input type="datetime-local" name="submission_deadline" id="submission_deadline">
                     </div>
                 </div>
+                <!-- Assignment File Input -->
                 <div class="row">
                     <div class="col">
                         <div class="upload-file-button">
-                            <label for="upload_assignment" class="upload-cv-label">
+                            <label for="uploadAssignment" class="upload-file-label">
                                 Télécharger la tâche <ion-icon name="document-attach-outline"></ion-icon>
                             </label>
-                            <input type="file" id="upload_assignment" name="upload_assignment" accept=".pdf"
+                            <input type="file" id="uploadAssignment" name="upload_assignment" accept=".pdf"
                                 class="upload-file-input">
                         </div>
                         <p class="text">(PDF uniquement, max 2 Mo)</p>
-                        <p class="file-name">Aucun fichier sélectionné</p>
+                        <p class="file-name" id="assignmentFileName">Aucun fichier sélectionné</p>
                     </div>
                 </div>
             </section>
@@ -458,34 +461,36 @@ if (in_array('teacher', (array) $user->roles)) {
                         <textarea name="comment" id="comment"></textarea>
                     </div>
                 </div>
+                <!-- Report File Input -->
                 <div class="row">
                     <div class="col">
                         <div class="upload-file-button">
-                            <label for="upload_report" class="upload-cv-label">
+                            <label for="uploadReport" class="upload-file-label">
                                 Télécharger le rapport d'avancement <ion-icon name="document-attach-outline"></ion-icon>
                             </label>
-                            <input type="file" id="upload_report" name="upload_report" accept=".pdf"
+                            <input type="file" id="uploadReport" name="upload_report" accept=".pdf"
                                 class="upload-file-input">
                         </div>
                         <p class="text">(PDF uniquement, max 2 Mo)</p>
-                        <p class="file-name">Aucun fichier sélectionné</p>
+                        <p class="file-name" id="reportFileName">Aucun fichier sélectionné</p>
                     </div>
                 </div>
             </section>
 
             <!-- Add slide -->
             <section class="section col add-slide">
+                <!-- Slide File Input -->
                 <div class="row">
                     <div class="col">
                         <div class="upload-file-button">
-                            <label for="upload_slide" class="upload-cv-label">
+                            <label for="uploadSlide" class="upload-file-label">
                                 Télécharger la diapositive <ion-icon name="document-attach-outline"></ion-icon>
                             </label>
-                            <input type="file" id="upload_slide" name="upload_slide" accept=".pdf"
+                            <input type="file" id="uploadSlide" name="upload_slide" accept=".pdf"
                                 class="upload-file-input">
                         </div>
                         <p class="text">(PDF uniquement, max 2 Mo)</p>
-                        <p class="file-name">Aucun fichier sélectionné</p>
+                        <p class="file-name" id="slideFileName">Aucun fichier sélectionné</p>
                     </div>
                 </div>
             </section>
@@ -523,6 +528,15 @@ document.addEventListener("DOMContentLoaded", function() {
     const addReportSection = document.querySelector(".add-report");
     const addSlideSection = document.querySelector(".add-slide");
 
+    // File inputs and their corresponding name displays
+    const assignmentFileInput = document.getElementById("uploadAssignment");
+    const reportFileInput = document.getElementById("uploadReport");
+    const slideFileInput = document.getElementById("uploadSlide");
+
+    const assignmentFileNameDisplay = document.getElementById("assignmentFileName");
+    const reportFileNameDisplay = document.getElementById("reportFileName");
+    const slideFileNameDisplay = document.getElementById("slideFileName");
+
     function updateFormVisibility() {
         const selectedValue = fileTypeSelect.value;
 
@@ -531,11 +545,11 @@ document.addEventListener("DOMContentLoaded", function() {
         addSlideSection.style.display = "none";
 
         if (selectedValue === "Assignment") {
-            addAssignmentSection.style.display = "block";
+            addAssignmentSection.style.display = "flex";
         } else if (selectedValue === "Progress Report") {
-            addReportSection.style.display = "block";
+            addReportSection.style.display = "flex";
         } else {
-            addSlideSection.style.display = "block"; // Default
+            addSlideSection.style.display = "flex"; // Default
         }
     }
 
@@ -544,6 +558,49 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Update visibility on change
     fileTypeSelect.addEventListener("change", updateFormVisibility);
+
+    // Handle file input changes for assignment
+    assignmentFileInput.addEventListener("change", function() {
+        handleFileInputChange(assignmentFileInput, assignmentFileNameDisplay);
+    });
+
+    // Handle file input changes for report
+    reportFileInput.addEventListener("change", function() {
+        handleFileInputChange(reportFileInput, reportFileNameDisplay);
+    });
+
+    // Handle file input changes for slide
+    slideFileInput.addEventListener("change", function() {
+        handleFileInputChange(slideFileInput, slideFileNameDisplay);
+    });
+
+    // Function to handle file input changes
+    function handleFileInputChange(fileInput, fileNameDisplay) {
+        const file = fileInput.files[0];
+
+        if (file) {
+            const validFormats = ["application/pdf"];
+
+            if (!validFormats.includes(file.type)) {
+                alert("Only PDF files are allowed.");
+                fileInput.value = "";
+                fileNameDisplay.textContent = "No file selected";
+                return;
+            }
+
+            if (file.size > 2 * 1024 * 1024) {
+                alert("File size exceeds 2MB. Please upload a smaller file.");
+                fileInput.value = "";
+                fileNameDisplay.textContent = "No file selected";
+                return;
+            }
+
+            // Display the selected file name
+            fileNameDisplay.textContent = `Selected File: ${file.name}`;
+        } else {
+            fileNameDisplay.textContent = "No file selected";
+        }
+    }
 });
 </script>
 
