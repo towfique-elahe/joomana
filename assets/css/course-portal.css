@@ -147,6 +147,66 @@
   border: var(--border);
   border-radius: 0.3rem;
 }
+/* add/update class link modal */
+#addLinkModal .modal-content {
+  background-color: var(--gray-background-color);
+  margin: 5% auto;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 45rem;
+  position: relative;
+}
+#addLinkModal .modal-heading {
+  width: 100%;
+  text-align: center;
+}
+#addLinkModal form {
+  width: 100% !important;
+}
+#addLinkModal label {
+  text-align: left;
+}
+#addLinkModal .modal-button.confirm {
+  background-color: var(--primary-color);
+  color: white;
+}
+/* reprogram class modal */
+#reprogramModal .modal-content {
+  background-color: var(--gray-background-color);
+  margin: 3% auto;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 60rem;
+  position: relative;
+}
+#reprogramModal form {
+  width: 100% !important;
+}
+#reprogramModal label {
+  text-align: left;
+}
+#reprogramModal .modal-button.confirm {
+  background-color: var(--primary-color);
+  color: white;
+}
+/* cancel class modal */
+#cancelModal .modal-content {
+  background-color: var(--gray-background-color);
+  margin: 5% auto;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 45rem;
+  position: relative;
+}
+#cancelModal form {
+  width: 100% !important;
+}
+#cancelModal label {
+  text-align: left;
+}
 
 /* student management page */
 #courseStudentManagement .table th,
@@ -419,6 +479,40 @@
 #addResource .modal-button.confirm {
   background-color: var(--primary-color);
   color: white;
+}
+
+/* submissions page */
+#courseSubmissions .upload-file-button {
+  width: fit-content;
+  background-color: #fdf2ef;
+  border-radius: 5px;
+}
+#courseSubmissions .upload-file-button:hover {
+  background-color: var(--accent-color);
+}
+#courseSubmissions .upload-file-label {
+  padding: 1rem 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--accent-color);
+  font-family: var(--accent-font-family);
+  font-size: var(--accent-font-size);
+  font-weight: var(--accent-font-weight);
+}
+#courseSubmissions .upload-file-button:hover .upload-file-label {
+  color: white;
+}
+#courseSubmissions .upload-file-input {
+  display: none; /* Hidden input */
+}
+#courseSubmissions .file-name {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
 }
 
 /* communication page */

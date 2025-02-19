@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.0.2';
+    $custom_tables_version = '1.0.4';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -26,10 +26,12 @@ function create_custom_tables() {
     $communications_table      = $wpdb->prefix . 'communications';
     $student_courses_table     = $wpdb->prefix . 'student_courses';
     $teacher_courses_table     = $wpdb->prefix . 'teacher_courses';
+    $course_class_links_table  = $wpdb->prefix . 'course_class_links';
     $course_assignments_table  = $wpdb->prefix . 'course_assignments';
     $course_slides_table       = $wpdb->prefix . 'course_slides';
     $students_table            = $wpdb->prefix . 'students';
     $student_reports_table     = $wpdb->prefix . 'student_reports';
+    $student_submissions_table = $wpdb->prefix . 'student_submissions';
     $parents_table             = $wpdb->prefix . 'parents';
     $teachers_table            = $wpdb->prefix . 'teachers';
     $teacher_bank_details      = $wpdb->prefix . 'teacher_bank_details';
@@ -122,8 +124,17 @@ function create_custom_tables() {
         teacher_id BIGINT(20) UNSIGNED NOT NULL,
         course_id BIGINT(20) UNSIGNED NOT NULL,
         status ENUM('En cours', 'Complété') NOT NULL DEFAULT 'En cours',
-        class_link VARCHAR(255) DEFAULT NULL,
         assigned_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    $course_class_links_sql = "CREATE TABLE $course_class_links_table (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        course_id BIGINT(20) UNSIGNED NOT NULL,
+        group_number INT(11) NOT NULL,
+        class_link VARCHAR(255) DEFAULT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) $charset_collate;";
@@ -183,6 +194,16 @@ function create_custom_tables() {
         student_id BIGINT(20) UNSIGNED NOT NULL,
         band_score DECIMAL(5,2) DEFAULT NULL,
         comment TEXT DEFAULT NULL,
+        file VARCHAR(255) DEFAULT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    $student_submissions_sql = "CREATE TABLE $student_submissions_table (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        course_id BIGINT(20) UNSIGNED NOT NULL,
+        group_number INT(11) NOT NULL,
+        student_id BIGINT(20) UNSIGNED NOT NULL,
         file VARCHAR(255) DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
@@ -306,10 +327,12 @@ function create_custom_tables() {
     dbDelta($communications_sql);
     dbDelta($student_courses_sql);
     dbDelta($teacher_courses_sql);
+    dbDelta($course_class_links_sql);
     dbDelta($course_assignments_sql);
     dbDelta($course_slides_sql);
     dbDelta($students_sql);
     dbDelta($student_reports_sql);
+    dbDelta($student_submissions_sql);
     dbDelta($parents_sql);
     dbDelta($teachers_sql);
     dbDelta($teacher_bank_details_sql);
@@ -352,6 +375,13 @@ function add_foreign_keys() {
         "{$wpdb->prefix}course_assignments" => [
             "fk_course_assignments_teacher_id"  => "ALTER TABLE {$wpdb->prefix}course_assignments ADD CONSTRAINT fk_course_assignments_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;",
             "fk_course_assignments_course_id"   => "ALTER TABLE {$wpdb->prefix}course_assignments ADD CONSTRAINT fk_course_assignments_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}student_submissions" => [
+            "fk_student_submissions_student_id"  => "ALTER TABLE {$wpdb->prefix}student_submissions ADD CONSTRAINT fk_student_submissions_student_id FOREIGN KEY (student_id) REFERENCES {$wpdb->prefix}students(id) ON DELETE CASCADE;",
+            "fk_student_submissions_course_id"   => "ALTER TABLE {$wpdb->prefix}student_submissions ADD CONSTRAINT fk_student_submissions_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}course_class_links" => [
+            "fk_course_class_links_course_id"   => "ALTER TABLE {$wpdb->prefix}course_class_links ADD CONSTRAINT fk_course_class_links_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
         ],
         "{$wpdb->prefix}course_slides" => [
             "fk_course_slides_teacher_id"  => "ALTER TABLE {$wpdb->prefix}course_slides ADD CONSTRAINT fk_course_slides_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;",

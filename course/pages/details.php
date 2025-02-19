@@ -54,17 +54,27 @@ if (!$course) {
     }
 }
 
-// for student users only
+$group_number = 0;
+
 if (in_array('student', (array) $user->roles)) {
+    $student_id = $user->ID;
     // Query the custom table to get the student's teacher_id
     $student_courses_table  = $wpdb->prefix . 'student_courses'; // Ensure the table name is correct
     $teacher_id = $wpdb->get_var(
         $wpdb->prepare(
             "SELECT teacher_id FROM $student_courses_table  WHERE student_id = %d AND course_id = %d",
-            $user->id,
+            $student_id,
             $course_id
         )
     );
+    $student_group = $wpdb->get_var($wpdb->prepare(
+        "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
+        $student_id,
+        $course_id
+    ));
+    if ($student_group) {
+        $group_number = intval($student_group);
+    }
 
     // Fetch the teacher's details using the teacher_id for the student
     $teacher_table = $wpdb->prefix. 'teachers';
@@ -91,13 +101,27 @@ if (in_array('student', (array) $user->roles)) {
             )
         );
     }
-}
 
-// for teacher users only
-if (in_array('teacher', (array) $user->roles)) {
+    // Fetch existing class link for course_id and group_number
+    $class_links_table = $wpdb->prefix . "course_class_links";
+    // Check if a record already exists for this course and group
+    $existing_class_link = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM $class_links_table WHERE course_id = %d AND group_number = %d",
+        $course_id, $group_number
+    ));
+
+} elseif (in_array('teacher', (array) $user->roles)) {
     // Query the custom table to get the student's teacher_id
     $student_courses_table  = $wpdb->prefix . 'student_courses'; // Ensure the table name is correct
-    $teacher_id = $user->id;
+    $teacher_id = $user->ID;
+    $teacher_group = $wpdb->get_var($wpdb->prepare(
+        "SELECT group_number FROM {$wpdb->prefix}teacher_courses WHERE teacher_id = %d AND course_id = %d LIMIT 1",
+        $teacher_id,
+        $course_id
+    ));
+    if ($teacher_group) {
+        $group_number = intval($teacher_group);
+    }
 
     // Fetch the teacher's details using the teacher_id for the student
     $teacher_table = $wpdb->prefix. 'teachers';
@@ -123,6 +147,94 @@ if (in_array('teacher', (array) $user->roles)) {
                 "SELECT * FROM $students_table WHERE id IN ($student_ids_placeholder)"
             )
         );
+    }
+
+    // Fetch existing class link for course_id and group_number
+    $class_links_table = $wpdb->prefix . "course_class_links";
+    // Check if a record already exists for this course and group
+    $existing_class_link = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM $class_links_table WHERE course_id = %d AND group_number = %d",
+        $course_id, $group_number
+    ));
+
+    // Handle add/edit class links
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'save_class_link') {
+        global $wpdb;
+        $table_name = $wpdb->prefix . "course_class_links";
+
+        $class_link = esc_url($_POST['class_link']);
+        $class_link_id = isset($_POST['class_link_id']) ? intval($_POST['class_link_id']) : 0;
+
+        if ($class_link_id > 0) {
+            // Update existing record
+            $wpdb->update(
+                $table_name,
+                [
+                    'class_link' => $class_link,
+                    'updated_at' => current_time('mysql')
+                ],
+                [ 'id' => $class_link_id ]
+            );
+        } else {
+            // Check if a record already exists for this course and group
+            $existing = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM $table_name WHERE course_id = %d AND group_number = %d",
+                $course_id, $group_number
+            ));
+            
+            if ($existing) {
+                // Update the existing record
+                $wpdb->update(
+                    $table_name,
+                    [ 'class_link' => $class_link, 'updated_at' => current_time('mysql') ],
+                    [ 'id' => $existing ]
+                );
+            } else {
+                // Insert new record
+                $wpdb->insert(
+                    $table_name,
+                    [
+                        'course_id' => $course_id,
+                        'group_number' => $group_number,
+                        'class_link' => $class_link,
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql')
+                    ]
+                );
+            }
+        }
+
+        // Redirect to prevent resubmission
+        wp_safe_redirect($_SERVER['REQUEST_URI']);
+        exit;
+    }
+
+    // Handle reschedule course class
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'reschedule_course') {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'courses';
+
+        // Sanitize user inputs
+        $start_date = sanitize_text_field($_POST['start_date']);
+        $time_slot = sanitize_text_field($_POST['time_slot']);
+    
+        // Update course in the database
+        $wpdb->update(
+            $table_name,
+            [
+                'start_date' => $start_date,
+                'time_slot'  => $time_slot,
+            ],
+            ['id' => $course_id],
+            [
+                '%s', '%s',
+            ],
+            ['%d']
+        );
+    
+        // Redirect to prevent resubmission
+        wp_safe_redirect($_SERVER['REQUEST_URI']);
+        exit;
     }
 }
 
@@ -227,20 +339,66 @@ if (in_array('teacher', (array) $user->roles)) {
                             ?>
 
                             <?php
+                                if (in_array('student', (array) $user->roles)) {
+                            ?>
+                            <!-- meeting details -->
+                            <div class="col meeting-details">
+                                <h4 class="meeting-title">Réunion Zoom</h4>
+                                <div class="meeting-link-container">
+                                    <?php
+                                        if($existing_class_link->class_link) {
+                                            echo '<p class="meeting-link" id="classLink">[ '. esc_html($existing_class_link->class_link) . ' ]</p>';
+                                        } else {
+                                            echo '<p class="meeting-link">[ Pas encore attribué ]</p>';
+                                        }
+                                    ?>
+
+                                    <?php if($existing_class_link->class_link) { ?>
+                                    <button class="meeting-link-copy" onclick="copyToClipboard()">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <?php } ?>
+                                </div>
+
+                                <?php if($existing_class_link->class_link) { ?>
+                                <a href="<?php echo esc_url($existing_class_link->class_link); ?>" target="_blank"
+                                    class="button">
+                                    <i class="fas fa-external-link-square-alt"></i> Rejoindre
+                                </a>
+                                <?php } ?>
+                            </div>
+                            <?php
+                                }
+                            ?>
+
+                            <?php
                                 if (in_array('teacher', (array) $user->roles)) {
                             ?>
                             <!-- meeting details -->
                             <div class="col meeting-details">
                                 <h4 class="meeting-title">Réunion Zoom</h4>
                                 <div class="meeting-link-container">
-                                    <p class="meeting-link">[Pas encore attribué.]</p>
-                                    <button class="meeting-link-copy">
+                                    <?php
+                                        if($existing_class_link->class_link) {
+                                            echo '<p class="meeting-link" id="classLink">[ '. esc_html($existing_class_link->class_link) . ' ]</p>';
+                                        } else {
+                                            echo '<p class="meeting-link">[ Pas encore attribué ]</p>';
+                                        }
+                                    ?>
+
+                                    <?php if($existing_class_link->class_link) { ?>
+                                    <button class="meeting-link-copy" onclick="copyToClipboard()">
                                         <i class="fas fa-copy"></i>
                                     </button>
+                                    <?php } ?>
                                 </div>
-                                <a href="" class="button">
+
+                                <?php if($existing_class_link->class_link) { ?>
+                                <a href="<?php echo esc_url($existing_class_link->class_link); ?>" target="_blank"
+                                    class="button">
                                     <i class="fas fa-external-link-square-alt"></i> Rejoindre
                                 </a>
+                                <?php } ?>
                             </div>
 
                             <!-- settings -->
@@ -248,7 +406,7 @@ if (in_array('teacher', (array) $user->roles)) {
                                 <h4 class="settings-title">Paramètres</h4>
                                 <div class="buttons">
                                     <button type="button" class="button add-link open-modal" data-modal="addLinkModal">
-                                        <i class="fas fa-plus"></i> ajouter un nouveau lien de classe
+                                        <i class="fas fa-link"></i> ajouter/mettre à jour le lien de classe
                                     </button>
                                     <button type="button" class="button reprogram open-modal"
                                         data-modal="reprogramModal">
@@ -316,20 +474,29 @@ if (in_array('teacher', (array) $user->roles)) {
     </div>
 </div>
 
-<!-- Add Link Modal -->
+<!-- Add/Update Class Link Modal -->
 <div id="addLinkModal" class="modal">
     <div class="modal-content">
-        <span class="modal-close">&times;</span>
+        <span class="modal-close">
+            <i class="fas fa-times"></i>
+        </span>
         <h4 class="modal-heading">Ajouter un lien de classe</h4>
-        <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
-            <input type="hidden" name="action" value="add_zoom_link">
+
+        <form method="post" action="" class="form add-class-link">
+            <input type="hidden" name="action" value="save_class_link">
             <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
-            <div class="form-group">
-                <label for="zoom_link">Lien Zoom</label>
-                <input type="url" name="zoom_link" id="zoom_link" required>
+            <input type="hidden" name="class_link_id" id="classLinkId" value="<?= $existing_class_link -> id; ?>">
+
+            <div class="row">
+                <div class="col">
+                    <label for="classLink">Lien Zoom</label>
+                    <input type="url" name="class_link" id="classLink" value="<?= $existing_class_link -> class_link ?>"
+                        required>
+                </div>
             </div>
+
             <div class="modal-actions">
-                <button type="submit" class="modal-button confirm">Ajouter</button>
+                <button type="submit" class="modal-button confirm">Enregistrer</button>
                 <button type="button" class="modal-button cancel close-modal">Annuler</button>
             </div>
         </form>
@@ -339,19 +506,102 @@ if (in_array('teacher', (array) $user->roles)) {
 <!-- Reprogrammer Modal -->
 <div id="reprogramModal" class="modal">
     <div class="modal-content">
-        <span class="modal-close">&times;</span>
+        <span class="modal-close">
+            <i class="fas fa-times"></i>
+        </span>
         <h4 class="modal-heading">Reprogrammer le cours</h4>
         <form method="post" action="">
             <input type="hidden" name="action" value="reschedule_course">
-            <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
-            <div class="form-group">
-                <label for="new_date">Nouvelle date</label>
-                <input type="date" name="new_date" id="new_date" required>
+
+            <div class="row">
+                <div class="calendar col">
+                    <!-- Hidden inputs for date and time -->
+                    <input type="hidden" id="start_date" name="start_date"
+                        value="<?php echo esc_attr($course->start_date); ?>">
+                    <input type="hidden" id="time_slot" name="time_slot"
+                        value="<?php echo esc_attr($course->time_slot); ?>">
+
+                    <div class="calendar-header row">
+                        <div class="buttons">
+                            <div class="custom-select-wrapper">
+                                <select id="yearSelect">
+                                    <option>2022</option>
+                                    <option>2023</option>
+                                    <option selected>2024</option>
+                                    <option>2025</option>
+                                </select>
+                                <i class="fas fa-caret-down custom-arrow"></i>
+                            </div>
+                            <div class="custom-select-wrapper">
+                                <select id="monthSelect">
+                                    <option value="1">Janvier</option>
+                                    <option value="2">Février</option>
+                                    <option value="3">Mars</option>
+                                    <option value="4">Avril</option>
+                                    <option value="5">Mai</option>
+                                    <option value="6">Juin</option>
+                                    <option value="7">Juillet</option>
+                                    <option value="8">Août</option>
+                                    <option value="9">Septembre</option>
+                                    <option value="10">Octobre</option>
+                                    <option value="11">Novembre</option>
+                                    <option value="12" selected>Décembre</option>
+                                </select>
+                                <i class="fas fa-caret-down custom-arrow"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button class="button reset" id="resetButton">
+                                <i class="fas fa-undo"></i> Reprogrammer
+                            </button>
+                        </div>
+
+                        <div class="special-heading">Date de début</div>
+                    </div>
+
+                    <table class="table calendar-table" id="calendarTable">
+                        <thead>
+                            <tr>
+                                <th>Dimanche</th>
+                                <th>Lundi</th>
+                                <th>Mardi</th>
+                                <th>Mercredi</th>
+                                <th>Jeudi</th>
+                                <th>Vendredi</th>
+                                <th>Samedi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Calendar dates will be populated dynamically -->
+                        </tbody>
+                    </table>
+
+                    <table class="table time-table" id="timeTable">
+                        <tbody>
+                            <tr>
+                                <td>8:00 AM - 10:00 AM</td>
+                                <td>10:00 AM - 12:00 PM</td>
+                                <td>12:00 PM - 2:00 PM</td>
+                                <td>2:00 PM - 4:00 PM</td>
+                            </tr>
+                            <tr>
+                                <td>4:00 PM - 6:00 PM</td>
+                                <td>6:00 PM - 8:00 PM</td>
+                                <td>8:00 PM - 10:00 PM</td>
+                                <td>10:00 PM - 12:00 AM</td>
+                            </tr>
+                            <tr>
+                                <td>12:00 AM - 2:00 AM</td>
+                                <td>2:00 AM - 4:00 AM</td>
+                                <td>4:00 AM - 6:00 AM</td>
+                                <td>6:00 AM - 8:00 AM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="new_time">Nouvel horaire</label>
-                <input type="time" name="new_time" id="new_time" required>
-            </div>
+
             <div class="modal-actions">
                 <button type="submit" class="modal-button confirm">Reprogrammer</button>
                 <button type="button" class="modal-button cancel close-modal">Annuler</button>
@@ -363,17 +613,23 @@ if (in_array('teacher', (array) $user->roles)) {
 <!-- Cancel Modal -->
 <div id="cancelModal" class="modal">
     <div class="modal-content">
-        <span class="modal-close">&times;</span>
+        <span class="modal-close">
+            <i class="fas fa-times"></i>
+        </span>
         <h4 class="modal-heading">
             <i class="fas fa-exclamation-triangle" style="color: crimson"></i> Avertissement
         </h4>
         <p class="modal-info">Etes-vous sûr de vouloir annuler le cours ?</p>
         <form action="" method="post">
             <input type="hidden" name="action" value="cancel_class">
-            <div class="form-group">
-                <label for="new_time">Raison</label>
-                <textarea name="reason" id="reason" required></textarea>
+
+            <div class="row">
+                <div class="col">
+                    <label for="reason">Raison</label>
+                    <textarea name="reason" id="reason" required></textarea>
+                </div>
             </div>
+
             <div class="modal-actions">
                 <button id="confirmCancel" class="modal-button delete">Confirmer</button>
                 <button class="modal-button cancel close-modal">Annuler</button>
@@ -381,5 +637,21 @@ if (in_array('teacher', (array) $user->roles)) {
         </form>
     </div>
 </div>
+
+<script>
+function copyToClipboard() {
+    var classLink = document.getElementById("classLink").textContent;
+    classLink = classLink.replace(/\[|\]/g, '').trim(); // Remove brackets
+
+    var tempInput = document.createElement("input");
+    tempInput.value = classLink;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+
+    alert("Lien copié: " + classLink);
+}
+</script>
 
 <?php require_once(get_template_directory() . '/course/templates/footer.php'); ?>

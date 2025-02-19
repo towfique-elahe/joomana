@@ -80,7 +80,7 @@ if (in_array('student', (array) $user->roles)) {
     }
 }
 
-// Handle file upload for teachers
+// Handle resource file upload for teachers
 if (in_array('teacher', (array) $user->roles)) {
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'add_resource') {
         global $wpdb;
@@ -270,11 +270,17 @@ if (in_array('teacher', (array) $user->roles)) {
         </div>
 
         <div class="content-section">
+            <?php
+                if (in_array('teacher', (array) $user->roles)) {
+            ?>
             <div class="row">
                 <button type="button" class="button add-resource open-modal" data-modal="addResource">
                     <i class="fas fa-plus"></i> Ajouter une ressource
                 </button>
             </div>
+            <?php
+                }
+            ?>
 
             <div class="row file-container">
                 <!-- Display Course Assignments -->
@@ -282,9 +288,15 @@ if (in_array('teacher', (array) $user->roles)) {
                 <div class="file-card">
                     <div class="file-top">
                         <p class="file-type assignment">Assignment</p>
+                        <?php
+                            if (in_array('teacher', (array) $user->roles)) {
+                        ?>
                         <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
                             <i class="fas fa-trash-alt"></i>
                         </button>
+                        <?php
+                            }
+                        ?>
                         <div class="file-icon">
                             <i class="fas fa-file-pdf"></i>
                         </div>
@@ -310,9 +322,15 @@ if (in_array('teacher', (array) $user->roles)) {
                 <div class="file-card">
                     <div class="file-top">
                         <p class="file-type slide">Slide</p>
+                        <?php
+                            if (in_array('teacher', (array) $user->roles)) {
+                        ?>
                         <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
                             <i class="fas fa-trash-alt"></i>
                         </button>
+                        <?php
+                            }
+                        ?>
                         <div class="file-icon">
                             <i class="fas fa-file-pdf"></i>
                         </div>
@@ -338,9 +356,15 @@ if (in_array('teacher', (array) $user->roles)) {
                 <div class="file-card">
                     <div class="file-top">
                         <p class="file-type report">Progress Report</p>
+                        <?php
+                            if (in_array('teacher', (array) $user->roles)) {
+                        ?>
                         <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
                             <i class="fas fa-trash-alt"></i>
                         </button>
+                        <?php
+                            }
+                        ?>
                         <div class="file-icon">
                             <i class="fas fa-file-pdf"></i>
                         </div>
@@ -377,7 +401,6 @@ if (in_array('teacher', (array) $user->roles)) {
 
         <form method="post" action="" class="form add-resource-form" enctype="multipart/form-data">
             <input type="hidden" name="action" value="add_resource">
-            <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
 
             <!-- Select file type -->
             <section class="section col file-type">
