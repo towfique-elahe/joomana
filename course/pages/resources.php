@@ -229,6 +229,56 @@ if (in_array('teacher', (array) $user->roles)) {
     ));
 }
 
+// Handle file deletion for teachers
+if (in_array('teacher', (array) $user->roles)) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
+        global $wpdb;
+
+        // Get the file ID from the form submission
+        $file_id = intval($_POST['delete_item_id']);
+        $file_type = sanitize_text_field($_POST['file_type']);
+
+        // Determine the table and file URL based on the file type
+        $table_name = '';
+        $file_url = '';
+
+        if ($file_type == 'Assignment') {
+            $table_name = $wpdb->prefix . 'course_assignments';
+            $file_url = $wpdb->get_var($wpdb->prepare(
+                "SELECT file FROM $table_name WHERE id = %d",
+                $file_id
+            ));
+        } elseif ($file_type == 'Progress Report') {
+            $table_name = $wpdb->prefix . 'student_reports';
+            $file_url = $wpdb->get_var($wpdb->prepare(
+                "SELECT file FROM $table_name WHERE id = %d",
+                $file_id
+            ));
+        } elseif ($file_type == 'Course Slide') {
+            $table_name = $wpdb->prefix . 'course_slides';
+            $file_url = $wpdb->get_var($wpdb->prepare(
+                "SELECT file FROM $table_name WHERE id = %d",
+                $file_id
+            ));
+        }
+
+        // If the file URL is found, delete the file from the media library
+        if ($file_url) {
+            $attachment_id = attachment_url_to_postid($file_url);
+            if ($attachment_id) {
+                wp_delete_attachment($attachment_id, true); // Force delete the file
+            }
+        }
+
+        // Delete the record from the database
+        $wpdb->delete($table_name, ['id' => $file_id]);
+
+        // Redirect to prevent resubmission
+        wp_safe_redirect($_SERVER['REQUEST_URI']);
+        exit;
+    }
+}
+
 ?>
 
 <div class="content-area">
@@ -291,9 +341,13 @@ if (in_array('teacher', (array) $user->roles)) {
                         <?php
                             if (in_array('teacher', (array) $user->roles)) {
                         ?>
-                        <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                        <form method="post" class="delete-form">
+                            <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($assignment->id); ?>">
+                            <input type="hidden" name="file_type" id="deleteFileType" value="Assignment">
+                            <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
                         <?php
                             }
                         ?>
@@ -325,9 +379,13 @@ if (in_array('teacher', (array) $user->roles)) {
                         <?php
                             if (in_array('teacher', (array) $user->roles)) {
                         ?>
-                        <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                        <form method="post" class="delete-form">
+                            <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($assignment->id); ?>">
+                            <input type="hidden" name="file_type" id="deleteFileType" value="Course Slide">
+                            <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
                         <?php
                             }
                         ?>
@@ -359,9 +417,13 @@ if (in_array('teacher', (array) $user->roles)) {
                         <?php
                             if (in_array('teacher', (array) $user->roles)) {
                         ?>
-                        <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                        <form method="post" class="delete-form">
+                            <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($assignment->id); ?>">
+                            <input type="hidden" name="file_type" id="deleteFileType" value="Progress Report">
+                            <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
                         <?php
                             }
                         ?>
@@ -529,18 +591,17 @@ if (in_array('teacher', (array) $user->roles)) {
 <!-- File Delete Modal -->
 <div id="fileDelete" class="modal">
     <div class="modal-content">
-        <span class="modal-close">&times;</span>
+        <span class="modal-close">
+            <i class="fas fa-times"></i>
+        </span>
         <h4 class="modal-heading">
             <i class="fas fa-exclamation-triangle" style="color: crimson"></i> Avertissement
         </h4>
-        <p class="modal-info">Etes-vous sûr de vouloir supprimer le fichier ?</p>
-        <form action="" method="post">
-            <input type="hidden" name="action" value="delete_file">
-            <div class="modal-actions">
-                <button id="confirmCancel" class="modal-button delete">Confirmer</button>
-                <button class="modal-button cancel close-modal">Annuler</button>
-            </div>
-        </form>
+        <p class="modal-info">Êtes-vous sûr de vouloir supprimer ce niveau ?</p>
+        <div class="modal-actions">
+            <button id="confirmBtn" class="modal-button delete">Supprimer</button>
+            <button id="cancelBtn" class="modal-button cancel close-modal">Annuler</button>
+        </div>
     </div>
 </div>
 

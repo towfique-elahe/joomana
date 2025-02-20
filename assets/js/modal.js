@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', closeModal);
     });
 
-    // Confirm cancel
-    document.getElementById('confirmCancel')?.addEventListener('click', function() {
+    // Confirm button submit
+    document.getElementById('confirmBtn')?.addEventListener('click', function() {
         if (formToSubmit) {
             formToSubmit.submit();
         }

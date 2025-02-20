@@ -122,6 +122,28 @@ function upload_file($file_key) {
     return null;
 }
 
+// Fetch files from the database
+$submissions = [];
+
+if (in_array('teacher', (array) $user->roles)) {
+    // Fetch submissions for the teacher
+    $submissions = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}student_submissions WHERE course_id = %d AND group_number = %d",
+        $course_id,
+        $group_number
+    ));
+
+} elseif (in_array('student', (array) $user->roles)) {
+    // Fetch submissions for the student
+    $submissions = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}student_submissions WHERE course_id = %d AND group_number = %d AND student_id = %d",
+        $course_id,
+        $group_number,
+        $student_id
+    ));
+
+}
+
 ?>
 
 <div class="content-area">
@@ -188,6 +210,44 @@ function upload_file($file_key) {
             <?php
                 }
             ?>
+
+            <div class="row file-container">
+                <!-- Display Submissions -->
+                <?php foreach ($submissions as $submission) : ?>
+                <div class="file-card">
+                    <div class="file-top">
+                        <p class="file-type assignment">Assignment</p>
+                        <?php
+                            if (in_array('student', (array) $user->roles)) {
+                        ?>
+                        <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        <?php
+                            }
+                        ?>
+                        <div class="file-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                    </div>
+                    <div class="file-bottom row">
+                        <div class="col">
+                            <h3 class="file-title"><?php echo basename($submission->file); ?></h3>
+                            <p class="file-uploaded-time">
+                                Téléchargé: <?php echo date('Y-m-d | H:i:s', strtotime($submission->created_at)); ?>
+                            </p>
+                        </div>
+                        <div class="col">
+                            <a href="<?php echo esc_url($submission->file); ?>" class="download-button" download>
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+
+            </div>
+
         </div>
 
     </div>
