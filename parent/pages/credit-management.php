@@ -8,25 +8,27 @@ $pageTitle = 'Gestion De Crédit';
 
 require_once(get_template_directory() . '/parent/templates/header.php');
 
-// Exit if accessed directly
-if (!defined('ABSPATH')) {
-    exit;
-}
+// Get current user ID
+$current_user = get_current_user_id();
 
-// Query to fetch all users with the role 'teacher'
-$args = [
-    'role'    => 'teacher',
-    'orderby' => 'display_name',
-    'order'   => 'ASC',
-];
-$teachers = get_users($args);
+// Get table name
+global $wpdb;
+$parent_table = $wpdb->prefix . 'parents';
+$credits_table = $wpdb->prefix . 'credits';
+
+// Get the parent details by the current user
+$parent = $wpdb->get_row($wpdb->prepare("SELECT * FROM $parent_table WHERE id = %d", $current_user));
+
+// Get the parent's credit transactions by the current user
+$credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits_table WHERE user_id = %d", $current_user));
+
 ?>
 
 <div class="content-area">
     <div class="sidebar-container">
         <?php require_once(get_template_directory() . '/parent/templates/sidebar.php'); ?>
     </div>
-    <div id="adminTeacherManagement" class="main-content">
+    <div id="parentCredit" class="main-content">
         <div class="content-header">
             <h2 class="content-title">Gestion de crédit</h2>
             <div class="content-breadcrumb">
@@ -38,72 +40,70 @@ $teachers = get_users($args);
             </div>
         </div>
 
-        <!-- <div class="content-section user-list">
-            <div class="search-bar">
-                <input type="text" placeholder="Rechercher Un Professeur" onkeyup="filterUser()">
-            </div>
+        <div class="content-section statistics">
+            <div class="section-body">
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nom</th>
-                        <th>Compétence</th>
-                        <th>Attribuer Un Cours</th>
-                        <th>Paiement Total</th>
-                        <th>Statut</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="user-list">
-                    <?php if (!empty($teachers)) : ?>
-                    <?php foreach ($teachers as $teacher) : ?>
-                    <?php
-                            // Example of fetching custom data for each teacher
-                            $skills = get_user_meta($teacher->ID, 'skills', true) ?: 'Non spécifié';
-                            $courses = get_user_meta($teacher->ID, 'assigned_courses', true) ?: 0;
-                            $payment = get_user_meta($teacher->ID, 'total_payment', true) ?: 0;
-                            $status = get_user_meta($teacher->ID, 'status', true) ?: 'In Review';
-                            ?>
-                    <tr>
-                        <td>
-                            <?php echo esc_html($teacher->ID); ?>
-                        </td>
-                        <td class="user-name">
-                            <a href="<?php echo esc_url(get_author_posts_url($teacher->ID)); ?>">
-                                <?php echo esc_html($teacher->display_name); ?>
-                            </a>
-                        </td>
-                        <td>
-                            <?php echo esc_html($skills); ?>
-                        </td>
-                        <td>
-                            <?php echo esc_html($courses); ?>
-                        </td>
-                        <td class="payment">
-                            <i class="fa fa-eur" aria-hidden="true"></i>
-                            <?php echo esc_html($payment); ?>
-                        </td>
-                        <td>
-                            <span class="status <?php echo strtolower(str_replace(' ', '-', $status)); ?>">
-                                <?php echo esc_html($status); ?>
-                            </span>
-                        </td>
-                        <td class="action-btn">
-                            <a href="#">
-                                <i class="fa fa-user-o" aria-hidden="true"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <?php else : ?>
-                    <tr>
-                        <td colspan="7">Aucun professeur trouvé.</td>
-                    </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div> -->
+                <!-- Available Credit Count -->
+                <a href="javascript:void()" class="statistic-box total-teacher">
+                    <h4 class="statistic-title">
+                        <i class="fas fa-chalkboard-teacher"></i> Crédit disponible
+                    </h4>
+                    <p class="statistic-value">
+                        <?php echo esc_html($parent->credit); ?>
+                    </p>
+                </a>
+
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="row list">
+                <div class="col">
+                    <!-- payments history -->
+                    <div class="credit-history">
+                        <h3 class="section-heading">Historique de crédit</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Crédit</th>
+                                    <th>Transaction Type</th>
+                                    <th>Transaction Reason</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <?php 
+                                    if ($credit_transactions) {
+                                        // Start the table body and prepare an array for rows
+                                        $rows = [];
+                                    
+                                        // Loop through the fetched payments and prepare the rows
+                                        foreach ($credit_transactions as $transaction) {
+                                            $rows[] = sprintf(
+                                                '<tr>
+                                                    <td class="credit">%d</td>
+                                                    <td>%s</td>
+                                                    <td>%s</td>
+                                                    <td>%s</td>
+                                                </tr>',
+                                                esc_html($transaction->credit),
+                                                esc_html($transaction->transaction_type),
+                                                esc_html($transaction->transaction_reason),
+                                                esc_html(date('M d, Y', strtotime($transaction->created_at))),
+                                            );
+                                        }
+                                    
+                                        // Output all rows in one go
+                                        echo '<tbody id="list">' . implode('', $rows) . '</tbody>';
+                                    } else {
+                                        echo '<tr><td colspan="4" class="no-data">Aucune transaction de crédit trouvée.</td></tr>';
+                                    }
+                                ?>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 

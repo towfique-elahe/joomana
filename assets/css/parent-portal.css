@@ -1,0 +1,35 @@
+/* credit management page */
+#parentCredit .table {
+  width: 100%;
+}
+#parentCredit .table .credit {
+  color: var(--accent-color);
+}
+
+/* payments page */
+#parentPayments .filter-container {
+  flex-direction: row-reverse;
+}
+#parentPayments .list th:nth-child(1),
+#parentPayments .list td:nth-child(1) {
+  text-align: left;
+}
+#parentPayments .table th:last-child,
+#parentPayments .table td:last-child {
+  width: 7rem;
+}
+#parentPayments .table .invoice {
+  color: var(--primary-color);
+}
+#parentPayments .table .pdf {
+  color: crimson;
+}
+#parentPayments .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+#parentPayments .table .action-buttons a {
+  font-size: 1.2rem;
+}

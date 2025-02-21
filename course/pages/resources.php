@@ -14,7 +14,6 @@ if (!defined('ABSPATH')) {
 
 // Get the current user
 $user = wp_get_current_user();
-$default_user_image = esc_url(get_stylesheet_directory_uri() . '/assets/image/user.png');
 
 // Get course_id from session
 if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
@@ -380,7 +379,7 @@ if (in_array('teacher', (array) $user->roles)) {
                             if (in_array('teacher', (array) $user->roles)) {
                         ?>
                         <form method="post" class="delete-form">
-                            <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($assignment->id); ?>">
+                            <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($slide->id); ?>">
                             <input type="hidden" name="file_type" id="deleteFileType" value="Course Slide">
                             <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
                                 <i class="fas fa-trash-alt"></i>
@@ -418,7 +417,7 @@ if (in_array('teacher', (array) $user->roles)) {
                             if (in_array('teacher', (array) $user->roles)) {
                         ?>
                         <form method="post" class="delete-form">
-                            <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($assignment->id); ?>">
+                            <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($report->id); ?>">
                             <input type="hidden" name="file_type" id="deleteFileType" value="Progress Report">
                             <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
                                 <i class="fas fa-trash-alt"></i>

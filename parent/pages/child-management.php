@@ -65,7 +65,7 @@ $students = get_users($args);
                             $enrolled = get_user_meta($student->ID, 'enrolled', true) ? 'Oui' : 'Non';
                             $payment = get_user_meta($student->ID, 'total_payment', true) ?: '0';
                             ?>
-                    <tr>
+                    <!-- <tr>
                         <td>
                             <?php echo esc_html($student->ID); ?>
                         </td>
@@ -92,7 +92,7 @@ $students = get_users($args);
                                 <i class="fa fa-user-o" aria-hidden="true"></i>
                             </a>
                         </td>
-                    </tr>
+                    </tr> -->
                     <?php endforeach; ?>
                     <?php else : ?>
                     <tr>

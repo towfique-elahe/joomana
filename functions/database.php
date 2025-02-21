@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.0.4';
+    $custom_tables_version = '1.0.5';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -26,6 +26,7 @@ function create_custom_tables() {
     $communications_table      = $wpdb->prefix . 'communications';
     $student_courses_table     = $wpdb->prefix . 'student_courses';
     $teacher_courses_table     = $wpdb->prefix . 'teacher_courses';
+    $teacher_evaluations_table = $wpdb->prefix . 'teacher_evaluations';
     $course_class_links_table  = $wpdb->prefix . 'course_class_links';
     $course_assignments_table  = $wpdb->prefix . 'course_assignments';
     $course_slides_table       = $wpdb->prefix . 'course_slides';
@@ -126,6 +127,18 @@ function create_custom_tables() {
         status ENUM('En cours', 'Complété') NOT NULL DEFAULT 'En cours',
         assigned_date DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    $teacher_evaluations_sql = "CREATE TABLE $teacher_evaluations_table (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        course_id BIGINT(20) UNSIGNED NOT NULL,
+        group_number INT(11) NOT NULL,
+        teacher_id BIGINT(20) UNSIGNED NOT NULL,
+        student_id BIGINT(20) UNSIGNED NOT NULL,
+        rating INT(11) NOT NULL CHECK (rating BETWEEN 1 AND 5),
+        comment TEXT DEFAULT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) $charset_collate;";
 
@@ -327,6 +340,7 @@ function create_custom_tables() {
     dbDelta($communications_sql);
     dbDelta($student_courses_sql);
     dbDelta($teacher_courses_sql);
+    dbDelta($teacher_evaluations_sql);
     dbDelta($course_class_links_sql);
     dbDelta($course_assignments_sql);
     dbDelta($course_slides_sql);
@@ -371,6 +385,11 @@ function add_foreign_keys() {
         "{$wpdb->prefix}teacher_courses" => [
             "fk_teacher_courses_teacher_id"  => "ALTER TABLE {$wpdb->prefix}teacher_courses ADD CONSTRAINT fk_teacher_courses_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;",
             "fk_teacher_courses_course_id"   => "ALTER TABLE {$wpdb->prefix}teacher_courses ADD CONSTRAINT fk_teacher_courses_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}teacher_evaluations" => [
+            "fk_teacher_evaluations_teacher_id"  => "ALTER TABLE {$wpdb->prefix}teacher_evaluations ADD CONSTRAINT fk_teacher_evaluations_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;",
+            "fk_teacher_evaluations_student_id"  => "ALTER TABLE {$wpdb->prefix}teacher_evaluations ADD CONSTRAINT fk_teacher_evaluations_student_id FOREIGN KEY (student_id) REFERENCES {$wpdb->prefix}students(id) ON DELETE CASCADE;",
+            "fk_teacher_evaluations_course_id"   => "ALTER TABLE {$wpdb->prefix}teacher_evaluations ADD CONSTRAINT fk_teacher_evaluations_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
         ],
         "{$wpdb->prefix}course_assignments" => [
             "fk_course_assignments_teacher_id"  => "ALTER TABLE {$wpdb->prefix}course_assignments ADD CONSTRAINT fk_course_assignments_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;",

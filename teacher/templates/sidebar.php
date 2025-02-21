@@ -18,7 +18,7 @@
         </li>
         <li class="sidebar-item">
             <a href="<?php echo home_url('/teacher/resources/'); ?>">
-                <i class="fas fa-folder-open"></i> Ressources
+                <i class="fas fa-folder-open"></i> Resources
             </a>
         </li>
         <li class="sidebar-item">

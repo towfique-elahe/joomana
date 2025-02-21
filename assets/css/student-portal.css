@@ -1,3 +1,265 @@
+/* resources page */
+#studentResources .select-course {
+  width: 100%;
+}
+#studentResources .select-course label {
+  font-family: var(--accent-font-family) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  margin-bottom: -5px;
+  text-transform: capitalize;
+}
+#studentResources .select-course select {
+  margin-top: 0.5rem;
+  width: 100%;
+  height: fit-content;
+  font-family: var(--text-font-family) !important;
+  font-size: var(--text-font-size) !important;
+  font-weight: var(--text-font-weight) !important;
+  border: var(--border) !important;
+  border-radius: 5px !important;
+  outline: none;
+  padding: 10px 30px 10px 15px !important;
+  appearance: none; /* Remove the default dropdown arrow (for most browsers) */
+  -webkit-appearance: none; /* Remove the default dropdown arrow in WebKit browsers */
+  -moz-appearance: none; /* Remove the default dropdown arrow in Firefox */
+  width: 100%; /* Make select take full width of the wrapper */
+  cursor: pointer;
+}
+#studentResources .select-course select::-ms-expand {
+  display: none;
+}
+#studentResources .select-course select:focus {
+  border-color: var(--accent-color) !important;
+}
+#studentResources .select-course .custom-select-wrapper {
+  position: relative;
+  display: block; /* Allow positioning the arrow next to the select */
+}
+#studentResources .select-course .custom-arrow {
+  position: absolute;
+  top: 65%;
+  right: 10px; /* Adjust the right padding to position the arrow */
+  transform: translateY(-50%); /* Vertically center the arrow */
+  font-size: 14px; /* Adjust the size of the arrow */
+  color: #333; /* Change the color of the arrow */
+  pointer-events: none; /* Prevent interaction with the icon */
+}
+#studentResources .file-container {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  row-gap: 1rem;
+}
+#studentResources .file-card {
+  width: calc((100% / 4) - 0.54rem);
+  border: var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+#studentResources .file-top {
+  position: relative;
+  width: 100%;
+  background-color: rgb(236, 236, 236);
+}
+#studentResources .file-icon {
+  font-size: 5rem;
+  text-align: center;
+  padding: 4rem 1rem 1rem 1rem;
+  opacity: 0.2;
+}
+#studentResources .file-type {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1;
+  padding: 0.3rem 0.5rem;
+  border: var(--border);
+  border-radius: 0.3rem;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+#studentResources .file-type.assignment {
+  background-color: rgb(255, 224, 230);
+  color: crimson;
+  border-color: crimson;
+}
+#studentResources .file-type.report {
+  background-color: rgb(255, 237, 231);
+  color: orangered;
+  border-color: orangered;
+}
+#studentResources .file-type.slide {
+  background-color: rgb(228, 252, 252);
+  color: darkcyan;
+  border-color: darkcyan;
+}
+#studentResources .file-bottom {
+  width: 100%;
+  background-color: var(--gray-background-color);
+  padding: 1rem;
+}
+#studentResources .file-bottom .col {
+  flex: content;
+  justify-content: center;
+}
+#studentResources .file-title {
+  color: var(--dark-text-color);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+}
+#studentResources .file-uploaded-time {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: 0.8rem;
+}
+#studentResources .download-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  opacity: 0.7;
+  transition: ease 0.3s;
+}
+#studentResources .download-button:hover {
+  opacity: 1;
+}
+
+/* progress page */
+#studentProgress .select-course {
+  width: 100%;
+}
+#studentProgress .select-course label {
+  font-family: var(--accent-font-family) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  margin-bottom: -5px;
+  text-transform: capitalize;
+}
+#studentProgress .select-course select {
+  margin-top: 0.5rem;
+  width: 100%;
+  height: fit-content;
+  font-family: var(--text-font-family) !important;
+  font-size: var(--text-font-size) !important;
+  font-weight: var(--text-font-weight) !important;
+  border: var(--border) !important;
+  border-radius: 5px !important;
+  outline: none;
+  padding: 10px 30px 10px 15px !important;
+  appearance: none; /* Remove the default dropdown arrow (for most browsers) */
+  -webkit-appearance: none; /* Remove the default dropdown arrow in WebKit browsers */
+  -moz-appearance: none; /* Remove the default dropdown arrow in Firefox */
+  width: 100%; /* Make select take full width of the wrapper */
+  cursor: pointer;
+}
+#studentProgress .select-course select::-ms-expand {
+  display: none;
+}
+#studentProgress .select-course select:focus {
+  border-color: var(--accent-color) !important;
+}
+#studentProgress .select-course .custom-select-wrapper {
+  position: relative;
+  display: block; /* Allow positioning the arrow next to the select */
+}
+#studentProgress .select-course .custom-arrow {
+  position: absolute;
+  top: 65%;
+  right: 10px; /* Adjust the right padding to position the arrow */
+  transform: translateY(-50%); /* Vertically center the arrow */
+  font-size: 14px; /* Adjust the size of the arrow */
+  color: #333; /* Change the color of the arrow */
+  pointer-events: none; /* Prevent interaction with the icon */
+}
+#studentProgress .file-container {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  row-gap: 1rem;
+}
+#studentProgress .file-card {
+  width: calc((100% / 4) - 0.54rem);
+  border: var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+#studentProgress .file-top {
+  position: relative;
+  width: 100%;
+  background-color: rgb(236, 236, 236);
+}
+#studentProgress .file-icon {
+  font-size: 5rem;
+  text-align: center;
+  padding: 4rem 1rem 1rem 1rem;
+  opacity: 0.2;
+}
+#studentProgress .file-type {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1;
+  padding: 0.3rem 0.5rem;
+  border: var(--border);
+  border-radius: 0.3rem;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+#studentProgress .file-type.assignment {
+  background-color: rgb(255, 224, 230);
+  color: crimson;
+  border-color: crimson;
+}
+#studentProgress .file-type.report {
+  background-color: rgb(255, 237, 231);
+  color: orangered;
+  border-color: orangered;
+}
+#studentProgress .file-type.slide {
+  background-color: rgb(228, 252, 252);
+  color: darkcyan;
+  border-color: darkcyan;
+}
+#studentProgress .file-bottom {
+  width: 100%;
+  background-color: var(--gray-background-color);
+  padding: 1rem;
+}
+#studentProgress .file-bottom .col {
+  flex: content;
+  justify-content: center;
+}
+#studentProgress .file-title {
+  color: var(--dark-text-color);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+}
+#studentProgress .file-uploaded-time {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: 0.8rem;
+}
+#studentProgress .download-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  opacity: 0.7;
+  transition: ease 0.3s;
+}
+#studentProgress .download-button:hover {
+  opacity: 1;
+}
+
 /* credit management page */
 #studentCredit .table {
   width: 100%;

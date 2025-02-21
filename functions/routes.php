@@ -122,6 +122,8 @@ function parent_portal_rewrite_rules() {
     add_rewrite_rule('^parent/child-management/?$', 'index.php?parent_page=child-management', 'top');
     add_rewrite_rule('^parent/credit-management/?$', 'index.php?parent_page=credit-management', 'top');
     add_rewrite_rule('^parent/payments/?$', 'index.php?parent_page=payments', 'top');
+    add_rewrite_rule('^parent/payments/invoice/?$', 'index.php?parent_page=invoice', 'top');
+    add_rewrite_rule('^parent/payments/invoice/pdf/?$', 'index.php?parent_page=invoice-pdf', 'top');
     add_rewrite_rule('^parent/settings/?$', 'index.php?parent_page=settings', 'top');
 }
 add_action('init', 'parent_portal_rewrite_rules');

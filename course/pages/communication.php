@@ -91,6 +91,7 @@ $messages = $wpdb->get_results( $wpdb->prepare(
 	$course_id,
 	$group_number
 ) );
+
 ?>
 
 <div class="content-area">
