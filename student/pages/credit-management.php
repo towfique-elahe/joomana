@@ -25,7 +25,7 @@ $credits_table = $wpdb->prefix . 'credits';
 $student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $current_user));
 
 // Get the student's credit transactions by the current user
-$credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits_table WHERE user_id = %d", $current_user));
+$credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits_table WHERE user_id = %d ORDER BY created_at DESC", $current_user));
 
 ?>
 
@@ -56,6 +56,10 @@ $credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits
                     <p class="statistic-value">
                         <?php echo esc_html($student->credit); ?>
                     </p>
+                </a>
+
+                <a href="<?php echo home_url('/#buyCredit'); ?>" class="button buy-credit">
+                    <i class="fas fa-shopping-bag"></i> Buy Credit
                 </a>
 
             </div>

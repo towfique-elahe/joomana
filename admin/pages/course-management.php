@@ -115,7 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <?php foreach ($courses as $course) : ?>
                     <tr class="course-row">
                         <td class="name title">
-                            <a href="#">
+                            <a
+                                href="<?php echo esc_url(home_url('/admin/course-management/courses/edit-course/?edit_item_id=' . $course->id)); ?>">
                                 <?php echo esc_html($course->title); ?>
                             </a>
                         </td>

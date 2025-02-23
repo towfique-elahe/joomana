@@ -72,33 +72,33 @@ ob_start();
 
 <body>
     <div class="invoice">
-        <h1 class="header">Invoice</h1>
-        <p><strong>Invoice Number:</strong> <?= esc_html($payment->invoice_number); ?></p>
+        <h1 class="header">Facture</h1>
+        <p><strong>Numéro de facture:</strong> <?= esc_html($payment->invoice_number); ?></p>
         <p><strong>Date:</strong> <?= esc_html(date('M d, Y', strtotime($payment->created_at))); ?></p>
 
         <h3>Détails sur l'étudiant</h3>
-        <p><strong>Name:</strong> <?= esc_html($parent->first_name) . ' ' . esc_html($parent->last_name); ?></p>
+        <p><strong>Nom:</strong> <?= esc_html($parent->first_name) . ' ' . esc_html($parent->last_name); ?></p>
 
         <h3>Détails de paiement</h3>
         <table class="table">
             <tr>
-                <th>Credit</th>
+                <th>Crédit</th>
                 <td><?= esc_html($payment->credit); ?></td>
             </tr>
             <tr>
-                <th>Total Price</th>
+                <th>Prix ​​total</th>
                 <td><?= esc_html($payment->amount); ?></td>
             </tr>
             <tr>
-                <th>Currency</th>
+                <th>Devise</th>
                 <td><?= esc_html($payment->currency); ?></td>
             </tr>
             <tr>
-                <th>Status</th>
+                <th>Statut</th>
                 <td><?= esc_html($payment->status); ?></td>
             </tr>
             <tr>
-                <th>Payment Method</th>
+                <th>Mode de paiement</th>
                 <td><?= esc_html($payment->payment_method); ?></td>
             </tr>
         </table>

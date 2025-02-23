@@ -1078,9 +1078,6 @@ form .form-error p {
   gap: 0.7rem;
   transition: ease 0.3s;
 }
-/* #portal .statistics .statistic-box:hover .statistic-title {
-  color: var(--accent-color);
-} */
 #portal .statistics .statistic-value {
   color: var(--primary-color);
   font-family: var(--accent-font-family);
@@ -1089,6 +1086,15 @@ form .form-error p {
   transition: ease 0.3s;
 }
 #portal .statistics .statistic-box:hover .statistic-value {
-  /* color: var(--accent-color); */
   font-size: 4rem;
+}
+
+#portal .no-data {
+  width: 100%;
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  text-align: center;
+  margin-top: 1rem;
 }

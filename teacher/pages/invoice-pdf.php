@@ -71,8 +71,8 @@ ob_start();
 
 <body>
     <div class="invoice">
-        <h1 class="header">Invoice</h1>
-        <p><strong>Invoice Number:</strong> <?= esc_html($payment->invoice_number); ?></p>
+        <h1 class="header">Facture</h1>
+        <p><strong>Numéro de facture:</strong> <?= esc_html($payment->invoice_number); ?></p>
         <p><strong>Date:</strong> <?= esc_html(date('M d, Y', strtotime($payment->created_at))); ?></p>
 
         <h3>Détails de l'enseignant</h3>

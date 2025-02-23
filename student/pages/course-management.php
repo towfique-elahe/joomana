@@ -86,7 +86,8 @@ $completed_courses = get_student_completed_courses($student_id);
                             <div class="courses">
                                 <?php 
                                     $default_image = get_template_directory_uri() . '/assets/image/image-placeholder.png';
-                                    foreach ($active_courses as $course): 
+                                    if (!empty($active_courses)): 
+                                        foreach ($active_courses as $course): 
                                 ?>
                                 <div class="course-card">
                                     <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
@@ -108,7 +109,9 @@ $completed_courses = get_student_completed_courses($student_id);
                                             class="course-btn">Voir les détails</a>
                                     </div>
                                 </div>
-                                <?php endforeach; ?>
+                                <?php endforeach; else: ?>
+                                <p class="no-data">Aucun cours en cours.</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -118,11 +121,12 @@ $completed_courses = get_student_completed_courses($student_id);
                     <div class="row">
                         <div class="col">
                             <div class="courses">
-                                <?php foreach ($completed_courses as $course): ?>
+                                <?php if (!empty($completed_courses)): 
+                                foreach ($completed_courses as $course): ?>
                                 <div class="course-card">
                                     <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                         alt="Course Image" class="course-image">
-                                    <span class="course-tag completed">Completed</span>
+                                    <span class="course-tag completed">Complété</span>
                                     <h3 class="course-title">
                                         <?php echo esc_html($course->title); ?>
                                     </h3>
@@ -139,12 +143,16 @@ $completed_courses = get_student_completed_courses($student_id);
                                             class="course-btn">Voir les détails</a>
                                     </div>
                                 </div>
-                                <?php endforeach; ?>
+                                <?php endforeach; else: ?>
+                                <p class="no-data">Aucun cours terminé.</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+
         </div>
 
 

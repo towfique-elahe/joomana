@@ -187,10 +187,10 @@ $student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id 
                     <p class="brand-email">homedecorwholesale@support.com</p> -->
                 </div>
                 <div class="col">
-                    <h2 class="invoice-heading">Invoice</h2>
+                    <h2 class="invoice-heading">Facture</h2>
                     <table class="table invoice-info-table">
                         <tr>
-                            <th>Invoice Number</th>
+                            <th>Numéro de facture</th>
                             <td><?= esc_html($payment->invoice_number) ?></td>
                         </tr>
                         <tr>

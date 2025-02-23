@@ -126,3 +126,38 @@ function restrict_payment_to_specific_roles() {
         }
     }
 }
+
+
+// redirect the users to credit management after successful payment
+add_action('woocommerce_thankyou', 'redirect_after_payment');
+
+function redirect_after_payment($order_id) {
+    if (!$order_id) return;
+
+    // Get order object
+    $order = wc_get_order($order_id);
+
+    // Ensure the order exists
+    if (!$order) return;
+
+    // Get user ID
+    $user_id = $order->get_user_id();
+    if (!$user_id) return;
+
+    // Get user data
+    $user = get_userdata($user_id);
+    if (!$user) return;
+
+    // Define redirection URLs based on role
+    $redirect_url = home_url('/');
+
+    if (in_array('student', (array) $user->roles)) {
+        $redirect_url = home_url('/student/credit-management');
+    } elseif (in_array('parent', (array) $user->roles)) {
+        $redirect_url = home_url('/parent/credit-management');
+    }
+
+    // Redirect
+    wp_safe_redirect($redirect_url);
+    exit;
+}

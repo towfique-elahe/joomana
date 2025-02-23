@@ -1,4 +1,27 @@
 /* credit management page */
+#parentCredit .statistics .section-body {
+  align-items: flex-start;
+}
+#parentCredit .button.buy-credit {
+  display: inline-block;
+  text-decoration: none;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border: var(--border);
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: ease 0.3s;
+}
+#parentCredit .button.buy-credit:hover {
+  background-color: var(--accent-color);
+}
 #parentCredit .table {
   width: 100%;
 }

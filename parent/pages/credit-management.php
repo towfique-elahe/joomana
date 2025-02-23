@@ -8,6 +8,11 @@ $pageTitle = 'Gestion De Crédit';
 
 require_once(get_template_directory() . '/parent/templates/header.php');
 
+// Exit if accessed directly
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 // Get current user ID
 $current_user = get_current_user_id();
 
@@ -20,7 +25,7 @@ $credits_table = $wpdb->prefix . 'credits';
 $parent = $wpdb->get_row($wpdb->prepare("SELECT * FROM $parent_table WHERE id = %d", $current_user));
 
 // Get the parent's credit transactions by the current user
-$credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits_table WHERE user_id = %d", $current_user));
+$credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits_table WHERE user_id = %d ORDER BY created_at DESC", $current_user));
 
 ?>
 
@@ -51,6 +56,10 @@ $credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits
                     <p class="statistic-value">
                         <?php echo esc_html($parent->credit); ?>
                     </p>
+                </a>
+
+                <a href="<?php echo home_url('/#buyCredit'); ?>" class="button buy-credit">
+                    <i class="fas fa-shopping-bag"></i> Buy Credit
                 </a>
 
             </div>
