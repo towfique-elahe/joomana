@@ -46,13 +46,6 @@ $teacher_id = $wpdb->get_var($wpdb->prepare(
     $group_number
 ));
 
-$existing = $wpdb->get_var($wpdb->prepare(
-    "SELECT id FROM {$wpdb->prefix}teacher_evaluations 
-    WHERE student_id = %d AND course_id = %d 
-    AND group_number = %d AND teacher_id = %d",
-    $student_id, $course_id, $group_number, $teacher_id
-));
-
 // Handle evaluation submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_evaluation'])) {
     if (in_array('student', (array)$user->roles)) {
@@ -179,60 +172,46 @@ $evaluations = $wpdb->get_results($wpdb->prepare(
                     <?php endif; ?>
                 </div>
 
-                <?php if (!$existing) : ?>
                 <?php if (in_array('student', (array)$user->roles)) : ?>
                 <?php if ($teacher_id) : ?>
                 <div class="evaluation-form col">
                     <h3 class="section-heading">Évaluer votre enseignant</h3>
-                    <?php 
-                            $current_evaluation = $evaluations[0] ?? null;
-                            $current_rating = $current_evaluation->rating ?? 0;
-                            $current_comment = $current_evaluation->comment ?? '';
-                    ?>
                     <form method="POST" class="form">
                         <div class="star-rating">
                             <?php for ($i = 1; $i <= 5; $i++) : ?>
-                            <span class="star <?php echo $i <= $current_rating ? 'active' : ''; ?>"
-                                data-value="<?php echo $i; ?>">
+                            <span class="star" data-value="<?php echo $i; ?>">
                                 <i class="fas fa-star"></i>
                             </span>
                             <?php endfor; ?>
-                            <input type="hidden" name="rating" id="rating" value="<?php echo $current_rating; ?>"
-                                required>
+                            <input type="hidden" name="rating" id="rating" value="0" required>
                         </div>
-                        <textarea name="comment" placeholder="Vos commentaires..." rows="4"
-                            required><?php echo esc_textarea($current_comment); ?></textarea>
-                        <button type="submit" name="submit_evaluation" <?php echo $current_evaluation ? 'disabled' : ''
-                            ; ?>>
-                            <?php echo $current_evaluation ? 'Évaluation soumise' : 'Soumettre'; ?>
-                        </button>
+                        <textarea name="comment" placeholder="Vos commentaires..." rows="4" required></textarea>
+                        <button type="submit" name="submit_evaluation">Soumettre</button>
                     </form>
                 </div>
                 <?php else : ?>
                 <p class="no-data">Aucun enseignant assigné à votre groupe.</p>
                 <?php endif; ?>
                 <?php endif; ?>
-                <?php endif; ?>
             </div>
-
         </div>
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Star rating interaction
-        document.querySelectorAll('.star-rating .star').forEach(star => {
-            star.addEventListener('click', function () {
-                const container = this.closest('.star-rating');
-                const value = parseInt(this.dataset.value);
-                container.querySelectorAll('.star').forEach(s => {
-                    s.classList.toggle('active', s.dataset.value <= value);
-                });
-                container.querySelector('#rating').value = value;
+document.addEventListener('DOMContentLoaded', function() {
+    // Star rating interaction
+    document.querySelectorAll('.star-rating .star').forEach(star => {
+        star.addEventListener('click', function() {
+            const container = this.closest('.star-rating');
+            const value = parseInt(this.dataset.value);
+            container.querySelectorAll('.star').forEach(s => {
+                s.classList.toggle('active', s.dataset.value <= value);
             });
+            container.querySelector('#rating').value = value;
         });
     });
+});
 </script>
 
 <?php require_once(get_template_directory() . '/course/templates/footer.php'); ?>

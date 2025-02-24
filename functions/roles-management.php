@@ -39,11 +39,21 @@ function joomana_add_custom_roles() {
         'upload_files'    => false,
     ];
 
+    // Define admin capabilities
+    $admin_caps = array_merge($base_caps, [
+        'manage_options'  => true,
+        'edit_users'      => true,
+        'delete_users'    => true,
+        'create_users'    => true,
+        'list_users'      => true,
+        'promote_users'   => true,
+    ]);
+
     // Add Admin Role
     add_role(
         'admin',
         __('Admin', 'joomana'),
-        $base_caps
+        $admin_caps
     );
 
     // Add Teacher Role

@@ -162,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                             </a>
                             <form method="post" class="delete-form">
                                 <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($level->id); ?>">
-                                <button type="button" class="action-button delete open-modal">
+                                <button type="button" class="action-button delete open-modal" data-modal="deleteLevel">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </form>
@@ -181,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="modal" class="modal">
+<div id="deleteLevel" class="modal">
     <div class="modal-content">
         <span class="modal-close">
             <i class="fas fa-times"></i>

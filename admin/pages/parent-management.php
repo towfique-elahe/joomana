@@ -29,6 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
     $delete_item_id = intval($_POST['delete_item_id']);
 
     if ($delete_item_id > 0) {
+        require_once ABSPATH . 'wp-admin/includes/user.php'; // Ensure function is available
+        
         // Delete the parent record from the custom table
         $deleted = $wpdb->delete($table_name, ['id' => $delete_item_id], ['%d']);
 
@@ -117,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                             </a>
                             <form method="post" class="delete-form">
                                 <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($parent->id); ?>">
-                                <button type="button" class="action-button delete open-modal">
+                                <button type="button" class="action-button delete open-modal" data-modal="deleteUser">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </form>
@@ -136,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="modal" class="modal">
+<div id="deleteUser" class="modal">
     <div class="modal-content">
         <span class="modal-close">
             <i class="fas fa-times"></i>

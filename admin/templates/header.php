@@ -25,6 +25,13 @@
     <link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/root.css'; ?>">
     <link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/admin-portal.css'; ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- TinyMCE CSS and JS -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <!-- Place the first <script> tag in your HTML's <head> -->
+    <script src="https://cdn.tiny.cloud/1/iqobb2yhfrpds1fl6fms3kl7q3b7k0zwp9s38tjm91hsagfr/tinymce/7/tinymce.min.js"
+        referrerpolicy="origin"></script>
+
+
     <style>
     * {
         margin: 0;

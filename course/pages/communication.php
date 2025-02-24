@@ -180,7 +180,7 @@ $messages = $wpdb->get_results( $wpdb->prepare(
                     <?php
 						}
 					} else {
-						echo "<p class='no-data'>No conversation messages yet.</p>";
+						echo "<p class='no-data'>Aucun message de conversation pour le moment.</p>";
 					}
 					?>
                 </div>

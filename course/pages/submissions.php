@@ -244,6 +244,8 @@ if (in_array('student', (array) $user->roles)) {
             ?>
 
             <div class="row file-container">
+                <?php if ($submissions) :?>
+
                 <!-- Display Submissions -->
                 <?php foreach ($submissions as $submission) : ?>
                 <div class="file-card">
@@ -280,6 +282,9 @@ if (in_array('student', (array) $user->roles)) {
                     </div>
                 </div>
                 <?php endforeach; ?>
+                <?php else :?>
+                <p class="no-data">Aucune soumission n'a été ajoutée pour ce cours</p>
+                <?php endif;?>
 
             </div>
 

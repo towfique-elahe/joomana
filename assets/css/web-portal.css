@@ -369,6 +369,26 @@ form .submit-button {
 }
 
 /* Course Details */
+.course-error-message {
+  background-color: rgb(255, 223, 230);
+  color: black;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  padding: 0.5rem 1rem;
+  border-radius: 0.3rem;
+  margin-bottom: 1rem;
+}
+.course-success-message {
+  background-color: rgb(213, 252, 213);
+  color: black;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  padding: 0.5rem 1rem;
+  border-radius: 0.3rem;
+  margin-bottom: 1rem;
+}
 #courseDetails .left-column {
   flex: 2;
   padding-right: 20px;

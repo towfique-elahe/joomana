@@ -146,6 +146,8 @@ $student_reports = $wpdb->get_results($wpdb->prepare(
         </div>
 
         <div class="row file-container">
+            <?php if ($course_assignments || $course_slides || $student_reports) :?>
+
             <!-- Display Course Assignments -->
             <?php foreach ($course_assignments as $assignment) : ?>
             <div class="file-card">
@@ -220,6 +222,9 @@ $student_reports = $wpdb->get_results($wpdb->prepare(
                 </div>
             </div>
             <?php endforeach; ?>
+            <?php else :?>
+            <p class="no-data">Aucune ressource n'a été ajoutée pour ce cours</p>
+            <?php endif;?>
 
         </div>
 

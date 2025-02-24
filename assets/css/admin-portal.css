@@ -721,7 +721,7 @@
 }
 #adminAddCourse .search-teacher .teacher-card,
 #adminAddCourse .selected-teachers .teacher-card {
-  width: calc((100% / 3) - 0.3rem);
+  width: calc((100% / 3) - 0.7rem);
   padding: 0.5rem;
   display: flex;
   align-items: center;
@@ -731,6 +731,7 @@
   border-radius: 0.3rem;
   cursor: pointer;
   transition: ease 0.3s;
+  position: relative;
 }
 #adminAddCourse .selected-teachers .teacher-card {
   cursor: initial;
@@ -757,6 +758,22 @@
   font-family: var(--text-font-family);
   font-weight: var(--accent-font-weight);
   font-size: var(--text-font-size);
+}
+#adminAddCourse .search-teacher .teacher-status {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: #fff;
+  color: var(--dark-text-color);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: 0.8rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.3rem;
+  z-index: 1;
+}
+#adminAddCourse .search-teacher .teacher-status.available {
+  background-color: lightgreen;
 }
 #adminAddCourse .search-teacher .teacher-card:hover .teacher-name {
   color: #fff;

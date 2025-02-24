@@ -50,10 +50,18 @@ function render_course_details_section() {
 
             if (is_wp_error($result)) {
                 $error_message = $result->get_error_message();
-                echo '<div class="error-message">' . esc_html($error_message) . '</div>';
+                echo '<div class="course-error-message">' . esc_html($error_message) . '</div>';
             } else {
-                echo '<div class="success-message">You have successfully enrolled in this course.</div>';
+                echo '<div class="course-success-message">Vous êtes inscrit avec succès à ce cours.</div>';
+                
+                // Redirect after a short delay to ensure the message is seen
+                echo '<script>
+                        setTimeout(function() {
+                            window.location.href = "' . home_url('/student/course-management') . '";
+                        }, 2000); // Redirect after 2 seconds
+                      </script>';
             }
+
         }
 
         ob_start();
@@ -62,7 +70,7 @@ function render_course_details_section() {
     <div class="left-column">
         <h2 class="title"><?php echo esc_html($course->title); ?></h2>
         <div class="description">
-            <p><?php echo esc_html($course->description); ?></p>
+            <?php echo $course->description; ?>
         </div>
 
         <!-- Calendar Section -->
@@ -140,33 +148,59 @@ function render_course_details_section() {
     <div class="right-column col">
         <div class="course-info">
             <img class="course-image"
-                src="<?php echo esc_url( ! empty( $course->image_url ) ? $course->image_url : get_template_directory_uri() . '/assets/image/image-placeholder.png' ); ?>"
+                src="<?php echo esc_url( ! empty( $course->image ) ? $course->image : get_template_directory_uri() . '/assets/image/image-placeholder.png' ); ?>"
                 alt="Course image" width="400" height="300" />
             <h3 class="info-heading">Le cours comprend:</h3>
             <ul class="info-list">
                 <li class="list-item">
                     <span class="item-name">
-                        <ion-icon name="pricetag-outline"></ion-icon> Prix:
+                        <i class="fas fa-tag"></i> Prix:
                     </span>
                     <span class="item-value price">€ 10</span>
                 </li>
                 <li class="list-item">
                     <span class="item-name">
-                        <ion-icon name="card-outline"></ion-icon> Crédit:
+                        <i class="far fa-credit-card"></i> Crédit:
                     </span>
                     <span class="item-value"><?php echo esc_html($course->required_credit); ?> credit</span>
                 </li>
                 <li class="list-item">
                     <span class="item-name">
-                        <ion-icon name="time-outline"></ion-icon> Durée:
+                        <i class="fas fa-hourglass-half"></i> Durée:
                     </span>
                     <span class="item-value"><?php echo esc_html($course->duration); ?> heures</span>
                 </li>
+                <?php
+                    $teacher_courses_table = "{$wpdb->prefix}teacher_courses";
+                    $teacher_count = $wpdb->get_var($wpdb->prepare(
+                        "SELECT COUNT(*) FROM $teacher_courses_table WHERE course_id = %d",
+                        $course_id
+                    ));
+                    if (!$teacher_count) {
+                        $teacher_count = 'n/a';
+                    }
+                ?>
                 <li class="list-item">
                     <span class="item-name">
-                        <ion-icon name="people-outline"></ion-icon> Étudiants:
+                        <i class="fas fa-user-tie"></i> Enseignants:
                     </span>
-                    <span class="item-value">n/a</span>
+                    <span class="item-value"><?php echo esc_html($teacher_count); ?></span>
+                </li>
+                <?php
+                    $student_courses_table = "{$wpdb->prefix}student_courses";
+                    $student_count = $wpdb->get_var($wpdb->prepare(
+                        "SELECT COUNT(*) FROM $student_courses_table WHERE course_id = %d",
+                        $course_id
+                    ));
+                    if (!$student_count) {
+                        $student_count = 'n/a';
+                    }
+                ?>
+                <li class="list-item">
+                    <span class="item-name">
+                        <i class="fas fa-user-graduate"></i> Étudiants:
+                    </span>
+                    <span class="item-value"><?php echo esc_html($student_count); ?></span>
                 </li>
             </ul>
             <div class="buttons">
@@ -202,6 +236,9 @@ function render_course_details_section() {
         </div>
     </div>
 </div>
+
+<!-- Font Awesome CSS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 <?php
         return ob_get_clean();
     } else {
@@ -221,52 +258,8 @@ function enroll_student_in_course($course_id, $student_id) {
     );
 
     if (!$course) {
-        return new WP_Error('course_not_found', 'Course not found.');
+        return new WP_Error('course_not_found', 'Cours non trouvé.');
     }
-
-    // Check if the student is already enrolled in this course
-    $is_enrolled = $wpdb->get_var(
-        $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d", $student_id, $course_id)
-    );
-
-    if ($is_enrolled) {
-        return new WP_Error('already_enrolled', 'You are already enrolled in this course.');
-    }
-
-    // Check if the student has sufficient credits
-    $student_credit = $wpdb->get_var(
-        $wpdb->prepare("SELECT credit FROM {$wpdb->prefix}students WHERE id = %d", $student_id)
-    );
-
-    if ($student_credit < $course->required_credit) {
-        return new WP_Error('insufficient_credit', 'Insufficient credit to enroll in this course.');
-    }
-
-    // Deduct credits from the student
-    $wpdb->query(
-        $wpdb->prepare("UPDATE {$wpdb->prefix}students SET credit = credit - %f WHERE id = %d", $course->required_credit, $student_id)
-    );
-
-    // Insert data into the credits table
-    $credits_table = $wpdb->prefix . 'credits';
-    $total_credit = $course->required_credit;
-    $wpdb->insert(
-        $credits_table,
-        [
-            'user_id' => $student_id,
-            'credit' => $total_credit, // Total credit from all products in the order
-            'transaction_type' => 'Débité', // Set transaction_type to 'Débité'
-            'transaction_reason' => 'Cours acheté', // Set transaction_reason to 'Débité'
-            'created_at' => current_time('mysql'), // Current timestamp
-        ],
-        [
-            '%d', // user_id
-            '%f', // credit
-            '%s', // transaction_type
-            '%s', // transaction_reason
-            '%s', // created_at
-        ]
-    );
 
     // Get all teachers assigned to this course along with their groups, ordered by group_number
     $teachers = $wpdb->get_results(
@@ -274,42 +267,89 @@ function enroll_student_in_course($course_id, $student_id) {
     );
 
     if (empty($teachers)) {
-        return new WP_Error('no_teachers_assigned', 'No teachers are assigned to this course.');
-    }
-
-    // Assign student to the next available group
-    $assigned = false;
-
-    foreach ($teachers as $teacher) {
-        // Count students in the current group
-        $student_count = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COUNT(*) FROM {$wpdb->prefix}student_courses 
-                 WHERE teacher_id = %d AND course_id = %d AND group_number = %d",
-                $teacher->teacher_id, $course_id, $teacher->group_number
-            )
+        
+        return new WP_Error('no_teachers_assigned', "Aucun enseignant n'est affecté à ce cours.");
+        
+    } else {
+        
+        // Check if the student is already enrolled in this course
+        $is_enrolled = $wpdb->get_var(
+            $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d", $student_id, $course_id)
         );
 
-        if ($student_count < $course->max_students_per_group) {
-            // Assign student to this group
-            $wpdb->insert(
-                "{$wpdb->prefix}student_courses",
-                array(
-                    'student_id'   => $student_id,
-                    'course_id'    => $course_id,
-                    'teacher_id'   => $teacher->teacher_id,
-                    'group_number' => $teacher->group_number
-                ),
-                array('%d', '%d', '%d', '%d')
-            );
-            $assigned = true;
-            break;
+        if ($is_enrolled) {
+            return new WP_Error('already_enrolled', 'Vous êtes déjà inscrit à ce cours.');
         }
-    }
 
-    if (!$assigned) {
-        // If no group has space, return an error or handle it as per your requirement
-        return new WP_Error('no_available_groups', 'All groups are full. Cannot enroll the student.');
+        // Check if the student has sufficient credits
+        $student_credit = $wpdb->get_var(
+            $wpdb->prepare("SELECT credit FROM {$wpdb->prefix}students WHERE id = %d", $student_id)
+        );
+
+        if ($student_credit < $course->required_credit) {
+            return new WP_Error('insufficient_credit', "Crédit insuffisant pour s'inscrire à ce cours.");
+        }
+
+        // Deduct credits from the student
+        $wpdb->query(
+            $wpdb->prepare("UPDATE {$wpdb->prefix}students SET credit = credit - %f WHERE id = %d", $course->required_credit, $student_id)
+        );
+
+        // Insert data into the credits table
+        $credits_table = $wpdb->prefix . 'credits';
+        $total_credit = $course->required_credit;
+        $wpdb->insert(
+            $credits_table,
+            [
+                'user_id' => $student_id,
+                'credit' => $total_credit, // Total credit from all products in the order
+                'transaction_type' => 'Débité', // Set transaction_type to 'Débité'
+                'transaction_reason' => 'Cours acheté', // Set transaction_reason to 'Débité'
+                'created_at' => current_time('mysql'), // Current timestamp
+            ],
+            [
+                '%d', // user_id
+                '%f', // credit
+                '%s', // transaction_type
+                '%s', // transaction_reason
+                '%s', // created_at
+            ]
+        );
+
+        // Assign student to the next available group
+        $assigned = false;
+
+        foreach ($teachers as $teacher) {
+            // Count students in the current group
+            $student_count = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM {$wpdb->prefix}student_courses 
+                    WHERE teacher_id = %d AND course_id = %d AND group_number = %d",
+                    $teacher->teacher_id, $course_id, $teacher->group_number
+                )
+            );
+
+            if ($student_count < $course->max_students_per_group) {
+                // Assign student to this group
+                $wpdb->insert(
+                    "{$wpdb->prefix}student_courses",
+                    array(
+                        'student_id'   => $student_id,
+                        'course_id'    => $course_id,
+                        'teacher_id'   => $teacher->teacher_id,
+                        'group_number' => $teacher->group_number
+                    ),
+                    array('%d', '%d', '%d', '%d')
+                );
+                $assigned = true;
+                break;
+            }
+        }
+
+        if (!$assigned) {
+            // If no group has space, return an error or handle it as per your requirement
+            return new WP_Error('no_available_groups', "Tous les groupes sont complets. Impossible d'inscrire l'élève.");
+        }
     }
 
     return true;

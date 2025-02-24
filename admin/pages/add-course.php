@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
 
     // Sanitize user inputs
     $title = sanitize_text_field($_POST['title']);
-    $description = sanitize_textarea_field($_POST['description']);
+    $description = wp_kses_post($_POST['description']);
     $category = sanitize_text_field($_POST['category']);
     $topic = sanitize_text_field($_POST['topic']);
     $grade = sanitize_text_field($_POST['grade']);
@@ -239,23 +239,17 @@ ob_end_clean();
                             <div class="custom-select-wrapper">
                                 <select id="category" name="category" required>
                                     <option value="" disabled selected>Sélectionnez une catégorie</option>
-
                                     <?php
-                                                        global $wpdb; // Access the global $wpdb object for database queries
-                
-                                                        // Query the custom 'course_categories' table
-                                                        $categories = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_categories");
-                
-                                                        // Check if categories are available
-                                                        if ($categories) {
-                                                            foreach ($categories as $category) {
-                                                                echo '<option value="' . esc_attr($category->category) . '">' . esc_html($category->category) . '</option>';
-                                                            }
-                                                        } else {
-                                                            echo '<option disabled>No categorie found</option>';
-                                                        }
-                                                    ?>
-
+                global $wpdb;
+                $categories = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_categories");
+                if ($categories) {
+                    foreach ($categories as $category) {
+                        echo '<option value="' . esc_attr($category->category) . '">' . esc_html($category->category) . '</option>';
+                    }
+                } else {
+                    echo '<option disabled>No categories found</option>';
+                }
+                ?>
                                 </select>
                                 <i class="fas fa-chevron-down custom-arrow" style="color: #585858;"></i>
                             </div>
@@ -266,23 +260,7 @@ ob_end_clean();
                             <div class="custom-select-wrapper">
                                 <select id="topic" name="topic" required>
                                     <option value="" disabled selected>Sélectionnez le sujet</option>
-
-                                    <?php
-                                                        global $wpdb; // Access the global $wpdb object for database queries
-                
-                                                        // Query the custom 'course_topics' table
-                                                        $topics = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_topics");
-                
-                                                        // Check if topics are available
-                                                        if ($topics) {
-                                                            foreach ($topics as $topic) {
-                                                                echo '<option value="' . esc_attr($topic->topic) . '">' . esc_html($topic->topic) . '</option>';
-                                                            }
-                                                        } else {
-                                                            echo '<option disabled>No sujets found</option>';
-                                                        }
-                                                    ?>
-
+                                    <!-- Topics will be populated dynamically here -->
                                 </select>
                                 <i class="fas fa-chevron-down custom-arrow" style="color: #585858;"></i>
                             </div>
@@ -383,44 +361,6 @@ ob_end_clean();
                     </div>
 
                     <div class="row">
-                        <div class="col">
-                            <label for="assigned_teachers">Affecter des enseignants</label>
-                            <div class="selected-teachers">
-                                <!-- Placeholder for selected teachers -->
-                            </div>
-                            <div class="search-teacher col">
-                                <input type="text" id="search-teacher-input" placeholder="Recherche d'enseignant">
-                                <div class="teacher-container" id="teacher-container">
-                                    <?php
-                                    global $wpdb; // Access the global $wpdb object for database queries
-                                    
-                                    // Query the custom 'teachers' table
-                                    $teachers = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teachers");
-                                    
-                                    // Define the default image path
-                                    $default_image = get_template_directory_uri() . '/assets/image/user.png';
-                            
-                                    // Check if teachers are available
-                                    if ($teachers) {
-                                        foreach ($teachers as $teacher) {
-                                            // Use the teacher's image if available, otherwise use the default image
-                                            $image_url = !empty($teacher->image) ? esc_url($teacher->image) : esc_url($default_image);
-                                            
-                                            echo '<div class="teacher-card" data-id="' . esc_attr($teacher->id) . '">';
-                                            echo '<img src="' . $image_url . '" alt="' . esc_attr($teacher->first_name) . ' ' . esc_attr($teacher->last_name) . '" class="teacher-image">';
-                                            echo '<h3 class="teacher-name">' . esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name) . '</h3>';
-                                            echo '</div>';
-                                        }
-                                    } else {
-                                        echo '<p>Aucun enseignant trouvé.</p>';
-                                    }
-                                    ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
                         <div class="calendar col">
                             <!-- date input -->
                             <input type="hidden" id="start_date" name="start_date">
@@ -509,6 +449,45 @@ ob_end_clean();
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col">
+                            <label for="assigned_teachers">Affecter des enseignants</label>
+                            <div class="selected-teachers">
+                                <!-- Placeholder for selected teachers -->
+                            </div>
+                            <div class="search-teacher col">
+                                <input type="text" id="search-teacher-input" placeholder="Recherche d'enseignant">
+                                <div class="teacher-container" id="teacher-container">
+                                    <?php
+                                    global $wpdb; // Access the global $wpdb object for database queries
+                                    
+                                    // Query the custom 'teachers' table
+                                    $teachers = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teachers");
+                                    
+                                    // Define the default image path
+                                    $default_image = get_template_directory_uri() . '/assets/image/user.png';
+                            
+                                    // Check if teachers are available
+                                    if ($teachers) {
+                                        foreach ($teachers as $teacher) {
+                                            // Use the teacher's image if available, otherwise use the default image
+                                            $image_url = !empty($teacher->image) ? esc_url($teacher->image) : esc_url($default_image);
+                                            
+                                            echo '<div class="teacher-card" data-id="' . esc_attr($teacher->id) . '">';
+                                            echo '<img src="' . $image_url . '" alt="' . esc_attr($teacher->first_name) . ' ' . esc_attr($teacher->last_name) . '" class="teacher-image">';
+                                            echo '<h3 class="teacher-name">' . esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name) . '</h3>';
+                                            echo '<span class="teacher-status available">Disponible</span>';
+                                            echo '</div>';
+                                        }
+                                    } else {
+                                        echo '<p>Aucun enseignant trouvé.</p>';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <button type="submit" class="submit-button" name="add_course">Ajouter</button>
                 </section>
             </form>
@@ -516,5 +495,51 @@ ob_end_clean();
 
     </div>
 </div>
+
+<!-- Add jQuery (if not already included) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+jQuery(document).ready(function($) {
+    // Event listener for category dropdown change
+    $('#category').on('change', function() {
+        var selectedCategory = $(this).val(); // Get the selected category
+
+        if (selectedCategory) {
+            // Clear the topic dropdown
+            $('#topic').html('<option value="" disabled selected>Sélectionnez le sujet</option>');
+
+            // Send AJAX request to fetch topics
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>', // WordPress AJAX endpoint
+                type: 'POST',
+                data: {
+                    action: 'fetch_topics', // AJAX action
+                    category: selectedCategory // Selected category
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Populate the topic dropdown
+                        var topics = response.data;
+                        if (topics.length > 0) {
+                            topics.forEach(function(topic) {
+                                $('#topic').append('<option value="' + topic.topic +
+                                    '">' + topic.topic + '</option>');
+                            });
+                        } else {
+                            $('#topic').append('<option disabled>No topics found</option>');
+                        }
+                    } else {
+                        console.error('Error fetching topics');
+                    }
+                },
+                error: function() {
+                    console.error('AJAX request failed');
+                }
+            });
+        }
+    });
+});
+</script>
 
 <?php require_once(get_template_directory() . '/admin/templates/footer.php'); ?>

@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 `;
 
                 selectedTeachers.appendChild(selectedCard);
+
+                // Hide the selected teacher card in the search list
+                teacherCard.style.display = "none";
             }
         }
     });

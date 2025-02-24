@@ -137,6 +137,8 @@ $student_reports = $wpdb->get_results($wpdb->prepare(
         </div>
 
         <div class="row file-container">
+            <?php if ($student_reports) :?>
+
             <!-- Display Student Reports -->
             <?php foreach ($student_reports as $report) : ?>
             <div class="file-card">
@@ -177,6 +179,9 @@ $student_reports = $wpdb->get_results($wpdb->prepare(
                 </div>
             </div>
             <?php endforeach; ?>
+            <?php else :?>
+            <p class="no-data">Aucun rapport de progression n'a été ajouté pour ce cours</p>
+            <?php endif;?>
 
         </div>
 

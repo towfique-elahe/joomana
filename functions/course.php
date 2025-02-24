@@ -302,3 +302,33 @@ function render_available_courses($atts = [], $content = null) {
 
 // Register the shortcode
 add_shortcode('available_courses', 'render_available_courses');
+
+
+
+// Add AJAX handler for fetching topics for admin add course page
+add_action('wp_ajax_fetch_topics', 'fetch_topics_callback'); // For logged-in users
+add_action('wp_ajax_nopriv_fetch_topics', 'fetch_topics_callback'); // For non-logged-in users
+
+function fetch_topics_callback() {
+    global $wpdb;
+
+    // Check if category is provided
+    if (isset($_POST['category'])) {
+        $category = sanitize_text_field($_POST['category']);
+
+        // Query topics for the selected category
+        $topics = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}course_topics WHERE category = %s",
+            $category
+        ));
+
+        if ($topics) {
+            // Return topics as JSON
+            wp_send_json_success($topics);
+        } else {
+            wp_send_json_error('No topics found for this category');
+        }
+    } else {
+        wp_send_json_error('Category not provided');
+    }
+}

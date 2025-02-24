@@ -37,7 +37,7 @@ $success_message = ''; // Initialize success message variable
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_course'])) {
     // Sanitize user inputs
     $title = sanitize_text_field($_POST['title']);
-    $description = sanitize_textarea_field($_POST['description']);
+    $description = wp_kses_post($_POST['description']);
     $category = sanitize_text_field($_POST['category']);
     $topic = sanitize_text_field($_POST['topic']);
     $grade = sanitize_text_field($_POST['grade']);

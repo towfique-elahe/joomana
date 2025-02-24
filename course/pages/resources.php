@@ -332,6 +332,8 @@ if (in_array('teacher', (array) $user->roles)) {
             ?>
 
             <div class="row file-container">
+                <?php if ($course_assignments || $course_slides || $student_reports) :?>
+
                 <!-- Display Course Assignments -->
                 <?php foreach ($course_assignments as $assignment) : ?>
                 <div class="file-card">
@@ -445,6 +447,9 @@ if (in_array('teacher', (array) $user->roles)) {
                     </div>
                 </div>
                 <?php endforeach; ?>
+                <?php else :?>
+                <p class="no-data">Aucune ressource n'a été ajoutée pour ce cours</p>
+                <?php endif;?>
 
             </div>
 
@@ -467,11 +472,11 @@ if (in_array('teacher', (array) $user->roles)) {
             <section class="section col file-type">
                 <div class="row">
                     <div class="col">
-                        <label for="file_type">File Type</label>
+                        <label for="file_type">Type de fichier</label>
                         <select name="file_type" id="file_type" required>
-                            <option value="Assignment">Assignment</option>
-                            <option value="Progress Report">Progress Report</option>
-                            <option value="Course Slide">Course Slide</option>
+                            <option value="Assignment">Affectation</option>
+                            <option value="Progress Report">Rapport d'avancement</option>
+                            <option value="Course Slide">Diapositive du cours</option>
                         </select>
                     </div>
                 </div>
@@ -481,7 +486,7 @@ if (in_array('teacher', (array) $user->roles)) {
             <section class="section col add-assignment">
                 <div class="row">
                     <div class="col">
-                        <label for="submission_deadline">Submission Deadline</label>
+                        <label for="submission_deadline">Date limite de soumission</label>
                         <input type="datetime-local" name="submission_deadline" id="submission_deadline">
                     </div>
                 </div>
@@ -505,7 +510,7 @@ if (in_array('teacher', (array) $user->roles)) {
             <section class="section col add-report">
                 <div class="row">
                     <div class="col">
-                        <label for="student_id">Student</label>
+                        <label for="student_id">Étudiant</label>
                         <select name="student_id" id="student_id">
                             <?php
                                 // Check if any student IDs were found
@@ -521,12 +526,12 @@ if (in_array('teacher', (array) $user->roles)) {
                                         }
                                     } else {
                             ?>
-                            <option value="">No student details were found</option>
+                            <option value="">Aucun détail sur l'étudiant n'a été trouvé</option>
                             <?php
                                         }
                                     } else {
                             ?>
-                            <option value="">No students are enrolled</option>
+                            <option value="">Aucun étudiant n'est inscrit</option>
                             <?php
                                 }
                             ?>
@@ -541,7 +546,7 @@ if (in_array('teacher', (array) $user->roles)) {
                 </div>
                 <div class="row">
                     <div class="col">
-                        <label for="comment">Comment</label>
+                        <label for="comment">Commentaire</label>
                         <textarea name="comment" id="comment"></textarea>
                     </div>
                 </div>
