@@ -1,3 +1,63 @@
+/* dashboard */
+#teacherDashboard .statistic-box.total-course {
+  background-color: rgb(242, 248, 255);
+}
+#teacherDashboard .statistic-box.total-course:hover {
+  background-color: rgb(221, 237, 255);
+}
+#teacherDashboard .statistic-box.total-course .statistic-value {
+  color: rgb(0, 96, 206);
+}
+#teacherDashboard .statistic-box.total-in-progress-course {
+  background-color: rgb(255, 248, 238);
+}
+#teacherDashboard .statistic-box.total-in-progress-course:hover {
+  background-color: rgb(255, 240, 219);
+}
+#teacherDashboard .statistic-box.total-in-progress-course .statistic-value {
+  color: rgb(238, 139, 0);
+}
+#teacherDashboard .statistic-box.total-completed-course {
+  background-color: rgb(248, 255, 238);
+}
+#teacherDashboard .statistic-box.total-completed-course:hover {
+  background-color: rgb(236, 255, 208);
+}
+#teacherDashboard .statistic-box.total-completed-course .statistic-value {
+  color: rgb(133, 216, 0);
+}
+#teacherDashboard .statistic-box.total-student {
+  background-color: rgb(255, 255, 238);
+}
+#teacherDashboard .statistic-box.total-student:hover {
+  background-color: rgb(255, 255, 221);
+}
+#teacherDashboard .statistic-box.total-student .statistic-value {
+  color: rgb(212, 212, 0);
+}
+#teacherDashboard .statistic-box.total-due {
+  background-color: rgb(255, 238, 248);
+}
+#teacherDashboard .statistic-box.total-due:hover {
+  background-color: rgb(255, 221, 241);
+}
+#teacherDashboard .statistic-box.total-due .statistic-value {
+  color: rgb(223, 0, 130);
+}
+#teacherDashboard .statistic-box.total-deposit {
+  background-color: rgb(247, 242, 255);
+}
+#teacherDashboard .statistic-box.total-deposit:hover {
+  background-color: rgb(237, 227, 253);
+}
+#teacherDashboard .statistic-box.total-deposit .statistic-value {
+  color: rgb(106, 0, 255);
+}
+#teacherDashboard .statistic-box.total-due .currecy,
+#teacherDashboard .statistic-box.total-deposit .currecy {
+  font-size: 2rem;
+}
+
 /* course management page */
 #teacherCourses .tab-content .tab-pane {
   display: none;
@@ -236,6 +296,7 @@
   font-weight: var(--accent-font-weight);
   font-size: var(--accent-font-size);
 }
+#teacherResources .file-uploaded-by,
 #teacherResources .file-uploaded-time {
   color: var(--text-color);
   font-family: var(--text-font-family);

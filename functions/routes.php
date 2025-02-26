@@ -74,7 +74,6 @@ add_action('template_redirect', 'restrict_admin_pages');
 function teacher_portal_rewrite_rules() {
     add_rewrite_rule('^teacher/dashboard/?$', 'index.php?teacher_page=dashboard', 'top');
     add_rewrite_rule('^teacher/course-management/?$', 'index.php?teacher_page=course-management', 'top');
-    add_rewrite_rule('^teacher/student-management/?$', 'index.php?teacher_page=student-management', 'top');
     add_rewrite_rule('^teacher/resources/?$', 'index.php?teacher_page=resources', 'top');
     add_rewrite_rule('^teacher/revenues/?$', 'index.php?teacher_page=revenues', 'top');
     add_rewrite_rule('^teacher/revenues/bank-details/?$', 'index.php?teacher_page=bank-details', 'top');

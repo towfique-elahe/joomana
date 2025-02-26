@@ -113,3 +113,35 @@ function joomana_cleanup_custom_roles() {
     }
 }
 add_action('switch_theme', 'joomana_cleanup_custom_roles');
+
+// 7. Send an email when a user registers with a specific role (teacher, student, or parent)
+function custom_registration_email_notification($user_id) {
+    // Get user data
+    $user = get_userdata($user_id);
+    $user_email = $user->user_email;
+    
+    // Get user roles
+    $user_roles = $user->roles;
+    
+    // Define the subject and message based on the role
+    if (in_array('teacher', $user_roles)) {
+        $subject = 'Welcome, Teacher!';
+        $message = 'Thank you for registering as a Teacher.';
+    } elseif (in_array('student', $user_roles)) {
+        $subject = 'Welcome, Student!';
+        $message = 'Thank you for registering as a Student.';
+    } elseif (in_array('parent', $user_roles)) {
+        $subject = 'Welcome, Parent!';
+        $message = 'Thank you for registering as a Parent.';
+    } else {
+        return; // Exit if the role is not one of the targeted roles
+    }
+
+    // Headers
+    $headers = ['Content-Type: text/html; charset=UTF-8'];
+
+    // Send the email
+    wp_mail($user_email, $subject, $message, $headers);
+}
+
+add_action('user_register', 'custom_registration_email_notification');

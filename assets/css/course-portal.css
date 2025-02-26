@@ -391,6 +391,7 @@
   font-weight: var(--accent-font-weight);
   font-size: var(--accent-font-size);
 }
+#courseResources .file-uploaded-by,
 #courseResources .file-uploaded-time {
   color: var(--text-color);
   font-family: var(--text-font-family);
@@ -585,6 +586,7 @@
   font-weight: var(--accent-font-weight);
   font-size: var(--accent-font-size);
 }
+#courseSubmissions .file-uploaded-by,
 #courseSubmissions .file-uploaded-time {
   color: var(--text-color);
   font-family: var(--text-font-family);

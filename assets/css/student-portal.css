@@ -1,3 +1,62 @@
+/* dashboard */
+#studentDashboard .statistic-box.total-course {
+  background-color: rgb(242, 248, 255);
+}
+#studentDashboard .statistic-box.total-course:hover {
+  background-color: rgb(221, 237, 255);
+}
+#studentDashboard .statistic-box.total-course .statistic-value {
+  color: rgb(0, 96, 206);
+}
+#studentDashboard .statistic-box.total-in-progress-course {
+  background-color: rgb(255, 248, 238);
+}
+#studentDashboard .statistic-box.total-in-progress-course:hover {
+  background-color: rgb(255, 240, 219);
+}
+#studentDashboard .statistic-box.total-in-progress-course .statistic-value {
+  color: rgb(238, 139, 0);
+}
+#studentDashboard .statistic-box.total-completed-course {
+  background-color: rgb(248, 255, 238);
+}
+#studentDashboard .statistic-box.total-completed-course:hover {
+  background-color: rgb(236, 255, 208);
+}
+#studentDashboard .statistic-box.total-completed-course .statistic-value {
+  color: rgb(133, 216, 0);
+}
+#studentDashboard .statistic-box.total-payments {
+  background-color: rgb(255, 238, 248);
+}
+#studentDashboard .statistic-box.total-payments:hover {
+  background-color: rgb(255, 221, 241);
+}
+#studentDashboard .statistic-box.total-payments .statistic-value {
+  color: rgb(223, 0, 130);
+}
+#studentDashboard .statistic-box.total-purchased-credit {
+  background-color: rgb(255, 255, 238);
+}
+#studentDashboard .statistic-box.total-purchased-credit:hover {
+  background-color: rgb(255, 255, 221);
+}
+#studentDashboard .statistic-box.total-purchased-credit .statistic-value {
+  color: rgb(212, 212, 0);
+}
+#studentDashboard .statistic-box.total-available-credit {
+  background-color: rgb(247, 242, 255);
+}
+#studentDashboard .statistic-box.total-available-credit:hover {
+  background-color: rgb(237, 227, 253);
+}
+#studentDashboard .statistic-box.total-available-credit .statistic-value {
+  color: rgb(106, 0, 255);
+}
+#studentDashboard .statistic-box.total-payments .currecy {
+  font-size: 2rem;
+}
+
 /* resources page */
 #studentResources .select-course {
   width: 100%;

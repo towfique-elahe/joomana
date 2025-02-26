@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_bank_details']
     } else {
         // Insert new record
         $inserted = $wpdb->insert(
-            $teacher_bank_details,
+            $teacher_bankinfo_table,
             [
                 'teacher_id'     => $teacher_id,
                 'bank_name'      => $bank_name,

@@ -51,7 +51,7 @@ $credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits
                 <!-- Available Credit Count -->
                 <a href="javascript:void()" class="statistic-box total-teacher">
                     <h4 class="statistic-title">
-                        <i class="fas fa-chalkboard-teacher"></i> Crédit disponible
+                        <i class="fas fa-coins"></i> Crédit disponible
                     </h4>
                     <p class="statistic-value">
                         <?php echo esc_html($student->credit); ?>

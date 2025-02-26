@@ -270,6 +270,20 @@ if (in_array('student', (array) $user->roles)) {
                     <div class="file-bottom row">
                         <div class="col">
                             <h3 class="file-title"><?php echo basename($submission->file); ?></h3>
+                            <?php
+                                if (in_array('teacher', (array) $user->roles)) {
+                                    $student_id = $submission->student_id;
+                                    // Fetch the student's details using the student_id
+                                    $student_table = $wpdb->prefix. 'students';
+                                    $student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $student_id));
+                            ?>
+                            <p class="file-uploaded-by">
+                                Étudiant:
+                                <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
+                            </p>
+                            <?php
+                                }
+                            ?>
                             <p class="file-uploaded-time">
                                 Téléchargé: <?php echo date('Y-m-d | H:i:s', strtotime($submission->created_at)); ?>
                             </p>

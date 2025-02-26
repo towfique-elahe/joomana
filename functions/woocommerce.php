@@ -103,3 +103,45 @@ function custom_woocommerce_billing_fields($fields) {
 
     return $fields;
 }
+
+/**
+ * After a successful order, send emails based on the user role.
+ */
+function send_email_on_parent_student_purchase($order_id) {
+    if (!$order_id) {
+        return;
+    }
+
+    // Get order details
+    $order = wc_get_order($order_id);
+    $user_id = $order->get_user_id();
+    $user = get_userdata($user_id);
+
+    // If the order was placed by a guest (no user ID), exit
+    if (!$user) {
+        return;
+    }
+
+    // Get user roles
+    $user_roles = $user->roles;
+
+    // Check if the user is a Parent or Student
+    if (in_array('parent', $user_roles)) {
+        $subject = "Thank You for Your Purchase, Parent!";
+        $message = "Hello, your purchase was successful. Thank you for your support!";
+    } elseif (in_array('student', $user_roles)) {
+        $subject = "Thank You for Your Purchase, Student!";
+        $message = "Hello, your purchase has been completed. Enjoy your learning!";
+    } else {
+        return; // Exit if the user is not a Parent or Student
+    }
+
+    // Email headers
+    $headers = ['Content-Type: text/html; charset=UTF-8'];
+
+    // Send email
+    wp_mail($user->user_email, $subject, $message, $headers);
+}
+
+// Hook into WooCommerce after a successful order
+add_action('woocommerce_thankyou', 'send_email_on_parent_student_purchase', 10, 1);

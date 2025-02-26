@@ -12,7 +12,7 @@ require_once(get_template_directory() . '/teacher/templates/header.php');
 function get_teacher_active_courses($teacher_id) {
     global $wpdb;
 
-    // Query to get the courses assigned to the student with status 'En cours'
+    // Query to get the courses assigned to the teacher with status 'En cours'
     $courses = $wpdb->get_results(
         $wpdb->prepare(
             "SELECT c.* 
@@ -27,11 +27,11 @@ function get_teacher_active_courses($teacher_id) {
     return $courses;
 }
 
-// function to get student's completed courses
-function get_student_completed_courses($teacher_id) {
+// function to get teacher's completed courses
+function get_teacher_completed_courses($teacher_id) {
     global $wpdb;
 
-    // Query to get the courses assigned to the student with status 'En cours'
+    // Query to get the courses assigned to the teacher with status 'En cours'
     $courses = $wpdb->get_results(
         $wpdb->prepare(
             "SELECT c.* 
@@ -49,11 +49,11 @@ function get_student_completed_courses($teacher_id) {
 // Get the current user ID
 $teacher_id = get_current_user_id();
 
-// Get the student's active courses
+// Get the teacher's active courses
 $active_courses = get_teacher_active_courses($teacher_id);
 
-// Get the student's completed courses
-$completed_courses = get_student_completed_courses($teacher_id);
+// Get the teacher's completed courses
+$completed_courses = get_teacher_completed_courses($teacher_id);
 
 ?>
 
