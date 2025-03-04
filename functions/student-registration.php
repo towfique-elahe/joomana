@@ -1,10 +1,5 @@
 <?php
 
-// Start the session if it's not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 // Student Registration Form
 
 // shortcode [student_registration_form]
@@ -41,16 +36,18 @@ function custom_student_registration_form() {
 
     <!-- Personal Information -->
     <section class="section col personal-information">
-        <h3 class="section-heading">Informations pour les étudiants</h3>
+        <h3 class="section-heading">Informations Générales</h3>
 
         <div class="row">
             <div class="col">
                 <label for="first_name">Prénom <span class="required">*</span></label>
-                <input type="text" id="first_name" name="first_name" placeholder="Votre prénom" required>
+                <input type="text" id="first_name" name="first_name"
+                    placeholder="Ton prénom, c’est plus sympa pour te connaître !" required>
             </div>
             <div class="col">
                 <label for="last_name">Nom de famille <span class="required">*</span></label>
-                <input type="text" id="last_name" name="last_name" placeholder="Votre nom de famille" required>
+                <input type="text" id="last_name" name="last_name" placeholder="Eh oui, il nous faut ton nom aussi 😄"
+                    required>
             </div>
         </div>
 
@@ -60,15 +57,14 @@ function custom_student_registration_form() {
                 <input type="date" id="date_of_birth" name="date_of_birth" required>
             </div>
             <div class="col">
-                <label for="gender">Sujet <span class="required">*</span></label>
+                <label for="gender">Sexe</label>
                 <div class="custom-select-wrapper">
-                    <select id="gender" name="gender" required>
+                    <select id="gender" name="gender">
                         <option value="" disabled selected>Sélectionnez le sexe</option>
                         <option value="Masculin">Masculin</option>
                         <option value="Féminin">Féminin</option>
                         <option value="Autre">Autre</option>
                     </select>
-                    <!-- <i class="fas fa-chevron-down custom-arrow" style="color: #585858;"></i> -->
                     <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
                 </div>
             </div>
@@ -77,37 +73,38 @@ function custom_student_registration_form() {
 
     <!-- Academic Details -->
     <section class="section col academic-details">
-        <h3 class="section-heading">Informations académiques</h3>
+        <h3 class="section-heading">Parle-nous de tes études</h3>
 
         <div class="row">
             <div class="col">
                 <label for="school">École actuelle <span class="required">*</span></label>
-                <input type="text" id="school" name="school" placeholder="Le nom de votre école" required>
+                <input type="text" id="school" name="school"
+                    placeholder="Le nom de ton école – même si c’est l’école de la vie 😎" required>
             </div>
         </div>
 
         <div class="row">
             <div class="col">
-                <label for="grade">Grade <span class="required">*</span></label>
+                <label for="grade">Classe actuelle <span class="required">*</span></label>
                 <div class="custom-select-wrapper">
                     <select id="grade" name="grade" required>
-                        <option value="" disabled selected>Sélectionnez le Grade</option>
+                        <option value="" disabled selected>Dis-nous où tu en es dans l’aventure scolaire.</option>
 
                         <?php
-                                                        global $wpdb; // Access the global $wpdb object for database queries
+                            global $wpdb; // Access the global $wpdb object for database queries
+
+                            // Query the custom 'course_grades' table
+                            $grades = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_grades");
                 
-                                                        // Query the custom 'course_grades' table
-                                                        $grades = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_grades");
-                
-                                                        // Check if grades are available
-                                                        if ($grades) {
-                                                            foreach ($grades as $grade) {
-                                                                echo '<option value="' . esc_attr($grade->grade) . '">' . esc_html($grade->grade) . '</option>';
-                                                            }
-                                                        } else {
-                                                            echo '<option disabled>No grade found</option>';
-                                                        }
-                                                    ?>
+                            // Check if grades are available
+                            if ($grades) {
+                                foreach ($grades as $grade) {
+                                    echo '<option value="' . esc_attr($grade->grade) . '">' . esc_html($grade->grade) . '</option>';
+                                }
+                            } else {
+                                echo '<option disabled>No grade found</option>';
+                            }
+                        ?>
 
                     </select>
                     <!-- <i class="fas fa-chevron-down custom-arrow" style="color: #585858;"></i> -->
@@ -118,46 +115,62 @@ function custom_student_registration_form() {
             <div class="col">
                 <label for="level">Niveau <span class="required">*</span></label>
                 <div class="custom-select-wrapper">
-                    <select id="level" name="level" required>
-                        <option value="" disabled selected>Sélectionnez le niveau</option>
-
-                        <?php
-                                                        global $wpdb; // Access the global $wpdb object for database queries
-                
-                                                        // Query the custom 'course_levels' table
-                                                        $levels = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_levels");
-                
-                                                        // Check if levels are available
-                                                        if ($levels) {
-                                                            foreach ($levels as $level) {
-                                                                echo '<option value="' . esc_attr($level->level) . '">' . esc_html($level->level) . '</option>';
-                                                            }
-                                                        } else {
-                                                            echo '<option disabled>No level found</option>';
-                                                        }
-                                                    ?>
-
+                    <!-- Hidden select element to store the actual level (Fort/Débutant) -->
+                    <select id="level" name="level" required style="display: none;">
+                        <option value="" disabled selected>Select a level</option>
+                        <option value="Fort">Fort</option>
+                        <option value="Débutant">Débutant</option>
                     </select>
-                    <!-- <i class="fas fa-chevron-down custom-arrow" style="color: #585858;"></i> -->
-                    <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
+
+                    <!-- Visible select element for user input (1-20) -->
+                    <select id="level-input" name="level-input" required>
+                        <option value="" disabled selected>On t’accueille quel que soit ton niveau – de débutant à fort
+                            💡</option>
+                        <?php
+            for ($i = 1; $i <= 20; $i++) {
+                echo '<option value="' . $i . '">' . $i . '</option>';
+            }
+            ?>
+                    </select>
+
+                    <!-- Arrow icon -->
+                    <ion-icon name="chevron-down-outline" class="custom-arrow md hydrated" role="img"></ion-icon>
                 </div>
             </div>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const levelInput = document.getElementById('level-input');
+                const levelSelect = document.getElementById('level');
+
+                levelInput.addEventListener('change', function() {
+                    const selectedValue = parseInt(levelInput.value, 10);
+
+                    // Determine the level based on the selected value
+                    if (selectedValue < 12) {
+                        levelSelect.value = 'Débutant'; // Weak (Débutant)
+                    } else {
+                        levelSelect.value = 'Fort'; // Strong (Fort)
+                    }
+                });
+
+                // Ensure the form submits the correct level value
+                document.querySelector('form').addEventListener('submit', function(e) {
+                    if (!levelSelect.value) {
+                        e.preventDefault(); // Prevent form submission if no level is selected
+                        alert('Please select a valid level.');
+                    }
+                });
+            });
+            </script>
+
         </div>
     </section>
 
     <!-- Modules of Interest -->
     <section class="section col interested-modules">
-        <h3 class="section-heading">Modules d'intérêt</h3>
+        <h3 class="section-heading">Choisis ce qui t’intéresse</h3>
 
-        <!-- <div id="subject_of_interest" class="checkbox-group">
-            <label class="row"><input type="checkbox" name="subject_of_interest[]" value="Algebra"> Algèbre</label>
-            <label class="row"><input type="checkbox" name="subject_of_interest[]" value="Geometry"> Géométrie</label>
-            <label class="row"><input type="checkbox" name="subject_of_interest[]" value="Trigonometry">
-                Trigonométrie</label>
-            <label class="row"><input type="checkbox" name="subject_of_interest[]" value="Calculus"> Calcul</label>
-            <label class="row"><input type="checkbox" name="subject_of_interest[]" value="Statistics">
-                Statistiques</label>
-        </div> -->
         <div id="subject_of_interest" class="checkbox-group">
             <?php
                 global $wpdb;
@@ -175,7 +188,7 @@ function custom_student_registration_form() {
 
     <!-- Weekly Availability -->
     <section class="section col weekly-availability">
-        <h3 class="section-heading">Disponibilité hebdomadaire (par créneau de 2 heures)</h3>
+        <h3 class="section-heading">Quand es-tu dispo ?</h3>
 
         <div class="row">
             <div class="col days">
@@ -277,26 +290,29 @@ function custom_student_registration_form() {
 
     <!-- Account Details -->
     <section class="section col account-details">
-        <h3 class="section-heading">Informations sur le compte</h3>
+        <h3 class="section-heading">Crée ton compte</h3>
 
         <div class="row">
             <div class="col">
-                <label for="username">Nom d'utilisateur</label>
-                <input type="text" id="username" name="username" placeholder="Votre nom d'utilisateur">
+                <label for="username">Nom d’utilisateur</label>
+                <input type="text" id="username" name="username"
+                    placeholder="Un pseudo sympa pour te connecter facilement.">
             </div>
             <div class="col">
                 <label for="email">E-mail <span class="required">*</span></label>
-                <input type="email" id="email" name="email" placeholder="Votre email" required>
+                <input type="email" id="email" name="email"
+                    placeholder="On t’écrit seulement pour des infos importantes, promis !" required>
             </div>
         </div>
 
         <div class="row">
             <div class="col">
                 <label for="password">Mot de passe <span class="required">*</span></label>
-                <input type="password" id="password" name="password" placeholder="Votre mot de passe" required>
+                <input type="password" id="password" name="password"
+                    placeholder="Simple mais sécurisé – comme les maths chez nous !" required>
             </div>
             <div class="col">
-                <label for="confirm_password">Confirmez le mot de passe <span class="required">*</span></label>
+                <label for="confirm_password">Confirmation du mot de passe <span class="required">*</span></label>
                 <input type="password" id="confirm_password" name="confirm_password"
                     placeholder="Confirmez votre mot de passe" required>
             </div>
@@ -305,9 +321,9 @@ function custom_student_registration_form() {
 
     <!-- Parent/Guardian Consent -->
     <div class="col guardian-consent">
-        <h3 class="section-heading">Consentement des parents/tuteurs</h3>
+        <h3 class="section-heading">Consentement des Parents/Tuteurs</h3>
         <input type="text" name="parent_consent" id="parent_consent" class="declaration-input signature"
-            placeholder="Consentement" required>
+            placeholder="Parce qu’on veut que tes parents soient d’accord avec tout ça !" required>
     </div>
 
     <!-- Submit Button -->
@@ -347,7 +363,7 @@ function handle_student_registration_form() {
         $thursday_timeslot = isset($_POST['thursday_timeslot']) ? sanitize_text_field($_POST['thursday_timeslot']) : null;
         $friday_timeslot = isset($_POST['friday_timeslot']) ? sanitize_text_field($_POST['friday_timeslot']) : null;
         $saturday_timeslot = isset($_POST['saturday_timeslot']) ? sanitize_text_field($_POST['saturday_timeslot']) : null;
-        $sunday_timeslot = isset($_POST['sunday_timeslot']) ? sanitize_text_field($_POST['sunday_timeslot']) : null;        
+        $sunday_timeslot = isset($_POST['sunday_timeslot']) ? sanitize_text_field($_POST['sunday_timeslot']) : null;
         $parent_consent = sanitize_text_field($_POST['parent_consent']);
         $email = sanitize_email($_POST['email']);
         $username = sanitize_user($_POST['username']);
@@ -428,6 +444,17 @@ function handle_student_registration_form() {
 
             // Set success message
             $_SESSION['registration_success'] = 'Registration successful. Welcome!';
+
+            // Send email to the student
+            $to = $email;
+            $subject = 'Welcome to Our Platform!';
+            $message = "Hello $first_name,\n\nThank you for registering with us. Your account has been successfully created.\n\n";
+            $message .= "Username: $username\n";
+            $message .= "Password: (the password you entered during registration)\n\n";
+            $message .= "We look forward to seeing you on our platform!\n\nBest regards,\nThe Team";
+
+            // Send the email
+            wp_mail($to, $subject, $message);
 
             // Redirect to the current page to prevent form resubmission
             wp_safe_redirect($_SERVER['REQUEST_URI']);

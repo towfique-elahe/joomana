@@ -18,13 +18,13 @@ form .weekly-availability .radio-group label {
   font-weight: var(--text-font-weight) !important;
 }
 form .signature {
-  max-width: 300px;
+  max-width: 30rem;
   border: none !important;
   border-bottom: var(--border) !important;
   border-radius: 0 !important;
 }
 form .submit-button {
-  max-width: 300px;
+  max-width: 30rem;
 }
 
 /* Teacher Registration From */
@@ -136,7 +136,7 @@ form .submit-button {
 }
 .teacher-registration-form .declaration input {
   width: 100%;
-  max-width: 300px;
+  max-width: 30rem;
   border: none !important;
   border-bottom: var(--border) !important;
 }

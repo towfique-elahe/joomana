@@ -1,10 +1,5 @@
 <?php
 
-// Start the session if it's not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 // Teacher Registration Form
 
 // shortcode [teacher_registration_form]
@@ -45,6 +40,24 @@ function custom_teacher_registration_form() {
 
         <div class="row">
             <div class="col">
+                <label for="civility">Ajouter civilité <span class="required">*</span></label>
+                <div class="custom-select-wrapper">
+                    <select id="civility" name="civility" required>
+                        <option value="" disabled selected>M. ou Mme</option>
+                        <option value="Mr">M</option>
+                        <option value="Mrs">Mme</option>
+                    </select>
+                    <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
+                </div>
+            </div>
+            <div class="col">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" placeholder="Nom d'utilisateur">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
                 <label for="first_name">Prénom <span class="required">*</span></label>
                 <input type="text" id="first_name" name="first_name" placeholder="Votre prénom" required>
             </div>
@@ -56,8 +69,8 @@ function custom_teacher_registration_form() {
 
         <div class="row">
             <div class="col">
-                <label for="username">Nom d'utilisateur</label>
-                <input type="text" id="username" name="username" placeholder="Nom d'utilisateur">
+                <label for="date_of_birth">Date de naissance <span class="required">*</span></label>
+                <input type="date" id="date_of_birth" name="date_of_birth" required>
             </div>
         </div>
 
@@ -73,9 +86,6 @@ function custom_teacher_registration_form() {
                 <label for="password">Mot de passe <span class="required">*</span></label>
                 <input type="password" id="password" name="password" placeholder="Votre mot de passe" required>
             </div>
-        </div>
-
-        <div class="row">
             <div class="col">
                 <label for="confirm_password">Confirmez le mot de passe <span class="required">*</span></label>
                 <input type="password" id="confirm_password" name="confirm_password"
@@ -88,6 +98,24 @@ function custom_teacher_registration_form() {
                 <label for="company_name">Nom de l'entreprise</label>
                 <input type="text" id="company_name" name="company_name" placeholder="Votre dernier nom d'entreprise"
                     required>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label for="how_found">Comment as-tu connu Joomaths ?</label>
+                <div class="custom-select-wrapper">
+                    <select id="how_found" name="how_found">
+                        <option value="" disabled selected>Sélectionnez comment vous avez trouvé</option>
+                        <option value="Internet">Internet</option>
+                        <option value="Personal Network">Réseau personnel</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Other">Autre</option>
+                    </select>
+                    <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
+                </div>
             </div>
         </div>
 
@@ -364,15 +392,16 @@ function custom_teacher_registration_form() {
 
         <div class="row">
             <div class="col">
-                <label for="degree">Dernier Degré <span class="required">*</span></label>
-                <input type="text" id="degree" name="degree" placeholder="Votre dernier diplôme" required>
+                <label for="degree">Derniers diplômes <span class="required">*</span></label>
+                <input type="text" id="degree" name="degree" placeholder="Votre derniers diplômes" required>
             </div>
         </div>
 
         <div class="row">
             <div class="col">
-                <label for="institute">Institution d'obtention <span class="required">*</span></label>
-                <input type="text" id="institute" name="institute" placeholder="Nom de l'établissement" required>
+                <label for="institute">Écoles / Universités (Institution d'obtention ) <span
+                        class="required">*</span></label>
+                <input type="text" id="institute" name="institute" placeholder="Nom de Écoles / Universités" required>
             </div>
         </div>
 
@@ -418,15 +447,15 @@ function custom_teacher_registration_form() {
             <div class="col">
                 <textarea id="motivation_of_joining" name="motivation_of_joining"
                     placeholder="Décrivez votre motivation"></textarea>
-                <p class="text">Décrivez votre motivation pour rejoindre Joomana Class en tant que
-                    Professeur/Coach de Mathématiques (3 lignes maximum)</p>
+                <p class="text">Décrivez votre motivation pour rejoindre Joomana Class en tant que Professeur/Coach de
+                    Mathématiques (3 lignes maximum)</p>
             </div>
         </div>
     </section>
 
     <!-- Weekly Availability -->
     <section class="section col weekly-availability">
-        <h3 class="section-heading">Disponibilité hebdomadaire (par créneau de 2 heures)</h3>
+        <h3 class="section-heading">Quelles sont tes disponibilités pour donner des cours ?</h3>
 
         <div class="row">
             <div class="col days">
@@ -451,64 +480,62 @@ function custom_teacher_registration_form() {
 
                 <!-- Monday Time Slots (Radio Buttons) -->
                 <div class="row radio-group">
-                    <label class="row"><input type="radio" name="monday_timeslot" value="5pm-7pm"> 5pm-7pm</label>
+                    <label class="row"><input type="radio" name="monday_timeslot" value="5pm-6:30pm"> 5pm-6:30pm</label>
+                    <label class="row"><input type="radio" name="monday_timeslot" value="7pm-8:30pm"> 7pm-8:30pm</label>
                 </div>
 
                 <!-- Tuesday Time Slots (Radio Buttons) -->
                 <div class="row radio-group">
-                    <label class="row"><input type="radio" name="tuesday_timeslot" value="5pm-7pm">
-                        5pm-7pm</label>
+                    <label class="row"><input type="radio" name="tuesday_timeslot" value="5pm-6:30pm">
+                        5pm-6:30pm</label>
+                    <label class="row"><input type="radio" name="tuesday_timeslot" value="7pm-8:30pm">
+                        7pm-8:30pm</label>
                 </div>
 
                 <!-- Wednesday Time Slots (Radio Buttons) -->
                 <div class="row radio-group">
-                    <label class="row"><input type="radio" name="wednesday_timeslot" value="8am-10am">
-                        8am-10am</label>
-                    <label class="row"><input type="radio" name="wednesday_timeslot" value="10am-12pm">
-                        10am-12pm</label>
-                    <label class="row"><input type="radio" name="wednesday_timeslot" value="12pm-2pm">
-                        12pm-2pm</label>
-                    <label class="row"><input type="radio" name="wednesday_timeslot" value="2pm-4pm">
-                        2pm-4pm</label>
-                    <label class="row"><input type="radio" name="wednesday_timeslot" value="4pm-6pm"> 4pm-6pm</label>
+                    <label class="row"><input type="radio" name="wednesday_timeslot" value="2pm-3:30pm">
+                        2pm-3:30pm</label>
+                    <label class="row"><input type="radio" name="wednesday_timeslot" value="4pm-5:30pm">
+                        4pm-5:30pm</label>
                 </div>
 
                 <!-- Thursday Time Slots (Radio Buttons) -->
                 <div class="row radio-group">
-                    <label class="row"><input type="radio" name="thursday_timeslot" value="5pm-7pm">
-                        5pm-7pm</label>
+                    <label class="row"><input type="radio" name="thursday_timeslot" value="5pm-6:30pm">
+                        5pm-6:30pm</label>
+                    <label class="row"><input type="radio" name="thursday_timeslot" value="7pm-8:30pm">
+                        7pm-8:30pm</label>
                 </div>
 
                 <!-- Friday Time Slots (Radio Buttons) -->
                 <div class="row radio-group">
-                    <label class="row"><input type="radio" name="friday_timeslot" value="5pm-7pm"> 5pm-7pm</label>
+                    <label class="row"><input type="radio" name="friday_timeslot" value="5pm-6:30pm"> 5pm-6:30pm</label>
+                    <label class="row"><input type="radio" name="friday_timeslot" value="7pm-8:30pm"> 7pm-8:30pm</label>
                 </div>
 
                 <!-- Saturday Time Slots (Radio Buttons) -->
                 <div class="row radio-group">
-                    <label class="row"><input type="radio" name="saturday_timeslot" value="8am-10am">
-                        8am-10am</label>
-                    <label class="row"><input type="radio" name="saturday_timeslot" value="10am-12pm">
-                        10am-12pm</label>
-                    <label class="row"><input type="radio" name="saturday_timeslot" value="12pm-2pm">
-                        12pm-2pm</label>
-                    <label class="row"><input type="radio" name="saturday_timeslot" value="2pm-4pm">
-                        2pm-4pm</label>
-                    <label class="row"><input type="radio" name="saturday_timeslot" value="4pm-6pm"> 4pm-6pm</label>
+                    <label class="row"><input type="radio" name="saturday_timeslot" value="9am-10:30am">
+                        9am-10:30am</label>
+                    <label class="row"><input type="radio" name="saturday_timeslot" value="11am-12:30pm">
+                        11am-12:30pm</label>
+                    <label class="row"><input type="radio" name="saturday_timeslot" value="2pm-3:30pm">
+                        2pm-3:30pm</label>
+                    <label class="row"><input type="radio" name="saturday_timeslot" value="4pm-5:30pm">
+                        4pm-5:30pm</label>
                 </div>
 
                 <!-- Sunday Time Slots (Radio Buttons) -->
                 <div class="row radio-group">
-                    <label class="row"><input type="radio" name="sunday_timeslot" value="8am-10am">
-                        8am-10am</label>
-                    <label class="row"><input type="radio" name="sunday_timeslot" value="10am-12pm">
-                        10am-12pm</label>
-                    <label class="row"><input type="radio" name="sunday_timeslot" value="12pm-2pm">
-                        12pm-2pm</label>
-                    <label class="row"><input type="radio" name="sunday_timeslot" value="2pm-4pm"> 2pm-4pm</label>
-                    <label class="row"><input type="radio" name="sunday_timeslot" value="4pm-6pm"> 4pm-6pm</label>
+                    <label class="row"><input type="radio" name="sunday_timeslot" value="2pm-3:30pm"> 2pm-3:30pm</label>
+                    <label class="row"><input type="radio" name="sunday_timeslot" value="4pm-5:30pm"> 4pm-5:30pm</label>
+                    <label class="row"><input type="radio" name="sunday_timeslot" value="5:18pm-6:30pm">
+                        5:18pm-6:30pm</label>
+                    <label class="row"><input type="radio" name="sunday_timeslot" value="7pm-8:30pm"> 7pm-8:30pm</label>
                 </div>
             </div>
+
         </div>
     </section>
 
@@ -575,6 +602,7 @@ function custom_teacher_registration_form() {
                             class="upload-video-input">
                     </div>
                     <p class="text">(MP4, MOV uniquement, Max 20 Mo)</p>
+                    <p class="text">(Taille de la vidéo 3 minutes max)</p>
                     <p class="video-file-name">Aucun fichier sélectionné</p>
                 </div>
             </div>
@@ -616,13 +644,16 @@ function custom_teacher_registration_form() {
             global $wpdb;
     
             // Sanitize and validate form inputs
+            $civility = sanitize_text_field($_POST['civility']);
+            $username = sanitize_user($_POST['username']);
             $first_name = sanitize_text_field($_POST['first_name']);
             $last_name = sanitize_text_field($_POST['last_name']);
-            $username = sanitize_user($_POST['username']);
+            $date_of_birth = sanitize_text_field($_POST['date_of_birth']);
             $email = sanitize_email($_POST['email']);
             $password = $_POST['password'];
             $confirm_password = $_POST['confirm_password'];
             $company_name = sanitize_text_field($_POST['company_name']);
+            $how_found = sanitize_text_field($_POST['how_found']);
             $country = sanitize_text_field($_POST['country']);
             $address = sanitize_text_field($_POST['address']);
             $city = sanitize_text_field($_POST['city']);
@@ -775,10 +806,13 @@ function custom_teacher_registration_form() {
                 $table_name = $wpdb->prefix . 'teachers';
                 $wpdb->insert($table_name, [
                     'id' => $user_id,
+                    'civility' => $civility,
                     'first_name' => $first_name,
                     'last_name' => $last_name,
+                    'date_of_birth' => $date_of_birth,
                     'email' => $email,
                     'company_name' => $company_name,
+                    'how_found' => $how_found,
                     'country' => $country,
                     'address' => $address,
                     'city' => $city,
@@ -810,6 +844,17 @@ function custom_teacher_registration_form() {
                 ]);
 
                 $_SESSION['registration_success'] = 'Registration successful. Welcome to Joomana!';
+
+                // Send email to the student
+                $to = $email;
+                $subject = 'Welcome to Our Platform!';
+                $message = "Hello $first_name,\n\nThank you for registering with us. Your account has been successfully created.\n\n";
+                $message .= "Username: $username\n";
+                $message .= "Password: (the password you entered during registration)\n\n";
+                $message .= "We look forward to seeing you on our platform!\n\nBest regards,\nThe Team";
+
+                // Send the email
+                wp_mail($to, $subject, $message);
 
                 // Redirect to the current page to prevent form resubmission
                 wp_safe_redirect($_SERVER['REQUEST_URI']);
