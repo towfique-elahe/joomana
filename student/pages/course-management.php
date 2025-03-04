@@ -152,9 +152,7 @@ $completed_courses = get_student_completed_courses($student_id);
                 </div>
             </div>
 
-
         </div>
-
 
     </div>
 </div>

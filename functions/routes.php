@@ -119,6 +119,8 @@ add_action('template_redirect', 'restrict_teacher_pages');
 function parent_portal_rewrite_rules() {
     add_rewrite_rule('^parent/dashboard/?$', 'index.php?parent_page=dashboard', 'top');
     add_rewrite_rule('^parent/child-management/?$', 'index.php?parent_page=child-management', 'top');
+    add_rewrite_rule('^parent/child-management/add-child/?$', 'index.php?parent_page=add-child', 'top');
+    add_rewrite_rule('^parent/child-management/child-details/?$', 'index.php?parent_page=child-details', 'top');
     add_rewrite_rule('^parent/credit-management/?$', 'index.php?parent_page=credit-management', 'top');
     add_rewrite_rule('^parent/payments/?$', 'index.php?parent_page=payments', 'top');
     add_rewrite_rule('^parent/payments/invoice/?$', 'index.php?parent_page=invoice', 'top');

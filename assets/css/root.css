@@ -197,7 +197,8 @@ form input[readonly]:focus {
   border: var(--border) !important;
 }
 form select {
-  height: 50px;
+  height: 40px;
+  margin-top: 2px;
   color: var(--text-color) !important;
   font-family: var(--text-font-family) !important;
   font-size: var(--text-font-size) !important;
@@ -227,7 +228,7 @@ form .custom-arrow {
   top: 50%;
   right: 10px; /* Adjust the right padding to position the arrow */
   transform: translateY(-50%); /* Vertically center the arrow */
-  font-size: 18px; /* Adjust the size of the arrow */
+  font-size: 1rem; /* Adjust the size of the arrow */
   color: #333; /* Change the color of the arrow */
   pointer-events: none; /* Prevent interaction with the icon */
 }

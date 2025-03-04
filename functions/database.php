@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.0.6';
+    $custom_tables_version = '1.0.9';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -175,6 +175,7 @@ function create_custom_tables() {
 
     $students_sql = "CREATE TABLE $students_table (
         id BIGINT(20) UNSIGNED NOT NULL,
+        parent_id BIGINT(20) UNSIGNED NULL,
         first_name VARCHAR(255) NOT NULL,
         last_name VARCHAR(255) NOT NULL,
         date_of_birth DATE NOT NULL,
@@ -374,6 +375,9 @@ function add_foreign_keys() {
         "{$wpdb->prefix}communications" => [
             "fk_communications_user_id"   => "ALTER TABLE {$wpdb->prefix}communications ADD CONSTRAINT fk_communications_user_id FOREIGN KEY (user_id) REFERENCES {$wpdb->prefix}users(ID) ON DELETE CASCADE;",
             "fk_communications_course_id" => "ALTER TABLE {$wpdb->prefix}communications ADD CONSTRAINT fk_communications_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}students" => [
+            "fk_students_parent_id"  => "ALTER TABLE {$wpdb->prefix}students ADD CONSTRAINT fk_students_parent_id FOREIGN KEY (parent_id) REFERENCES {$wpdb->prefix}parents(id) ON DELETE CASCADE;"
         ],
         "{$wpdb->prefix}student_courses" => [
             "fk_student_courses_student_id"  => "ALTER TABLE {$wpdb->prefix}student_courses ADD CONSTRAINT fk_student_courses_student_id FOREIGN KEY (student_id) REFERENCES {$wpdb->prefix}students(id) ON DELETE CASCADE;",

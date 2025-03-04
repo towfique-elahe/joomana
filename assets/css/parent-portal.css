@@ -1,3 +1,277 @@
+/* child management page */
+#parentChildManagement .list th:nth-child(1),
+#parentChildManagement .list td:nth-child(1) {
+  text-align: left;
+}
+#parentChildManagement .list th:nth-child(2),
+#parentChildManagement .list td:nth-child(2) {
+  text-align: left;
+  width: 12rem;
+}
+#parentChildManagement .list th:nth-child(3),
+#parentChildManagement .list td:nth-child(3) {
+  text-align: left;
+  width: 12rem;
+}
+#parentChildManagement .list th:nth-child(4),
+#parentChildManagement .list td:nth-child(4) {
+  width: 6rem;
+}
+#parentChildManagement .list th:nth-child(5),
+#parentChildManagement .list td:nth-child(5) {
+  width: 12rem;
+}
+#parentChildManagement .table th:last-child,
+#parentChildManagement .table td:last-child {
+  width: 7rem;
+}
+#parentChildManagement .select-filters {
+  display: flex;
+  gap: 0.5rem;
+}
+#parentChildManagement .select-filters .custom-select-wrapper {
+  width: 12rem;
+  position: relative;
+  display: inline-block; /* Allow positioning the arrow next to the select */
+}
+#parentChildManagement .select-filters select {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+  border: var(--border);
+  border-radius: 0.4rem;
+  outline: none;
+  padding: 0.7rem 2rem 0.7rem 1rem;
+  appearance: none; /* Remove the default dropdown arrow (for most browsers) */
+  -webkit-appearance: none; /* Remove the default dropdown arrow in WebKit browsers */
+  -moz-appearance: none; /* Remove the default dropdown arrow in Firefox */
+  width: 100%; /* Make select take full width of the wrapper */
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#parentChildManagement .select-filters select::-ms-expand {
+  display: none;
+}
+#parentChildManagement .select-filters select:focus {
+  border-color: var(--accent-color) !important;
+}
+#parentChildManagement .select-filters .custom-arrow {
+  position: absolute;
+  top: 50%;
+  right: 10px; /* Adjust the right padding to position the arrow */
+  transform: translateY(-50%); /* Vertically center the arrow */
+  font-size: 1rem; /* Adjust the size of the arrow */
+  pointer-events: none; /* Prevent interaction with the icon */
+}
+
+/* student details */
+#parentChildDetails .section {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+#parentChildDetails .section.user-courses {
+  flex: 1.5;
+}
+#parentChildDetails .profile-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#parentChildDetails .profile-image {
+  width: 100%;
+  max-width: 10rem;
+  max-height: 10rem;
+  border: var(--border);
+  border-radius: 0.4rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+#parentChildDetails .profile-name {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--secondary-font-size);
+  color: var(--accent-color);
+}
+#parentChildDetails .profile-username {
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+  color: var(--text-color);
+}
+#parentChildDetails .detail-row {
+  padding: 1rem 0;
+  border-bottom: var(--border);
+}
+#parentChildDetails .detail-row:last-of-type {
+  border: none;
+}
+#parentChildDetails .detail-label {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  color: var(--dark-text-color);
+}
+#parentChildDetails .detail-value {
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+  color: var(--text-color);
+}
+#parentChildDetails .tab-content .tab-pane {
+  display: none;
+}
+#parentChildDetails .tab-content .tab-pane.show.active {
+  display: block;
+}
+#parentChildDetails .nav-tabs {
+  display: flex;
+  gap: 1rem;
+}
+#parentChildDetails .nav-tabs .nav-link {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  text-decoration: none;
+  text-transform: capitalize;
+  font-family: var(--accent-font-family);
+  font-size: var(--accent-font-size);
+  font-weight: var(--accent-font-weight);
+  padding: 0.5rem 1rem;
+  border-bottom: var(--border);
+  border-radius: 0.3rem 0.3rem 0 0;
+  transition: 0.3s;
+}
+#parentChildDetails .nav-tabs .nav-link.active {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+#parentChildDetails .courses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+#parentChildDetails .course-card {
+  background: #fff;
+  border: var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  width: calc(25% - 0.5rem);
+  display: flex;
+  flex-direction: column;
+}
+#parentChildDetails .course-image {
+  width: 100%;
+  height: 12rem;
+  object-fit: cover;
+  border-bottom: var(--border);
+}
+#parentChildDetails .course-tag {
+  display: inline;
+  width: fit-content;
+  margin: 1rem;
+  padding: 0.5rem 1rem;
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-size: 0.9rem;
+  font-weight: var(--accent-font-weight);
+  border: var(--border);
+  border-radius: 0.3rem;
+}
+#parentChildDetails .course-tag.in-progress {
+  background-color: #e8f9ff;
+  color: #155e95;
+  border-color: #155e95;
+}
+#parentChildDetails .course-tag.completed {
+  background-color: #eafaea;
+  color: #6e8e59;
+  border-color: #6e8e59;
+}
+#parentChildDetails .course-title {
+  margin: 0 15px;
+  height: 50px;
+  color: var(--dark-text-color) !important;
+  font-family: var(--accent-font-family) !important;
+  font-size: var(--accent-font-size) !important;
+  font-weight: var(--accent-font-weight) !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+#parentChildDetails .course-info {
+  margin: 0 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+#parentChildDetails .course-info p {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+}
+#parentChildDetails .course-footer {
+  margin: 2rem 1rem 1.5rem 1rem;
+  display: flex;
+}
+#parentChildDetails .course-price {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+}
+#parentChildDetails .course-price .amount {
+  font-family: var(--accent-font-family);
+  font-size: 24px;
+  font-weight: var(--accent-font-weight);
+  color: var(--accent-color);
+}
+#parentChildDetails .course-btn {
+  width: 100%;
+  text-align: center;
+  padding: 8px 16px;
+  background-color: var(--primary-color);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-family: var(--accent-font-family) !important;
+  font-size: var(--accent-font-size) !important;
+  font-weight: var(--accent-font-weight) !important;
+  transition: 0.3s ease;
+}
+#parentChildDetails .course-btn:hover {
+  background-color: var(--accent-color);
+}
+
+/* add child page */
+#parentAddChild form .section {
+  border-radius: 0.5rem;
+}
+#parentAddChild form .interested-subjects label,
+#parentAddChild form .interested-modules label {
+  font-family: var(--text-font-family) !important;
+  font-size: var(--text-font-size) !important;
+  font-weight: var(--text-font-weight) !important;
+}
+
+#parentAddChild form .weekly-availability .time-slots {
+  flex: 2 !important;
+}
+#parentAddChild form .weekly-availability .checkbox-group label,
+#parentAddChild form .weekly-availability .radio-group label {
+  display: flex;
+  align-items: center;
+  font-family: var(--text-font-family) !important;
+  font-size: var(--text-font-size) !important;
+  font-weight: var(--text-font-weight) !important;
+}
+#parentAddChild form .submit-button {
+  max-width: 30rem;
+  border-radius: 0.5rem !important;
+}
+
 /* credit management page */
 #parentCredit .statistics .section-body {
   align-items: flex-start;
