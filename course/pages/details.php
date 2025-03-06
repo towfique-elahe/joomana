@@ -2,7 +2,7 @@
 
 /* Template Name: Course | Details */
 
-// page title
+// Page title
 global $pageTitle;
 $pageTitle = 'Détails du cours';
 
@@ -19,9 +19,11 @@ $default_user_image = esc_url(get_stylesheet_directory_uri() . '/assets/image/us
 
 // Get course_id from session
 if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
-
     // Check the user's role and redirect accordingly
-    if (in_array('student', (array) $user->roles)) {
+    if (in_array('parent', (array) $user->roles)) {
+        wp_redirect(home_url('/parent/course-management/'));
+        exit;
+    } elseif (in_array('student', (array) $user->roles)) {
         wp_redirect(home_url('/student/course-management/'));
         exit;
     } elseif (in_array('teacher', (array) $user->roles)) {
@@ -38,10 +40,14 @@ $course_id = intval($_GET['course_id']);
 global $wpdb;
 $courses_table = $wpdb->prefix . 'courses';
 $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $courses_table WHERE id = %d", $course_id));
+$group_number = 0;
 
 if (!$course) {
     // Check the user's role and redirect accordingly
-    if (in_array('student', (array) $user->roles)) {
+    if (in_array('parent', (array) $user->roles)) {
+        wp_redirect(home_url('/parent/course-management/'));
+        exit;
+    } elseif (in_array('student', (array) $user->roles)) {
         wp_redirect(home_url('/student/course-management/'));
         exit;
     } elseif (in_array('teacher', (array) $user->roles)) {
@@ -54,9 +60,61 @@ if (!$course) {
     }
 }
 
-$group_number = 0;
+if (in_array('parent', (array) $user->roles)) {
+    $student_id = intval($_GET['student_id']);
+    // Query the custom table to get the student's teacher_id
+    $student_courses_table  = $wpdb->prefix . 'student_courses'; // Ensure the table name is correct
+    $teacher_id = $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT teacher_id FROM $student_courses_table  WHERE student_id = %d AND course_id = %d",
+            $student_id,
+            $course_id
+        )
+    );
+    $student_group = $wpdb->get_var($wpdb->prepare(
+        "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
+        $student_id,
+        $course_id
+    ));
+    if ($student_group) {
+        $group_number = intval($student_group);
+    }
 
-if (in_array('student', (array) $user->roles)) {
+    // Fetch the teacher's details using the teacher_id for the student
+    $teacher_table = $wpdb->prefix. 'teachers';
+    $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $teacher_id));
+
+    // Fetch all student IDs enrolled in the course for the given teacher group
+    $enrolled_student_ids = $wpdb->get_col(
+        $wpdb->prepare(
+            "SELECT student_id FROM $student_courses_table WHERE course_id = %d AND teacher_id = %d",
+            $course_id,
+            $teacher_id
+        )
+    );
+
+    // Check if any student IDs were found
+    if (!empty($enrolled_student_ids)) {
+        // Fetch student details from the students table
+        $students_table = $wpdb->prefix . 'students';
+        $student_ids_placeholder = implode(',', array_map('intval', $enrolled_student_ids)); // Sanitize IDs
+
+        $enrolled_students = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM $students_table WHERE id IN ($student_ids_placeholder)"
+            )
+        );
+    }
+
+    // Fetch existing class link for course_id and group_number
+    $class_links_table = $wpdb->prefix . "course_class_links";
+    // Check if a record already exists for this course and group
+    $existing_class_link = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM $class_links_table WHERE course_id = %d AND group_number = %d",
+        $course_id, $group_number
+    ));
+
+} elseif (in_array('student', (array) $user->roles)) {
     $student_id = $user->ID;
     // Query the custom table to get the student's teacher_id
     $student_courses_table  = $wpdb->prefix . 'student_courses'; // Ensure the table name is correct
@@ -253,6 +311,10 @@ if (in_array('student', (array) $user->roles)) {
                 ?>
                 <a href="<?php echo home_url('/student/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
                 <?php 
+                    } elseif (current_user_can('parent')) {
+                ?>
+                <a href="<?php echo home_url('/parent/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
+                <?php 
                     } elseif (current_user_can('teacher')) {
                 ?>
                 <a href="<?php echo home_url('/teacher/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
@@ -263,7 +325,12 @@ if (in_array('student', (array) $user->roles)) {
                 <?php 
                     if (current_user_can('student')) {
                 ?>
-                <a href="<?php echo home_url('/student/course-management'); ?>" class="breadcrumb-link">Gestion de
+                <a href="<?php echo home_url('/student/course-management'); ?>" class="breadcrumb-link">Gestion des
+                    enfants</a>
+                <?php 
+                    } elseif (current_user_can('parent')) {
+                ?>
+                <a href="<?php echo home_url('/parent/child-management'); ?>" class="breadcrumb-link">Gestion de
                     cours</a>
                 <?php 
                     } elseif (current_user_can('teacher')) {
@@ -307,7 +374,7 @@ if (in_array('student', (array) $user->roles)) {
                             </div>
 
                             <?php
-                                if (in_array('student', (array) $user->roles)) {
+                                if (current_user_can('student') || current_user_can('parent')) {
                             ?>
                             <!-- teacher details -->
                             <div class="col teacher-details">
@@ -339,11 +406,11 @@ if (in_array('student', (array) $user->roles)) {
                             ?>
 
                             <?php
-                                if (in_array('student', (array) $user->roles)) {
+                                if (current_user_can('student') || current_user_can('parent')) {
                             ?>
                             <!-- meeting details -->
                             <div class="col meeting-details">
-                                <h4 class="meeting-title">Réunion Zoom</h4>
+                                <h4 class="meeting-title">Réunion de classe</h4>
                                 <div class="meeting-link-container">
                                     <?php
                                         if($existing_class_link->class_link) {
@@ -376,7 +443,7 @@ if (in_array('student', (array) $user->roles)) {
                             ?>
                             <!-- meeting details -->
                             <div class="col meeting-details">
-                                <h4 class="meeting-title">Réunion Zoom</h4>
+                                <h4 class="meeting-title">Réunion de classe</h4>
                                 <div class="meeting-link-container">
                                     <?php
                                         if($existing_class_link->class_link) {

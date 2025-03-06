@@ -187,8 +187,10 @@ $completed_courses = get_student_completed_courses($student_id);
                                                 </p>
                                             </div>
                                             <div class="course-footer">
-                                                <a href="<?php echo site_url('/course/details/?course_id=' . $course->id); ?>"
-                                                    class="course-btn">Voir les détails</a>
+                                                <a href="<?php echo site_url('/course/details/?course_id=' . $course->id . '&student_id=' . $student->id); ?>"
+                                                    class="course-btn">
+                                                    Voir les détails
+                                                </a>
                                             </div>
                                         </div>
                                         <?php endforeach; else: ?>
@@ -221,8 +223,10 @@ $completed_courses = get_student_completed_courses($student_id);
                                                 </p>
                                             </div>
                                             <div class="course-footer">
-                                                <a href="<?php echo site_url('/course/details/?course_id=' . $course->id); ?>"
-                                                    class="course-btn">Voir les détails</a>
+                                                <a href="<?php echo site_url('/course/details/?course_id=' . $course->id . '&student_id=' . $student->id); ?>"
+                                                    class="course-btn">
+                                                    Voir les détails
+                                                </a>
                                             </div>
                                         </div>
                                         <?php endforeach; else: ?>

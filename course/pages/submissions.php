@@ -2,7 +2,7 @@
 
 /* Template Name: Course | Submissions */
 
-// page title
+// Page title
 global $pageTitle;
 $pageTitle = 'Soumission des devoirs';
 
@@ -15,13 +15,14 @@ if (!defined('ABSPATH')) {
 
 // Get the current user
 $user = wp_get_current_user();
-$default_user_image = esc_url(get_stylesheet_directory_uri() . '/assets/image/user.png');
 
 // Get course_id from session
 if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
-
     // Check the user's role and redirect accordingly
-    if (in_array('student', (array) $user->roles)) {
+    if (in_array('parent', (array) $user->roles)) {
+        wp_redirect(home_url('/parent/course-management/'));
+        exit;
+    } elseif (in_array('student', (array) $user->roles)) {
         wp_redirect(home_url('/student/course-management/'));
         exit;
     } elseif (in_array('teacher', (array) $user->roles)) {
@@ -36,7 +37,18 @@ if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
 $course_id = intval($_GET['course_id']);
 
 $group_number = 0;
-if (in_array('student', (array) $user->roles)) {
+
+if (in_array('parent', (array) $user->roles)) {
+    $student_id = intval($_GET['student_id']);
+    $student_group = $wpdb->get_var($wpdb->prepare(
+        "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
+        $student_id,
+        $course_id
+    ));
+    if ($student_group) {
+        $group_number = intval($student_group);
+    }
+} elseif (in_array('student', (array) $user->roles)) {
     $student_id = $user->ID;
     $student_group = $wpdb->get_var($wpdb->prepare(
         "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
@@ -133,7 +145,7 @@ if (in_array('teacher', (array) $user->roles)) {
         $group_number
     ));
 
-} elseif (in_array('student', (array) $user->roles)) {
+} elseif (current_user_can('student') || current_user_can('parent')) {
     // Fetch submissions for the student
     $submissions = $wpdb->get_results($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}student_submissions WHERE course_id = %d AND group_number = %d AND student_id = %d",
@@ -191,6 +203,10 @@ if (in_array('student', (array) $user->roles)) {
                 ?>
                 <a href="<?php echo home_url('/student/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
                 <?php 
+                    } elseif (current_user_can('parent')) {
+                ?>
+                <a href="<?php echo home_url('/parent/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
+                <?php 
                     } elseif (current_user_can('teacher')) {
                 ?>
                 <a href="<?php echo home_url('/teacher/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
@@ -201,7 +217,12 @@ if (in_array('student', (array) $user->roles)) {
                 <?php 
                     if (current_user_can('student')) {
                 ?>
-                <a href="<?php echo home_url('/student/course-management'); ?>" class="breadcrumb-link">Gestion de
+                <a href="<?php echo home_url('/student/course-management'); ?>" class="breadcrumb-link">Gestion des
+                    enfants</a>
+                <?php 
+                    } elseif (current_user_can('parent')) {
+                ?>
+                <a href="<?php echo home_url('/parent/child-management'); ?>" class="breadcrumb-link">Gestion de
                     cours</a>
                 <?php 
                     } elseif (current_user_can('teacher')) {

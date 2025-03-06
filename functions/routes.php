@@ -241,7 +241,7 @@ add_filter('template_include', 'load_course_portal_templates');
 
 // Restrict course portal pages (optional, if you want to limit access)
 function restrict_course_pages() {
-    if (get_query_var('course_page') && !current_user_can('student') && !current_user_can('teacher')) {
+    if (get_query_var('course_page') && !current_user_can('parent') && !current_user_can('student') && !current_user_can('teacher')) {
         wp_redirect(wp_login_url());
         exit;
     }
