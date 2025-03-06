@@ -478,61 +478,68 @@ function custom_teacher_registration_form() {
             <div class="col time-slots">
                 <label for="">Créneaux horaires</label>
 
-                <!-- Monday Time Slots (Radio Buttons) -->
-                <div class="row radio-group">
-                    <label class="row"><input type="radio" name="monday_timeslot" value="5pm-6:30pm"> 5pm-6:30pm</label>
-                    <label class="row"><input type="radio" name="monday_timeslot" value="7pm-8:30pm"> 7pm-8:30pm</label>
-                </div>
-
-                <!-- Tuesday Time Slots (Radio Buttons) -->
-                <div class="row radio-group">
-                    <label class="row"><input type="radio" name="tuesday_timeslot" value="5pm-6:30pm">
+                <!-- Monday Time Slots -->
+                <div class="row checkbox-group">
+                    <label class="row"><input type="checkbox" name="monday_timeslot[]" value="5pm-6:30pm">
                         5pm-6:30pm</label>
-                    <label class="row"><input type="radio" name="tuesday_timeslot" value="7pm-8:30pm">
+                    <label class="row"><input type="checkbox" name="monday_timeslot[]" value="7pm-8:30pm">
                         7pm-8:30pm</label>
                 </div>
 
-                <!-- Wednesday Time Slots (Radio Buttons) -->
-                <div class="row radio-group">
-                    <label class="row"><input type="radio" name="wednesday_timeslot" value="2pm-3:30pm">
+                <!-- Tuesday Time Slots -->
+                <div class="row checkbox-group">
+                    <label class="row"><input type="checkbox" name="tuesday_timeslot[]" value="5pm-6:30pm">
+                        5pm-6:30pm</label>
+                    <label class="row"><input type="checkbox" name="tuesday_timeslot[]" value="7pm-8:30pm">
+                        7pm-8:30pm</label>
+                </div>
+
+                <!-- Wednesday Time Slots -->
+                <div class="row checkbox-group">
+                    <label class="row"><input type="checkbox" name="wednesday_timeslot[]" value="2pm-3:30pm">
                         2pm-3:30pm</label>
-                    <label class="row"><input type="radio" name="wednesday_timeslot" value="4pm-5:30pm">
+                    <label class="row"><input type="checkbox" name="wednesday_timeslot[]" value="4pm-5:30pm">
                         4pm-5:30pm</label>
                 </div>
 
-                <!-- Thursday Time Slots (Radio Buttons) -->
-                <div class="row radio-group">
-                    <label class="row"><input type="radio" name="thursday_timeslot" value="5pm-6:30pm">
+                <!-- Thursday Time Slots -->
+                <div class="row checkbox-group">
+                    <label class="row"><input type="checkbox" name="thursday_timeslot[]" value="5pm-6:30pm">
                         5pm-6:30pm</label>
-                    <label class="row"><input type="radio" name="thursday_timeslot" value="7pm-8:30pm">
+                    <label class="row"><input type="checkbox" name="thursday_timeslot[]" value="7pm-8:30pm">
                         7pm-8:30pm</label>
                 </div>
 
-                <!-- Friday Time Slots (Radio Buttons) -->
-                <div class="row radio-group">
-                    <label class="row"><input type="radio" name="friday_timeslot" value="5pm-6:30pm"> 5pm-6:30pm</label>
-                    <label class="row"><input type="radio" name="friday_timeslot" value="7pm-8:30pm"> 7pm-8:30pm</label>
+                <!-- Friday Time Slots -->
+                <div class="row checkbox-group">
+                    <label class="row"><input type="checkbox" name="friday_timeslot[]" value="5pm-6:30pm">
+                        5pm-6:30pm</label>
+                    <label class="row"><input type="checkbox" name="friday_timeslot[]" value="7pm-8:30pm">
+                        7pm-8:30pm</label>
                 </div>
 
-                <!-- Saturday Time Slots (Radio Buttons) -->
-                <div class="row radio-group">
-                    <label class="row"><input type="radio" name="saturday_timeslot" value="9am-10:30am">
+                <!-- Saturday Time Slots -->
+                <div class="row checkbox-group">
+                    <label class="row"><input type="checkbox" name="saturday_timeslot[]" value="9am-10:30am">
                         9am-10:30am</label>
-                    <label class="row"><input type="radio" name="saturday_timeslot" value="11am-12:30pm">
+                    <label class="row"><input type="checkbox" name="saturday_timeslot[]" value="11am-12:30pm">
                         11am-12:30pm</label>
-                    <label class="row"><input type="radio" name="saturday_timeslot" value="2pm-3:30pm">
+                    <label class="row"><input type="checkbox" name="saturday_timeslot[]" value="2pm-3:30pm">
                         2pm-3:30pm</label>
-                    <label class="row"><input type="radio" name="saturday_timeslot" value="4pm-5:30pm">
+                    <label class="row"><input type="checkbox" name="saturday_timeslot[]" value="4pm-5:30pm">
                         4pm-5:30pm</label>
                 </div>
 
-                <!-- Sunday Time Slots (Radio Buttons) -->
-                <div class="row radio-group">
-                    <label class="row"><input type="radio" name="sunday_timeslot" value="2pm-3:30pm"> 2pm-3:30pm</label>
-                    <label class="row"><input type="radio" name="sunday_timeslot" value="4pm-5:30pm"> 4pm-5:30pm</label>
-                    <label class="row"><input type="radio" name="sunday_timeslot" value="5:18pm-6:30pm">
+                <!-- Sunday Time Slots -->
+                <div class="row checkbox-group">
+                    <label class="row"><input type="checkbox" name="sunday_timeslot[]" value="2pm-3:30pm">
+                        2pm-3:30pm</label>
+                    <label class="row"><input type="checkbox" name="sunday_timeslot[]" value="4pm-5:30pm">
+                        4pm-5:30pm</label>
+                    <label class="row"><input type="checkbox" name="sunday_timeslot[]" value="5:18pm-6:30pm">
                         5:18pm-6:30pm</label>
-                    <label class="row"><input type="radio" name="sunday_timeslot" value="7pm-8:30pm"> 7pm-8:30pm</label>
+                    <label class="row"><input type="checkbox" name="sunday_timeslot[]" value="7pm-8:30pm">
+                        7pm-8:30pm</label>
                 </div>
             </div>
 
@@ -665,13 +672,13 @@ function custom_teacher_registration_form() {
             $subjects_of_interest = !empty($_POST['subjects_of_interest']) ? implode(',', array_map('sanitize_text_field', $_POST['subjects_of_interest'])) : '';
             $motivation_of_joining = sanitize_textarea_field($_POST['motivation_of_joining']);
             $available_days = !empty($_POST['available_days']) ? implode(',', array_map('sanitize_text_field', $_POST['available_days'])) : '';
-            $monday_timeslot = isset($_POST['monday_timeslot']) ? sanitize_text_field($_POST['monday_timeslot']) : null;
-            $tuesday_timeslot = isset($_POST['tuesday_timeslot']) ? sanitize_text_field($_POST['tuesday_timeslot']) : null;
-            $wednesday_timeslot = isset($_POST['wednesday_timeslot']) ? sanitize_text_field($_POST['wednesday_timeslot']) : null;
-            $thursday_timeslot = isset($_POST['thursday_timeslot']) ? sanitize_text_field($_POST['thursday_timeslot']) : null;
-            $friday_timeslot = isset($_POST['friday_timeslot']) ? sanitize_text_field($_POST['friday_timeslot']) : null;
-            $saturday_timeslot = isset($_POST['saturday_timeslot']) ? sanitize_text_field($_POST['saturday_timeslot']) : null;
-            $sunday_timeslot = isset($_POST['sunday_timeslot']) ? sanitize_text_field($_POST['sunday_timeslot']) : null;        
+            $monday_timeslot = !empty($_POST['monday_timeslot']) ? implode(',', array_map('sanitize_text_field', $_POST['monday_timeslot'])) : '';
+            $tuesday_timeslot = !empty($_POST['tuesday_timeslot']) ? implode(',', array_map('sanitize_text_field', $_POST['tuesday_timeslot'])) : '';
+            $wednesday_timeslot = !empty($_POST['wednesday_timeslot']) ? implode(',', array_map('sanitize_text_field', $_POST['wednesday_timeslot'])) : '';
+            $thursday_timeslot = !empty($_POST['thursday_timeslot']) ? implode(',', array_map('sanitize_text_field', $_POST['thursday_timeslot'])) : '';
+            $friday_timeslot = !empty($_POST['friday_timeslot']) ? implode(',', array_map('sanitize_text_field', $_POST['friday_timeslot'])) : '';
+            $saturday_timeslot = !empty($_POST['saturday_timeslot']) ? implode(',', array_map('sanitize_text_field', $_POST['saturday_timeslot'])) : '';
+            $sunday_timeslot = !empty($_POST['sunday_timeslot']) ? implode(',', array_map('sanitize_text_field', $_POST['sunday_timeslot'])) : '';
             $signature = sanitize_text_field($_POST['signature']);
             $signature_date = sanitize_text_field($_POST['signature_date']);
     

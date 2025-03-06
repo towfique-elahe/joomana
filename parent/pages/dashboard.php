@@ -8,13 +8,30 @@ $pageTitle = 'Tableau De Bord';
 
 require_once(get_template_directory() . '/parent/templates/header.php');
 
+// Exit if accessed directly
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// Get the current user
+$user = wp_get_current_user();
+$parent_id = $user->ID;
+
+global $wpdb;
+
+// Query to count total courses
+$child_count = $wpdb->get_var($wpdb->prepare(
+    "SELECT COUNT(*) FROM {$wpdb->prefix}students WHERE parent_id = %d",
+    $parent_id
+));
+
 ?>
 
 <div class="content-area">
     <div class="sidebar-container">
         <?php require_once(get_template_directory() . '/parent/templates/sidebar.php'); ?>
     </div>
-    <div id="adminDashboard" class="main-content">
+    <div id="parentDashboard" class="main-content">
         <div class="content-header">
             <h2 class="content-title">Tableau de bord</h2>
             <div class="content-breadcrumb">
@@ -24,29 +41,17 @@ require_once(get_template_directory() . '/parent/templates/header.php');
 
         <div class="content-section statistics">
             <h3 class="section-heading">
-                <i class="fa fa-bar-chart section-icon" aria-hidden="true"></i>
+                <i class="far fa-chart-bar"></i>
                 Statistiques
             </h3>
             <div class="section-body">
 
-                <?php
-                // Function to get the count of users with the role 'student'
-                function get_student_count() {
-                    $user_query = new WP_User_Query(array(
-                        'role' => 'student',
-                        'fields' => 'ID',
-                    ));
-                
-                    return $user_query->get_total();
-                }
-                
-                // Output the count
-                $student_count = get_student_count();
-                ?>
-                <a href="<?php echo home_url('/parent/child-management'); ?>" class="statistic-box">
-                    <h4 class="statistic-title">Nombre total d'étudiants</h4>
+                <a href="<?php echo home_url('/parent/child-management/'); ?>" class="statistic-box total-child">
+                    <h4 class="statistic-title">
+                        <i class="fas fa-user-graduate"></i> Total enfant
+                    </h4>
                     <p class="statistic-value">
-                        <?php echo esc_html($student_count); ?>
+                        <?php echo esc_html($child_count); ?>
                     </p>
                 </a>
 

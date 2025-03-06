@@ -6,6 +6,9 @@
 function render_course_details_section() {
     global $wpdb;
 
+    // Get the current user
+    $user = wp_get_current_user();
+
     $course_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
     if ($course_id <= 0) {
@@ -43,32 +46,62 @@ function render_course_details_section() {
             '2:00 AM - 4:00 AM', '4:00 AM - 6:00 AM', '6:00 AM - 8:00 AM'
         ];
 
-        // Handle enrollment form submission
-        if (isset($_POST['enroll_student'])) {
-            $student_id = get_current_user_id();
-            $result = enroll_student_in_course($course_id, $student_id);
-
-            if (is_wp_error($result)) {
-                $error_message = $result->get_error_message();
-                echo '<div class="course-error-message">' . esc_html($error_message) . '</div>';
-            } else {
-                echo '<div class="course-success-message">Vous êtes inscrit avec succès à ce cours.</div>';
-                
-                // Redirect after a short delay to ensure the message is seen
-                echo '<script>
-                        setTimeout(function() {
+        // Handle enrollment form submission for students
+        if (in_array('student', (array) $user->roles)) {
+            if (isset($_POST['enroll_student'])) {
+                $student_id = get_current_user_id();
+                $result = enroll_student_in_course($course_id, $student_id);
+    
+                if (is_wp_error($result)) {
+                    $error_message = $result->get_error_message();
+                    echo '<div class="course-error-message">' . esc_html($error_message) . '</div>';
+                } else {
+                    echo '<div class="course-success-message">Vous êtes inscrit avec succès à ce cours.</div>';
+                    
+                    // Redirect after a short delay to ensure the message is seen
+                    echo '<script>
+                        setTimeout(function () {
                             window.location.href = "' . home_url('/student/course-management') . '";
                         }, 2000); // Redirect after 2 seconds
-                      </script>';
+                    </script>';
+                }
             }
+        }
 
+        // Handle enrollment form submission for parents
+        if (in_array('parent', (array) $user->roles)) {
+            $parent_id = get_current_user_id(); // Get currently logged-in parent ID
+
+            // Query the custom 'students' table for current parents children
+            $childs = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}students WHERE parent_id = $parent_id");
+            
+            if (isset($_POST['enroll_child'])) {
+                $student_id = sanitize_text_field($_POST['student_id']);
+                $result = enroll_child_in_course($course_id, $student_id, $parent_id);
+    
+                if (is_wp_error($result)) {
+                    $error_message = $result->get_error_message();
+                    echo '<div class="course-error-message">' . esc_html($error_message) . '</div>';
+                } else {
+                    echo '<div class="course-success-message">Vous êtes inscrit avec succès à ce cours.</div>';
+                    
+                    // Redirect after a short delay to ensure the message is seen
+                    echo '<script>
+                        setTimeout(function () {
+                            window.location.href = "' . home_url('/student/course-management') . '";
+                        }, 2000); // Redirect after 2 seconds
+                    </script>';
+                }
+            }
         }
 
         ob_start();
         ?>
 <div id="courseDetails" class="container row">
     <div class="left-column">
-        <h2 class="title"><?php echo esc_html($course->title); ?></h2>
+        <h2 class="title">
+            <?php echo esc_html($course->title); ?>
+        </h2>
         <div class="description">
             <?php echo $course->description; ?>
         </div>
@@ -77,8 +110,12 @@ function render_course_details_section() {
         <div class="calendar col">
             <div class="calendar-header row">
                 <div class="start-date">
-                    <p class="start-month"><?php echo esc_html($months[$month]); ?></p>
-                    <p class="start-year"><?php echo $year; ?></p>
+                    <p class="start-month">
+                        <?php echo esc_html($months[$month]); ?>
+                    </p>
+                    <p class="start-year">
+                        <?php echo $year; ?>
+                    </p>
                 </div>
             </div>
 
@@ -162,13 +199,17 @@ function render_course_details_section() {
                     <span class="item-name">
                         <i class="far fa-credit-card"></i> Crédit:
                     </span>
-                    <span class="item-value"><?php echo esc_html($course->required_credit); ?> credit</span>
+                    <span class="item-value">
+                        <?php echo esc_html($course->required_credit); ?> credit
+                    </span>
                 </li>
                 <li class="list-item">
                     <span class="item-name">
                         <i class="fas fa-hourglass-half"></i> Durée:
                     </span>
-                    <span class="item-value"><?php echo esc_html($course->duration); ?> heures</span>
+                    <span class="item-value">
+                        <?php echo esc_html($course->duration); ?> heures
+                    </span>
                 </li>
                 <?php
                     $teacher_courses_table = "{$wpdb->prefix}teacher_courses";
@@ -184,7 +225,9 @@ function render_course_details_section() {
                     <span class="item-name">
                         <i class="fas fa-user-tie"></i> Enseignants:
                     </span>
-                    <span class="item-value"><?php echo esc_html($teacher_count); ?></span>
+                    <span class="item-value">
+                        <?php echo esc_html($teacher_count); ?>
+                    </span>
                 </li>
                 <?php
                     $student_courses_table = "{$wpdb->prefix}student_courses";
@@ -200,18 +243,59 @@ function render_course_details_section() {
                     <span class="item-name">
                         <i class="fas fa-user-graduate"></i> Étudiants:
                     </span>
-                    <span class="item-value"><?php echo esc_html($student_count); ?></span>
+                    <span class="item-value">
+                        <?php echo esc_html($student_count); ?>
+                    </span>
                 </li>
             </ul>
+            <?php
+                if (in_array('parent', (array) $user->roles)) {
+            ?>
+            <div class="buttons">
+                <!-- Enrollment Form -->
+                <form method="post" action="">
+                    <input type="hidden" name="enroll_child" value="1">
+                    <?php if (!empty($childs)) : ?>
+                    <label for="student_id">Choisissez un enfant:</label>
+                    <div class="custom-select-wrapper">
+                        <select name="student_id" id="student_id">
+                            <?php foreach ($childs as $child) : ?>
+                            <option value="<?php echo esc_attr($child->id); ?>">
+                                <?php echo esc_html($child->first_name) . ' ' . esc_html($child->last_name); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
+                    </div>
+                    <?php else : ?>
+                    <label for="student_id">Choisissez un enfant:</label>
+                    <div class="custom-select-wrapper">
+                        <select name="student_id" id="student_id">
+                            <option value="" selected disabled>Aucun enfant trouvé</option>
+                        </select>
+                        <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
+                    </div>
+                    <?php endif; ?>
+                    <button type="submit" class="button buy-now">
+                        <ion-icon name="bag-handle-outline"></ion-icon> Inscrire un enfant
+                    </button>
+                </form>
+            </div>
+            <?php
+                } else {
+            ?>
             <div class="buttons">
                 <!-- Enrollment Form -->
                 <form method="post" action="">
                     <input type="hidden" name="enroll_student" value="1">
                     <button type="submit" class="button buy-now">
-                        <ion-icon name="bag-handle-outline"></ion-icon> S'INSCRIRE
+                        <ion-icon name="bag-handle-outline"></ion-icon> Inscrire
                     </button>
                 </form>
             </div>
+            <?php
+                }
+            ?>
             <div class="share">
                 Partager sur:
                 <div class="social-buttons">
@@ -271,7 +355,6 @@ function enroll_student_in_course($course_id, $student_id) {
         return new WP_Error('no_teachers_assigned', "Aucun enseignant n'est affecté à ce cours.");
         
     } else {
-        
         // Check if the student is already enrolled in this course
         $is_enrolled = $wpdb->get_var(
             $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d", $student_id, $course_id)
@@ -302,6 +385,113 @@ function enroll_student_in_course($course_id, $student_id) {
             $credits_table,
             [
                 'user_id' => $student_id,
+                'credit' => $total_credit, // Total credit from all products in the order
+                'transaction_type' => 'Débité', // Set transaction_type to 'Débité'
+                'transaction_reason' => 'Cours acheté', // Set transaction_reason to 'Débité'
+                'created_at' => current_time('mysql'), // Current timestamp
+            ],
+            [
+                '%d', // user_id
+                '%f', // credit
+                '%s', // transaction_type
+                '%s', // transaction_reason
+                '%s', // created_at
+            ]
+        );
+    }
+
+    // Assign student to the next available group
+    $assigned = false;
+
+    foreach ($teachers as $teacher) {
+        // Count students in the current group
+        $student_count = $wpdb->get_var(
+        $wpdb->prepare(
+                "SELECT COUNT(*) FROM {$wpdb->prefix}student_courses 
+                WHERE teacher_id = %d AND course_id = %d AND group_number = %d",
+                $teacher->teacher_id, $course_id, $teacher->group_number
+            )
+        );
+
+        if ($student_count < $course->max_students_per_group) {
+            // Assign student to this group
+            $wpdb->insert(
+                "{$wpdb->prefix}student_courses",
+                array(
+                    'student_id'   => $student_id,
+                    'course_id'    => $course_id,
+                    'teacher_id'   => $teacher->teacher_id,
+                    'group_number' => $teacher->group_number
+                ),
+                array('%d', '%d', '%d', '%d')
+            );
+            $assigned = true;
+            break;
+        }
+
+        if (!$assigned) {
+            // If no group has space, return an error or handle it as per your requirement
+            return new WP_Error('no_available_groups', "Tous les groupes sont complets. Impossible d'inscrire l'élève.");
+        }
+    }
+
+    return true;
+}
+
+// Student Enrollment Function
+function enroll_child_in_course($course_id, $student_id, $parent_id) {
+    global $wpdb;
+
+    // Get course details
+    $course = $wpdb->get_row(
+        $wpdb->prepare("SELECT * FROM {$wpdb->prefix}courses WHERE id = %d", $course_id)
+    );
+
+    if (!$course) {
+        return new WP_Error('course_not_found', 'Cours non trouvé.');
+    }
+
+    // Get all teachers assigned to this course along with their groups, ordered by group_number
+    $teachers = $wpdb->get_results(
+        $wpdb->prepare("SELECT teacher_id, group_number FROM {$wpdb->prefix}teacher_courses WHERE course_id = %d ORDER BY group_number ASC", $course_id)
+    );
+
+    if (empty($teachers)) {
+        
+        return new WP_Error('no_teachers_assigned', "Aucun enseignant n'est affecté à ce cours.");
+        
+    } else {
+        
+        // Check if the student is already enrolled in this course
+        $is_enrolled = $wpdb->get_var(
+            $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d", $student_id, $course_id)
+        );
+
+        if ($is_enrolled) {
+            return new WP_Error('already_enrolled', 'Vous êtes déjà inscrit à ce cours.');
+        }
+
+        // Check if the parent has sufficient credits
+        $parent_credit = $wpdb->get_var(
+            $wpdb->prepare("SELECT credit FROM {$wpdb->prefix}parents WHERE id = %d", $parent_id)
+        );
+
+        if ($parent_credit < $course->required_credit) {
+            return new WP_Error('insufficient_credit', "Crédit insuffisant pour s'inscrire à ce cours.");
+        }
+
+        // Deduct credits from the parent
+        $wpdb->query(
+            $wpdb->prepare("UPDATE {$wpdb->prefix}parents SET credit = credit - %f WHERE id = %d", $course->required_credit, $parent_id)
+        );
+
+        // Insert data into the credits table
+        $credits_table = $wpdb->prefix . 'credits';
+        $total_credit = $course->required_credit;
+        $wpdb->insert(
+            $credits_table,
+            [
+                'user_id' => $parent_id,
                 'credit' => $total_credit, // Total credit from all products in the order
                 'transaction_type' => 'Débité', // Set transaction_type to 'Débité'
                 'transaction_reason' => 'Cours acheté', // Set transaction_reason to 'Débité'

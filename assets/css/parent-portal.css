@@ -1,3 +1,14 @@
+/* dashboard */
+#parentDashboard .statistic-box.total-child {
+  background-color: rgb(242, 248, 255);
+}
+#parentDashboard .statistic-box.total-child:hover {
+  background-color: rgb(221, 237, 255);
+}
+#parentDashboard .statistic-box.total-child .statistic-value {
+  color: rgb(0, 96, 206);
+}
+
 /* child management page */
 #parentChildManagement .list th:nth-child(1),
 #parentChildManagement .list td:nth-child(1) {
@@ -65,7 +76,7 @@
   pointer-events: none; /* Prevent interaction with the icon */
 }
 
-/* student details */
+/* child details */
 #parentChildDetails .section {
   background-color: #fff;
   padding: 1rem;
@@ -158,7 +169,7 @@
   border: var(--border);
   border-radius: 0.5rem;
   overflow: hidden;
-  width: calc(25% - 0.5rem);
+  width: calc(50% - 0.5rem);
   display: flex;
   flex-direction: column;
 }
