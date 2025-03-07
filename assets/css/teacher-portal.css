@@ -296,12 +296,19 @@
   font-weight: var(--accent-font-weight);
   font-size: var(--accent-font-size);
 }
-#teacherResources .file-uploaded-by,
-#teacherResources .file-uploaded-time {
+#teacherResources .file-info {
   color: var(--text-color);
   font-family: var(--text-font-family);
   font-weight: var(--text-font-weight);
   font-size: 0.8rem;
+}
+#teacherResources .file-info .accent {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: var(--accent-font-weight);
+}
+#teacherResources .file-info .accent:hover {
+  color: var(--accent-color);
 }
 #teacherResources .download-button {
   display: flex;

@@ -169,11 +169,19 @@
   font-weight: var(--accent-font-weight);
   font-size: var(--accent-font-size);
 }
-#studentResources .file-uploaded-time {
+#studentResources .file-info {
   color: var(--text-color);
   font-family: var(--text-font-family);
   font-weight: var(--text-font-weight);
   font-size: 0.8rem;
+}
+#studentResources .file-info .accent {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: var(--accent-font-weight);
+}
+#studentResources .file-info .accent:hover {
+  color: var(--accent-color);
 }
 #studentResources .download-button {
   display: flex;
@@ -300,11 +308,19 @@
   font-weight: var(--accent-font-weight);
   font-size: var(--accent-font-size);
 }
-#studentProgress .file-uploaded-time {
+#studentProgress .file-info {
   color: var(--text-color);
   font-family: var(--text-font-family);
   font-weight: var(--text-font-weight);
   font-size: 0.8rem;
+}
+#studentProgress .file-info .accent {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: var(--accent-font-weight);
+}
+#studentProgress .file-info .accent:hover {
+  color: var(--accent-color);
 }
 #studentProgress .download-button {
   display: flex;

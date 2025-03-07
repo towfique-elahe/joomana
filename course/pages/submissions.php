@@ -271,7 +271,7 @@ if (in_array('student', (array) $user->roles)) {
                 <?php foreach ($submissions as $submission) : ?>
                 <div class="file-card">
                     <div class="file-top">
-                        <p class="file-type submission">Submission</p>
+                        <p class="file-type submission">Soumission</p>
                         <?php
                             if (in_array('student', (array) $user->roles)) {
                         ?>
@@ -290,7 +290,7 @@ if (in_array('student', (array) $user->roles)) {
                     </div>
                     <div class="file-bottom row">
                         <div class="col">
-                            <h3 class="file-title"><?php echo basename($submission->file); ?></h3>
+                            <h3 class="file-title">Soumission | <?php echo basename($submission->file); ?></h3>
                             <?php
                                 if (in_array('teacher', (array) $user->roles)) {
                                     $student_id = $submission->student_id;
@@ -298,15 +298,16 @@ if (in_array('student', (array) $user->roles)) {
                                     $student_table = $wpdb->prefix. 'students';
                                     $student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $student_id));
                             ?>
-                            <p class="file-uploaded-by">
+                            <p class="file-info">
                                 Étudiant:
-                                <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
+                                <a href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id . '&course_id=' . $course_id)); ?>"
+                                    class="accent"><?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?></a>
                             </p>
                             <?php
                                 }
                             ?>
-                            <p class="file-uploaded-time">
-                                Téléchargé: <?php echo date('Y-m-d | H:i:s', strtotime($submission->created_at)); ?>
+                            <p class="file-info">
+                                Téléchargé: <?php echo date('d M, y', strtotime($submission->created_at)); ?>
                             </p>
                         </div>
                         <div class="col">

@@ -152,16 +152,19 @@ $student_reports = $wpdb->get_results($wpdb->prepare(
             <?php foreach ($course_assignments as $assignment) : ?>
             <div class="file-card">
                 <div class="file-top">
-                    <p class="file-type assignment">Assignment</p>
+                    <p class="file-type assignment">Affectation</p>
                     <div class="file-icon">
                         <i class="fas fa-file-pdf"></i>
                     </div>
                 </div>
                 <div class="file-bottom row">
                     <div class="col">
-                        <h3 class="file-title"><?php echo basename($assignment->file); ?></h3>
-                        <p class="file-uploaded-time">
-                            Téléchargé: <?php echo date('Y-m-d | H:i:s', strtotime($assignment->created_at)); ?>
+                        <h3 class="file-title">Affectation | <?php echo basename($assignment->file); ?></h3>
+                        <p class="file-info">
+                            Date limite: <?php echo date('d M, y', strtotime($assignment->deadline)); ?>
+                        </p>
+                        <p class="file-info">
+                            Téléchargé: <?php echo date('d M, y', strtotime($assignment->created_at)); ?>
                         </p>
                     </div>
                     <div class="col">
@@ -177,16 +180,16 @@ $student_reports = $wpdb->get_results($wpdb->prepare(
             <?php foreach ($course_slides as $slide) : ?>
             <div class="file-card">
                 <div class="file-top">
-                    <p class="file-type slide">Slide</p>
+                    <p class="file-type slide">Diapositive</p>
                     <div class="file-icon">
                         <i class="fas fa-file-pdf"></i>
                     </div>
                 </div>
                 <div class="file-bottom row">
                     <div class="col">
-                        <h3 class="file-title"><?php echo basename($slide->file); ?></h3>
-                        <p class="file-uploaded-time">
-                            Téléchargé: <?php echo date('Y-m-d | H:i:s', strtotime($slide->created_at)); ?>
+                        <h3 class="file-title">Diapositive | <?php echo basename($slide->file); ?></h3>
+                        <p class="file-info">
+                            Téléchargé: <?php echo date('d M, y', strtotime($slide->created_at)); ?>
                         </p>
                     </div>
                     <div class="col">
@@ -202,26 +205,34 @@ $student_reports = $wpdb->get_results($wpdb->prepare(
             <?php foreach ($student_reports as $report) : ?>
             <div class="file-card">
                 <div class="file-top">
-                    <p class="file-type report">Progress Report</p>
+                    <p class="file-type report">Rapport</p>
                     <div class="file-icon">
                         <i class="fas fa-file-pdf"></i>
                     </div>
                 </div>
                 <div class="file-bottom row">
                     <div class="col">
-                        <h3 class="file-title"><?php echo basename($report->file); ?></h3>
+                        <h3 class="file-title">Rapport | <?php echo basename($report->file); ?></h3>
                         <?php
-                            $student_id = $report->student_id;
-                            // Fetch the student's details using the student_id
-                            $student_table = $wpdb->prefix. 'students';
-                            $student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $student_id));
-                        ?>
-                        <p class="file-uploaded-by">
+                                if (in_array('teacher', (array) $user->roles)) {
+                                    $student_id = $report->student_id;
+                                    // Fetch the student's details using the student_id
+                                    $student_table = $wpdb->prefix. 'students';
+                                    $student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $student_id));
+                            ?>
+                        <p class="file-info">
                             Étudiant:
-                            <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
+                            <a href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id . '&course_id=' . $course_id)); ?>"
+                                class="accent"><?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?></a>
                         </p>
-                        <p class="file-uploaded-time">
-                            Téléchargé: <?php echo date('Y-m-d | H:i:s', strtotime($report->created_at)); ?>
+                        <?php
+                                }
+                            ?>
+                        <p class="file-info">
+                            Commentaire: <?php echo esc_html($report->comment); ?>
+                        </p>
+                        <p class="file-info">
+                            Téléchargé: <?php echo date('d M, y', strtotime($slide->created_at)); ?>
                         </p>
                     </div>
                     <div class="col">

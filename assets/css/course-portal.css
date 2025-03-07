@@ -24,13 +24,16 @@
   font-size: 1.2rem;
   font-family: var(--accent-font-family);
   font-weight: var(--accent-font-weight);
-  color: var(--dark-text-color);
+  color: var(--primary-color);
   border-bottom: var(--border);
   margin-top: 1rem;
   padding-bottom: 0.5rem;
 }
 #courseDetails .class-schedule ul {
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 #courseDetails .class-schedule li,
 #courseDetails .teacher-name,
@@ -40,6 +43,10 @@
   font-weight: var(--accent-font-weight);
   color: var(--dark-text-color);
 }
+#courseDetails .teacher-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
 #courseDetails .class-schedule .value,
 #courseDetails .teacher-data,
 #courseDetails .student-data {
@@ -48,9 +55,32 @@
   font-weight: var(--text-font-weight);
   color: var(--text-color);
 }
+#courseDetails .teacher-data {
+  border-bottom: var(--border);
+  padding-bottom: 1rem;
+}
+#courseDetails .teacher-data:last-of-type {
+  border: none;
+}
+#courseDetails .teacher-data .label {
+  color: var(--dark-text-color);
+  font-weight: var(--accent-font-weight);
+  margin-right: 0.5rem;
+}
+#courseDetails .teacher-data a {
+  text-decoration: none;
+  color: var(--primary-color);
+  border-bottom: var(--border);
+  border-color: var(--primary-color);
+  font-weight: var(--accent-font-weight);
+}
+#courseDetails .teacher-data a:hover {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+}
 #courseDetails .teacher-image {
   width: 10rem;
-  height: 10rem;
+  height: 12rem;
   object-fit: cover;
   border: var(--border);
   border-radius: 0.5rem;
@@ -391,12 +421,19 @@
   font-weight: var(--accent-font-weight);
   font-size: var(--accent-font-size);
 }
-#courseResources .file-uploaded-by,
-#courseResources .file-uploaded-time {
+#courseResources .file-info {
   color: var(--text-color);
   font-family: var(--text-font-family);
   font-weight: var(--text-font-weight);
   font-size: 0.8rem;
+}
+#courseResources .file-info .accent {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: var(--accent-font-weight);
+}
+#courseResources .file-info .accent:hover {
+  color: var(--accent-color);
 }
 #courseResources .download-button {
   display: flex;
@@ -586,12 +623,19 @@
   font-weight: var(--accent-font-weight);
   font-size: var(--accent-font-size);
 }
-#courseSubmissions .file-uploaded-by,
-#courseSubmissions .file-uploaded-time {
+#courseSubmissions .file-info {
   color: var(--text-color);
   font-family: var(--text-font-family);
   font-weight: var(--text-font-weight);
   font-size: 0.8rem;
+}
+#courseSubmissions .file-info .accent {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: var(--accent-font-weight);
+}
+#courseSubmissions .file-info .accent:hover {
+  color: var(--accent-color);
 }
 #courseSubmissions .download-button {
   display: flex;
@@ -718,7 +762,32 @@
   border: var(--border);
   border-radius: 0.5rem;
 }
-#courseTeacherEvaluation .no-data {
+#courseTeacherEvaluation .evaluation-item {
+  border-bottom: var(--border);
+}
+#courseTeacherEvaluation .evaluation-item:last-of-type {
+  border-bottom: none;
+}
+#courseTeacherEvaluation .evaluation-item .student-info {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--text-font-size);
+  margin-bottom: 0.5rem;
+}
+#courseTeacherEvaluation .evaluation-item .rating-stars {
+  padding: 0.2rem 0 1rem 0;
+}
+#courseTeacherEvaluation .evaluation-item .rating-stars .star {
+  font-size: 1.5rem;
+}
+#courseTeacherEvaluation .evaluation-item .evaluation-date {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: 0.8rem;
+}
+#courseTeacherEvaluation .evaluation-list .no-data {
   color: var(--text-color);
   font-family: var(--text-font-family);
   font-weight: var(--text-font-weight);
@@ -740,12 +809,6 @@
   font-family: var(--text-font-family);
   font-weight: var(--text-font-weight);
   font-size: var(--text-font-size);
-}
-#courseTeacherEvaluation .evaluation-date {
-  color: var(--accent-color);
-  font-family: var(--accent-font-family);
-  font-weight: var(--accent-font-weight);
-  font-size: 0.9rem;
 }
 #courseTeacherEvaluation .star.active,
 #courseTeacherEvaluation .star:hover {

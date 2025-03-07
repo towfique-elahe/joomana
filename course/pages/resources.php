@@ -156,14 +156,16 @@ if (in_array('teacher', (array) $user->roles)) {
             $file_field = "upload_report";
             $uploaded_file_url = upload_file($file_field);
 
+            $allowed_comments = ['Excellent', 'Bon', 'Moyen', 'Faible'];
+            $comment = in_array($_POST['comment'], $allowed_comments, true) ? $_POST['comment'] : null;
+            
             if ($uploaded_file_url) {
                 $wpdb->insert($table_name, [
                     'course_id' => $course_id,
                     'group_number' => $group_number,
                     'teacher_id' => $teacher_id,
                     'student_id' => intval($_POST['student_id']),
-                    'band_score' => intval($_POST['band_score']),
-                    'comment' => sanitize_textarea_field($_POST['comment']),
+                    'comment' => $comment,
                     'file' => $uploaded_file_url,
                     'created_at' => current_time('mysql'),
                 ]);
@@ -362,7 +364,7 @@ if (in_array('teacher', (array) $user->roles)) {
                 <?php foreach ($course_assignments as $assignment) : ?>
                 <div class="file-card">
                     <div class="file-top">
-                        <p class="file-type assignment">Assignment</p>
+                        <p class="file-type assignment">Affectation</p>
                         <?php
                             if (in_array('teacher', (array) $user->roles)) {
                         ?>
@@ -382,9 +384,12 @@ if (in_array('teacher', (array) $user->roles)) {
                     </div>
                     <div class="file-bottom row">
                         <div class="col">
-                            <h3 class="file-title"><?php echo basename($assignment->file); ?></h3>
-                            <p class="file-uploaded-time">
-                                Téléchargé: <?php echo date('Y-m-d | H:i:s', strtotime($assignment->created_at)); ?>
+                            <h3 class="file-title">Affectation | <?php echo basename($assignment->file); ?></h3>
+                            <p class="file-info">
+                                Date limite: <?php echo date('d M, y', strtotime($assignment->deadline)); ?>
+                            </p>
+                            <p class="file-info">
+                                Téléchargé: <?php echo date('d M, y', strtotime($assignment->created_at)); ?>
                             </p>
                         </div>
                         <div class="col">
@@ -400,7 +405,7 @@ if (in_array('teacher', (array) $user->roles)) {
                 <?php foreach ($course_slides as $slide) : ?>
                 <div class="file-card">
                     <div class="file-top">
-                        <p class="file-type slide">Slide</p>
+                        <p class="file-type slide">Diapositive</p>
                         <?php
                             if (in_array('teacher', (array) $user->roles)) {
                         ?>
@@ -420,9 +425,9 @@ if (in_array('teacher', (array) $user->roles)) {
                     </div>
                     <div class="file-bottom row">
                         <div class="col">
-                            <h3 class="file-title"><?php echo basename($slide->file); ?></h3>
-                            <p class="file-uploaded-time">
-                                Téléchargé: <?php echo date('Y-m-d | H:i:s', strtotime($slide->created_at)); ?>
+                            <h3 class="file-title">Diapositive | <?php echo basename($slide->file); ?></h3>
+                            <p class="file-info">
+                                Téléchargé: <?php echo date('d M, y', strtotime($slide->created_at)); ?>
                             </p>
                         </div>
                         <div class="col">
@@ -438,7 +443,7 @@ if (in_array('teacher', (array) $user->roles)) {
                 <?php foreach ($student_reports as $report) : ?>
                 <div class="file-card">
                     <div class="file-top">
-                        <p class="file-type report">Progress Report</p>
+                        <p class="file-type report">Rapport</p>
                         <?php
                             if (in_array('teacher', (array) $user->roles)) {
                         ?>
@@ -458,7 +463,7 @@ if (in_array('teacher', (array) $user->roles)) {
                     </div>
                     <div class="file-bottom row">
                         <div class="col">
-                            <h3 class="file-title"><?php echo basename($report->file); ?></h3>
+                            <h3 class="file-title">Rapport | <?php echo basename($report->file); ?></h3>
                             <?php
                                 if (in_array('teacher', (array) $user->roles)) {
                                     $student_id = $report->student_id;
@@ -466,15 +471,19 @@ if (in_array('teacher', (array) $user->roles)) {
                                     $student_table = $wpdb->prefix. 'students';
                                     $student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $student_id));
                             ?>
-                            <p class="file-uploaded-by">
+                            <p class="file-info">
                                 Étudiant:
-                                <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
+                                <a href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id . '&course_id=' . $course_id)); ?>"
+                                    class="accent"><?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?></a>
                             </p>
                             <?php
                                 }
                             ?>
-                            <p class="file-uploaded-time">
-                                Téléchargé: <?php echo date('Y-m-d | H:i:s', strtotime($report->created_at)); ?>
+                            <p class="file-info">
+                                Commentaire: <?php echo esc_html($report->comment); ?>
+                            </p>
+                            <p class="file-info">
+                                Téléchargé: <?php echo date('d M, y', strtotime($slide->created_at)); ?>
                             </p>
                         </div>
                         <div class="col">
@@ -578,14 +587,17 @@ if (in_array('teacher', (array) $user->roles)) {
                 </div>
                 <div class="row">
                     <div class="col">
-                        <label for="band_score">Band Score</label>
-                        <input type="number" name="band_score" id="band_score" min="0" max="100">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
                         <label for="comment">Commentaire</label>
-                        <textarea name="comment" id="comment"></textarea>
+                        <div class="custom-select-wrapper">
+                            <select name="comment" id="comment" required>
+                                <option value="">-- Choisissez une option --</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Bon">Bon</option>
+                                <option value="Moyen">Moyen</option>
+                                <option value="Faible">Faible</option>
+                            </select>
+                            <i class="fas fa-chevron-down custom-arrow"></i>
+                        </div>
                     </div>
                 </div>
                 <!-- Report File Input -->

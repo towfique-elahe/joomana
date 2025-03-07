@@ -149,7 +149,7 @@ $course_slides = $wpdb->get_results($wpdb->prepare(
             <?php foreach ($course_assignments as $assignment) : ?>
             <div class="file-card">
                 <div class="file-top">
-                    <p class="file-type assignment">Assignment</p>
+                    <p class="file-type assignment">Affectation</p>
                     <?php
                             if (in_array('teacher', (array) $user->roles)) {
                         ?>
@@ -169,12 +169,12 @@ $course_slides = $wpdb->get_results($wpdb->prepare(
                 </div>
                 <div class="file-bottom row">
                     <div class="col">
-                        <h3 class="file-title">
-                            <?php echo basename($assignment->file); ?>
-                        </h3>
-                        <p class="file-uploaded-time">
-                            Téléchargé:
-                            <?php echo date('Y-m-d | H:i:s', strtotime($assignment->created_at)); ?>
+                        <h3 class="file-title">Affectation | <?php echo basename($assignment->file); ?></h3>
+                        <p class="file-info">
+                            Date limite: <?php echo date('d M, y', strtotime($assignment->deadline)); ?>
+                        </p>
+                        <p class="file-info">
+                            Téléchargé: <?php echo date('d M, y', strtotime($assignment->created_at)); ?>
                         </p>
                     </div>
                     <div class="col">
@@ -190,7 +190,7 @@ $course_slides = $wpdb->get_results($wpdb->prepare(
             <?php foreach ($course_slides as $slide) : ?>
             <div class="file-card">
                 <div class="file-top">
-                    <p class="file-type slide">Slide</p>
+                    <p class="file-type slide">Diapositive</p>
                     <?php
                             if (in_array('teacher', (array) $user->roles)) {
                         ?>
@@ -210,12 +210,9 @@ $course_slides = $wpdb->get_results($wpdb->prepare(
                 </div>
                 <div class="file-bottom row">
                     <div class="col">
-                        <h3 class="file-title">
-                            <?php echo basename($slide->file); ?>
-                        </h3>
-                        <p class="file-uploaded-time">
-                            Téléchargé:
-                            <?php echo date('Y-m-d | H:i:s', strtotime($slide->created_at)); ?>
+                        <h3 class="file-title">Diapositive | <?php echo basename($slide->file); ?></h3>
+                        <p class="file-info">
+                            Téléchargé: <?php echo date('d M, y', strtotime($slide->created_at)); ?>
                         </p>
                     </div>
                     <div class="col">

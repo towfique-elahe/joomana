@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.0.9';
+    $custom_tables_version = '1.1.0';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -206,8 +206,7 @@ function create_custom_tables() {
         group_number INT(11) NOT NULL,
         teacher_id BIGINT(20) UNSIGNED NOT NULL,
         student_id BIGINT(20) UNSIGNED NOT NULL,
-        band_score DECIMAL(5,2) DEFAULT NULL,
-        comment TEXT DEFAULT NULL,
+        comment ENUM('Excellent', 'Bon', 'Moyen', 'Faible') DEFAULT NULL,
         file VARCHAR(255) DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)

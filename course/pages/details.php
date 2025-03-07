@@ -365,7 +365,7 @@ if (in_array('parent', (array) $user->roles)) {
                                         </span>
                                     </li>
                                     <li>
-                                        Time:
+                                        Temps:
                                         <span class="value">
                                             <?php echo esc_html($course->time_slot);?>
                                         </span>
@@ -380,22 +380,221 @@ if (in_array('parent', (array) $user->roles)) {
                             <div class="col teacher-details">
                                 <h4 class="teacher-title">Détails de l'enseignant</h4>
 
+                                <h4 class="teacher-name">
+                                    <?php echo esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name); ?>
+                                </h4>
+
                                 <div class="row">
                                     <img src="<?php echo !empty($teacher->image) ? esc_url($teacher->image) : $default_user_image; ?>"
                                         alt="" class="teacher-image">
 
                                     <div class="col teacher-info">
-                                        <h4 class="teacher-name">
-                                            <?php echo esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name); ?>
-                                        </h4>
+                                        <?php
+                                            $countries = [
+                                                'Afghanistan' => 'af',
+                                                'Afrique du Sud' => 'za',
+                                                'Albanie' => 'al',
+                                                'Algérie' => 'dz',
+                                                'Allemagne' => 'de',
+                                                'Andorre' => 'ad',
+                                                'Angola' => 'ao',
+                                                'Antigua-et-Barbuda' => 'ag',
+                                                'Arabie Saoudite' => 'sa',
+                                                'Argentine' => 'ar',
+                                                'Arménie' => 'am',
+                                                'Australie' => 'au',
+                                                'Autriche' => 'at',
+                                                'Azerbaïdjan' => 'az',
+                                                'Bahamas' => 'bs',
+                                                'Bahreïn' => 'bh',
+                                                'Bangladesh' => 'bd',
+                                                'Barbade' => 'bb',
+                                                'Belgique' => 'be',
+                                                'Belize' => 'bz',
+                                                'Bénin' => 'bj',
+                                                'Bhoutan' => 'bt',
+                                                'Biélorussie' => 'by',
+                                                'Bolivie' => 'bo',
+                                                'Bosnie-Herzégovine' => 'ba',
+                                                'Botswana' => 'bw',
+                                                'Brésil' => 'br',
+                                                'Brunei' => 'bn',
+                                                'Bulgarie' => 'bg',
+                                                'Burkina Faso' => 'bf',
+                                                'Burundi' => 'bi',
+                                                'Cambodge' => 'kh',
+                                                'Cameroun' => 'cm',
+                                                'Canada' => 'ca',
+                                                'Cap-Vert' => 'cv',
+                                                'Chili' => 'cl',
+                                                'Chine' => 'cn',
+                                                'Chypre' => 'cy',
+                                                'Colombie' => 'co',
+                                                'Comores' => 'km',
+                                                'Corée du Nord' => 'kp',
+                                                'Corée du Sud' => 'kr',
+                                                'Costa Rica' => 'cr',
+                                                'Croatie' => 'hr',
+                                                'Cuba' => 'cu',
+                                                'Danemark' => 'dk',
+                                                'Djibouti' => 'dj',
+                                                'Dominique' => 'dm',
+                                                'Égypte' => 'eg',
+                                                'Émirats arabes unis' => 'ae',
+                                                'Équateur' => 'ec',
+                                                'Érythrée' => 'er',
+                                                'Espagne' => 'es',
+                                                'Estonie' => 'ee',
+                                                'États-Unis' => 'us',
+                                                'Éthiopie' => 'et',
+                                                'Fidji' => 'fj',
+                                                'Finlande' => 'fi',
+                                                'France' => 'fr',
+                                                'Gabon' => 'ga',
+                                                'Gambie' => 'gm',
+                                                'Géorgie' => 'ge',
+                                                'Ghana' => 'gh',
+                                                'Grèce' => 'gr',
+                                                'Grenade' => 'gd',
+                                                'Guatemala' => 'gt',
+                                                'Guinée' => 'gn',
+                                                'Guinée-Bissau' => 'gw',
+                                                'Guinée équatoriale' => 'gq',
+                                                'Guyana' => 'gy',
+                                                'Haïti' => 'ht',
+                                                'Honduras' => 'hn',
+                                                'Hongrie' => 'hu',
+                                                'Inde' => 'in',
+                                                'Indonésie' => 'id',
+                                                'Irak' => 'iq',
+                                                'Iran' => 'ir',
+                                                'Irlande' => 'ie',
+                                                'Islande' => 'is',
+                                                'Israël' => 'il',
+                                                'Italie' => 'it',
+                                                'Jamaïque' => 'jm',
+                                                'Japon' => 'jp',
+                                                'Jordanie' => 'jo',
+                                                'Kazakhstan' => 'kz',
+                                                'Kenya' => 'ke',
+                                                'Kirghizistan' => 'kg',
+                                                'Kiribati' => 'ki',
+                                                'Koweït' => 'kw',
+                                                'Laos' => 'la',
+                                                'Lesotho' => 'ls',
+                                                'Lettonie' => 'lv',
+                                                'Liban' => 'lb',
+                                                'Liberia' => 'lr',
+                                                'Libye' => 'ly',
+                                                'Liechtenstein' => 'li',
+                                                'Lituanie' => 'lt',
+                                                'Luxembourg' => 'lu',
+                                                'Macédoine du Nord' => 'mk',
+                                                'Madagascar' => 'mg',
+                                                'Malaisie' => 'my',
+                                                'Malawi' => 'mw',
+                                                'Maldives' => 'mv',
+                                                'Mali' => 'ml',
+                                                'Malte' => 'mt',
+                                                'Maroc' => 'ma',
+                                                'Maurice' => 'mu',
+                                                'Mauritanie' => 'mr',
+                                                'Mexique' => 'mx',
+                                                'Micronésie' => 'fm',
+                                                'Moldavie' => 'md',
+                                                'Monaco' => 'mc',
+                                                'Mongolie' => 'mn',
+                                                'Monténégro' => 'me',
+                                                'Mozambique' => 'mz',
+                                                'Myanmar' => 'mm',
+                                                'Namibie' => 'na',
+                                                'Népal' => 'np',
+                                                'Nicaragua' => 'ni',
+                                                'Niger' => 'ne',
+                                                'Nigeria' => 'ng',
+                                                'Norvège' => 'no',
+                                                'Nouvelle-Zélande' => 'nz',
+                                                'Oman' => 'om',
+                                                'Ouganda' => 'ug',
+                                                'Ouzbékistan' => 'uz',
+                                                'Pakistan' => 'pk',
+                                                'Panama' => 'pa',
+                                                'Papouasie-Nouvelle-Guinée' => 'pg',
+                                                'Paraguay' => 'py',
+                                                'Pays-Bas' => 'nl',
+                                                'Pérou' => 'pe',
+                                                'Philippines' => 'ph',
+                                                'Pologne' => 'pl',
+                                                'Portugal' => 'pt',
+                                                'Qatar' => 'qa',
+                                                'République centrafricaine' => 'cf',
+                                                'République démocratique du Congo' => 'cd',
+                                                'République dominicaine' => 'do',
+                                                'République du Congo' => 'cg',
+                                                'Roumanie' => 'ro',
+                                                'Royaume-Uni' => 'gb',
+                                                'Russie' => 'ru',
+                                                'Rwanda' => 'rw',
+                                                'Saint-Marin' => 'sm',
+                                                'Sénégal' => 'sn',
+                                                'Serbie' => 'rs',
+                                                'Singapour' => 'sg',
+                                                'Somalie' => 'so',
+                                                'Soudan' => 'sd',
+                                                'Sri Lanka' => 'lk',
+                                                'Suède' => 'se',
+                                                'Suisse' => 'ch',
+                                                'Syrie' => 'sy',
+                                                'Tadjikistan' => 'tj',
+                                                'Tanzanie' => 'tz',
+                                                'Tchad' => 'td',
+                                                'Thaïlande' => 'th',
+                                                'Togo' => 'tg',
+                                                'Tunisie' => 'tn',
+                                                'Turquie' => 'tr',
+                                                'Ukraine' => 'ua',
+                                                'Uruguay' => 'uy',
+                                                'Venezuela' => 've',
+                                                'Vietnam' => 'vn',
+                                                'Yémen' => 'ye',
+                                                'Zambie' => 'zm',
+                                                'Zimbabwe' => 'zw',
+                                            ];
+
+                                            $country_name = $teacher->country;
+                                            $country_code = isset($countries[$country_name]) ? $countries[$country_name] : 'un';
+                                        ?>
                                         <p class="teacher-data">
+                                            <span class="label">
+                                                <i class="fas fa-globe-europe"></i> Pays :
+                                            </span>
+                                            <img src="https://flagcdn.com/24x18/<?php echo $country_code; ?>.png"
+                                                alt="<?php echo esc_html($country_name); ?>"
+                                                style="vertical-align:middle; margin-right:5px;">
+                                            <?php echo esc_html($country_name); ?>
+                                        </p>
+
+                                        <p class="teacher-data">
+                                            <span class="label">
+                                                <i class="fas fa-envelope"></i> E-mail:
+                                            </span>
+                                            <a href="mailto:<?php echo esc_html($teacher->email);?>">
+                                                <?php echo esc_html($teacher->email);?>
+                                            </a>
+                                        </p>
+                                        <p class="teacher-data">
+                                            <span class="label">
+                                                <i class="fas fa-phone"></i> Téléphone:
+                                            </span>
+                                            <a href="tel:<?php echo esc_html($teacher->phone);?>">
+                                                <?php echo esc_html($teacher->phone);?>
+                                            </a>
+                                        </p>
+                                        <p class="teacher-data">
+                                            <span class="label">
+                                                <i class="fas fa-comment"></i> Motivation:
+                                            </span>
                                             <?php echo esc_html($teacher->motivation_of_joining);?>
-                                        </p>
-                                        <p class="teacher-data">
-                                            <?php echo esc_html($teacher->email);?>
-                                        </p>
-                                        <p class="teacher-data">
-                                            <?php echo esc_html($teacher->phone);?>
                                         </p>
                                     </div>
                                 </div>
