@@ -46,6 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_course'])) {
     $max_student_groups = intval($_POST['max_student_groups']);
     $max_teachers = intval($_POST['max_teachers']);
     $duration = intval($_POST['duration']);
+    $required_credit = intval($_POST['required_credit']);
+    $course_material = esc_url_raw($_POST['course_material']);
     $start_date = sanitize_text_field($_POST['start_date']);
     $time_slot = sanitize_text_field($_POST['time_slot']);
     $assigned_teachers = isset($_POST['assigned_teachers']) ? json_encode($_POST['assigned_teachers']) : '';
@@ -104,25 +106,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_course'])) {
                 'max_student_groups'   => $max_student_groups,
                 'max_teachers'         => $max_teachers,
                 'duration'             => $duration,
-                'start_date'           => $start_date,
+                'required_credit'     => $required_credit,
+                'course_material'      => $course_material,
+                'start_date'          => $start_date,
                 'time_slot'            => $time_slot,
-                'assigned_teachers'    => $assigned_teachers,
+                'assigned_teachers'   => $assigned_teachers,
                 'image'                => $uploaded_image_path,
             ],
             ['id' => $course_id],
             [
-                '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s',
+                '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s',
             ],
             ['%d']
         );
-
-        // if ($updated === false) {
-        //     $error_message = 'Erreur: ' . esc_html($wpdb->last_error);
-        // } else {
-        //     $success_message = 'Le cours a été mis à jour avec succès.';
-        //     wp_redirect(home_url('/admin/course-management/courses/'));
-        //     exit;
-        // }
 
         if ($updated !== false) {
             // Delete existing teacher associations
@@ -131,19 +127,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_course'])) {
                 ['course_id' => $course_id],
                 ['%d']
             );
-    
+
             // Insert new teacher associations
             $assigned_teachers_array = isset($_POST['assigned_teachers']) ? 
                 array_map('intval', (array)$_POST['assigned_teachers']) : 
                 [];
-    
+
             $max_teachers = intval($_POST['max_teachers']);
             $total_teachers = count($assigned_teachers_array);
-    
+
             for ($i = 0; $i < min($total_teachers, $max_teachers); $i++) {
                 $teacher_id = $assigned_teachers_array[$i];
                 $group_number = $i + 1;
-    
+
                 $wpdb->insert(
                     $wpdb->prefix . 'teacher_courses',
                     [
@@ -154,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_course'])) {
                     ['%d', '%d', '%d']
                 );
             }
-    
+
             wp_redirect(home_url('/admin/course-management/courses/?success=updated'));
             exit;
         } else {
@@ -172,7 +168,7 @@ ob_end_clean();
         <?php require_once(get_template_directory() . '/admin/templates/sidebar.php'); ?>
     </div>
 
-    <div id="adminAddCourse" class="main-content">
+    <div id="adminEditCourse" class="main-content">
         <div class="content-header">
             <h2 class="content-title">Gestion de cours</h2>
             <div class="content-breadcrumb">
@@ -185,7 +181,7 @@ ob_end_clean();
                 <span class="separator">
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
-                <span class="active">Ajouter un cours</span>
+                <span class="active">Modifier un cours</span>
             </div>
         </div>
 
@@ -207,9 +203,9 @@ ob_end_clean();
                 </div>
                 <?php endif; ?>
 
-                <!-- Add Course -->
+                <!-- Edit Course -->
                 <section class="section col">
-                    <h3 class="section-heading">Ajouter un nouveau cours</h3>
+                    <h3 class="section-heading">Modifier le cours</h3>
 
                     <div class="row">
                         <div class="col">
@@ -230,19 +226,20 @@ ob_end_clean();
                     <div class="row">
                         <div class="col">
                             <label for="">Image</label>
+                            <?php 
+                                $default_image = get_template_directory_uri() . '/assets/image/image-placeholder.png'; 
+                                $image = !empty($course->image) ? esc_url($course->image) : esc_url($default_image);
+                            ?>
+                            <img src="<?php echo $image; ?>" alt="Cours image" class="current-image-preview">
                             <div class="upload-button">
                                 <label for="upload_image" class="upload-label">
-                                    Télécharger l'image <i class="fas fa-upload"></i>
+                                    Mettre à jour l'image <i class="fas fa-upload"></i>
                                 </label>
                                 <input type="file" id="upload_image" name="upload_image" accept="image/jpeg, image/png"
                                     class="upload-input">
                             </div>
                             <p class="text">(Images uniquement, JPEG/PNG, max 2 Mo)</p>
                             <p class="image-file-name">Aucun fichier sélectionné</p>
-                            <?php if (!empty($course->image)): ?>
-                            <p class="current-image">Image actuelle: <img src="<?php echo esc_url($course->image); ?>"
-                                    alt="Cours image" class="current-image-preview"></p>
-                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -349,59 +346,15 @@ ob_end_clean();
 
                     <div class="row">
                         <div class="col">
-                            <label for="assigned_teachers">Affecter des enseignants</label>
-                            <div class="selected-teachers">
-                                <?php
-                                    $assigned_teachers = json_decode($course->assigned_teachers, true);
-                                    // Define the default image path
-                                    $default_image = get_template_directory_uri() . '/assets/image/user.png';
-                                    
-                                    if ($assigned_teachers) {
-                                        foreach ($assigned_teachers as $teacher_id) {
-                                            $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}teachers WHERE id = %d", $teacher_id));
-                                            if ($teacher) {
-                                                $image_url = !empty($teacher->image) ? esc_url($teacher->image) : esc_url($default_image);
-                                                echo '<div class="teacher-card" data-id="' . esc_attr($teacher->id) . '">';
-                                                echo '<img src="' . $image_url . '" alt="' . esc_attr($teacher->first_name) . ' ' . esc_attr($teacher->last_name) . '" class="teacher-image">';
-                                                echo '<h3 class="teacher-name">' . esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name) . '</h3>';
-                                                echo '<button class="remove-teacher" type="button">&#10060;</button>';
-                                                echo '<input type="hidden" name="assigned_teachers[]" value="' . esc_attr($teacher->id) . '">';
-                                                echo '</div>';
-                                            }
-                                        }
-                                    }
-                                ?>
-                            </div>
-
-                            <div class="search-teacher col">
-                                <input type="text" id="search-teacher-input" placeholder="Recherche d'enseignants">
-                                <div class="teacher-container" id="teacher-container">
-                                    <?php
-                                    global $wpdb; // Access the global $wpdb object for database queries
-                                    
-                                    // Query the custom 'teachers' table
-                                    $teachers = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teachers");
-                                    
-                                    // Define the default image path
-                                    $default_image = get_template_directory_uri() . '/assets/image/user.png';
-                            
-                                    // Check if teachers are available
-                                    if ($teachers) {
-                                        foreach ($teachers as $teacher) {
-                                            // Use the teacher's image if available, otherwise use the default image
-                                            $image_url = !empty($teacher->image) ? esc_url($teacher->image) : esc_url($default_image);
-                                            
-                                            echo '<div class="teacher-card" data-id="' . esc_attr($teacher->id) . '">';
-                                            echo '<img src="' . $image_url . '" alt="' . esc_attr($teacher->first_name) . ' ' . esc_attr($teacher->last_name) . '" class="teacher-image">';
-                                            echo '<h3 class="teacher-name">' . esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name) . '</h3>';
-                                            echo '</div>';
-                                        }
-                                    } else {
-                                        echo '<p>Aucun enseignant trouvé.</p>';
-                                    }
-                                    ?>
-                                </div>
-                            </div>
+                            <label for="required_credit">Crédit <span class="required">*</span></label>
+                            <input type="number" id="required_credit" name="required_credit" min="1"
+                                value="<?php echo esc_attr($course->required_credit); ?>" placeholder="2" required>
+                        </div>
+                        <div class="col">
+                            <label for="course_material">Matériel de cours <span class="required"></span></label>
+                            <input type="url" name="course_material" id="course_material"
+                                value="<?php echo esc_url($course->course_material); ?>"
+                                placeholder="Lien vers le matériel de cours">
                         </div>
                     </div>
 
@@ -494,7 +447,65 @@ ob_end_clean();
                         </div>
                     </div>
 
-                    <button type="submit" class="submit-button" name="edit_course">Ajouter</button>
+                    <div class="row">
+                        <div class="col">
+                            <label for="assigned_teachers">Affecter des enseignants</label>
+                            <div class="selected-teachers">
+                                <?php
+                                    $assigned_teachers = json_decode($course->assigned_teachers, true);
+                                    // Define the default image path
+                                    $default_image = get_template_directory_uri() . '/assets/image/user.png';
+                                    
+                                    if ($assigned_teachers) {
+                                        foreach ($assigned_teachers as $teacher_id) {
+                                            $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}teachers WHERE id = %d", $teacher_id));
+                                            if ($teacher) {
+                                                $image_url = !empty($teacher->image) ? esc_url($teacher->image) : esc_url($default_image);
+                                                echo '<div class="teacher-card" data-id="' . esc_attr($teacher->id) . '">';
+                                                echo '<img src="' . $image_url . '" alt="' . esc_attr($teacher->first_name) . ' ' . esc_attr($teacher->last_name) . '" class="teacher-image">';
+                                                echo '<h3 class="teacher-name">' . esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name) . '</h3>';
+                                                echo '<button class="remove-teacher" type="button">&#10060;</button>';
+                                                echo '<input type="hidden" name="assigned_teachers[]" value="' . esc_attr($teacher->id) . '">';
+                                                echo '</div>';
+                                            }
+                                        }
+                                    }
+                                ?>
+                            </div>
+
+                            <div class="search-teacher col">
+                                <input type="text" id="search-teacher-input" placeholder="Recherche d'enseignants">
+                                <div class="teacher-container" id="teacher-container">
+                                    <?php
+                                    global $wpdb; // Access the global $wpdb object for database queries
+                                    
+                                    // Query the custom 'teachers' table
+                                    $teachers = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teachers");
+                                    
+                                    // Define the default image path
+                                    $default_image = get_template_directory_uri() . '/assets/image/user.png';
+                            
+                                    // Check if teachers are available
+                                    if ($teachers) {
+                                        foreach ($teachers as $teacher) {
+                                            // Use the teacher's image if available, otherwise use the default image
+                                            $image_url = !empty($teacher->image) ? esc_url($teacher->image) : esc_url($default_image);
+                                            
+                                            echo '<div class="teacher-card" data-id="' . esc_attr($teacher->id) . '">';
+                                            echo '<img src="' . $image_url . '" alt="' . esc_attr($teacher->first_name) . ' ' . esc_attr($teacher->last_name) . '" class="teacher-image">';
+                                            echo '<h3 class="teacher-name">' . esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name) . '</h3>';
+                                            echo '</div>';
+                                        }
+                                    } else {
+                                        echo '<p>Aucun enseignant trouvé.</p>';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-button" name="edit_course">Modifier</button>
                 </section>
             </form>
         </div>
@@ -502,6 +513,51 @@ ob_end_clean();
     </div>
 </div>
 
+<!-- Add jQuery (if not already included) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+jQuery(document).ready(function($) {
+    // Event listener for category dropdown change
+    $('#category').on('change', function() {
+        var selectedCategory = $(this).val(); // Get the selected category
+
+        if (selectedCategory) {
+            // Clear the topic dropdown
+            $('#topic').html('<option value="" disabled selected>Sélectionnez le sujet</option>');
+
+            // Send AJAX request to fetch topics
+            $.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>', // WordPress AJAX endpoint
+                type: 'POST',
+                data: {
+                    action: 'fetch_topics', // AJAX action
+                    category: selectedCategory // Selected category
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Populate the topic dropdown
+                        var topics = response.data;
+                        if (topics.length > 0) {
+                            topics.forEach(function(topic) {
+                                $('#topic').append('<option value="' + topic.topic +
+                                    '">' + topic.topic + '</option>');
+                            });
+                        } else {
+                            $('#topic').append('<option disabled>No topics found</option>');
+                        }
+                    } else {
+                        console.error('Error fetching topics');
+                    }
+                },
+                error: function() {
+                    console.error('AJAX request failed');
+                }
+            });
+        }
+    });
+});
+</script>
+
 <?php
-ob_end_clean();
 require_once(get_template_directory() . '/admin/templates/footer.php');

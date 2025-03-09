@@ -19,7 +19,7 @@
 #courseDetails .teacher-title,
 #courseDetails .meeting-title,
 #courseDetails .settings-title,
-#courseDetails .list-title {
+#courseDetails .sidebar-title {
   width: 100%;
   font-size: 1.2rem;
   font-family: var(--accent-font-family);
@@ -149,17 +149,17 @@
 #courseDetails .settings .button:hover {
   opacity: 0.8;
 }
-#courseDetails .student-list {
+#courseDetails .course-sidebar {
   flex: 1;
   background-color: #fff;
   border: var(--border);
   border-radius: 0.5rem;
   padding: 1rem 1.5rem 2rem 1.5rem;
 }
-#courseDetails .student-list .list {
+#courseDetails .course-sidebar .list {
   list-style: none;
 }
-#courseDetails .list-title {
+#courseDetails .sidebar-title {
   margin: 0;
 }
 #courseDetails .list-item {
@@ -170,12 +170,33 @@
   border: none;
   padding: none;
 }
-#courseDetails .student-list .student-image {
+#courseDetails .course-sidebar .student-image {
   width: 4rem;
   height: 4rem;
   object-fit: cover;
   border: var(--border);
   border-radius: 0.3rem;
+}
+#courseDetails .material-link-container {
+  align-items: center;
+}
+#courseDetails .material-link {
+  word-break: break-all;
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+}
+#courseDetails .material-link-icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  border: none;
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+#courseDetails .material-link-icon:hover {
+  color: var(--accent-color);
 }
 /* add/update class link modal */
 #addLinkModal .modal-content {

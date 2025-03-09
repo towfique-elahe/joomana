@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
     $max_teachers = intval($_POST['max_teachers']);
     $duration = intval($_POST['duration']);
     $required_credit = intval($_POST['required_credit']);
+    $course_material = esc_url_raw($_POST['course_material']);
     $start_date = sanitize_text_field($_POST['start_date']);
     $time_slot = sanitize_text_field($_POST['time_slot']);
     // Retrieve the array of teacher IDs submitted via "assigned_teachers[]"
@@ -100,13 +101,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
                 'max_teachers'         => $max_teachers,
                 'duration'             => $duration,
                 'required_credit'      => $required_credit,
+                'course_material'      => $course_material,
                 'start_date'           => $start_date,
                 'time_slot'            => $time_slot,
                 'assigned_teachers'    => $assigned_teachers_json,
                 'image'                => $uploaded_image_path,
             ],
             [
-                '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s',
+                '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s',
             ]
         );
         
@@ -357,6 +359,11 @@ ob_end_clean();
                             <label for="required_credit">Crédit <span class="required">*</span></label>
                             <input type="number" id="required_credit" name="required_credit" min="1" placeholder="2"
                                 required>
+                        </div>
+                        <div class="col">
+                            <label for="course_material">Matériel de cours <span class="required"></span></label>
+                            <input type="url" name="course_material" id="course_material"
+                                placeholder="Lien vers le matériel de cours">
                         </div>
                     </div>
 

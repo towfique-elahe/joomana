@@ -692,43 +692,73 @@ if (in_array('parent', (array) $user->roles)) {
 
                         </div>
 
-                        <div class="col student-list">
-                            <h4 class="list-title">Liste des étudiants</h4>
+                        <div class="col">
+                            <!-- student list -->
+                            <div class="col course-sidebar">
+                                <h4 class="sidebar-title">Liste des étudiants</h4>
 
-                            <ul class="list">
+                                <ul class="list">
 
-                                <?php
-                                        // Check if any student IDs were found
-                                        if (!empty($enrolled_student_ids)) {
-                                            // Output or process the enrolled students
-                                            if (!empty($enrolled_students)) {
-                                                foreach ($enrolled_students as $student) {
-                                    ?>
-                                <li class="row list-item">
-                                    <img src="<?php echo !empty($student->image) ? esc_url($student->image) : $default_user_image; ?>"
-                                        alt="" class="student-image">
+                                    <?php
+                                            // Check if any student IDs were found
+                                            if (!empty($enrolled_student_ids)) {
+                                                // Output or process the enrolled students
+                                                if (!empty($enrolled_students)) {
+                                                    foreach ($enrolled_students as $student) {
+                                        ?>
+                                    <li class="row list-item">
+                                        <img src="<?php echo !empty($student->image) ? esc_url($student->image) : $default_user_image; ?>"
+                                            alt="" class="student-image">
 
-                                    <div class="col student-info">
-                                        <h5 class="student-name">
-                                            <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
-                                        </h5>
-                                        <p class="student-data">
-                                            <?php echo esc_html($student->grade);?>
-                                        </p>
-                                    </div>
-                                </li>
-                                <?php
+                                        <div class="col student-info">
+                                            <h5 class="student-name">
+                                                <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
+                                            </h5>
+                                            <p class="student-data">
+                                                <?php echo esc_html($student->grade);?>
+                                            </p>
+                                        </div>
+                                    </li>
+                                    <?php
+                                                }
+                                            } else {
+                                                echo "Aucun détail étudiant n'a été trouvé pour les étudiants inscrits.";
                                             }
                                         } else {
-                                            echo "Aucun détail étudiant n'a été trouvé pour les étudiants inscrits.";
+                                            echo "Pourtant, aucun étudiant n'est inscrit à ce cours pour vous.";
                                         }
-                                    } else {
-                                        echo "Pourtant, aucun étudiant n'est inscrit à ce cours pour vous.";
-                                    }
+    
+                                    ?>
 
-                                ?>
+                                </ul>
+                            </div>
 
-                            </ul>
+                            <?php
+                            if (current_user_can('teacher')) {
+                        ?>
+                            <!-- course materials -->
+                            <div class="col course-sidebar">
+                                <h4 class="sidebar-title">Matériel de cours</h4>
+                                <div class="material-link-container row">
+                                    <?php
+                                        if($course->course_material) {
+                                            echo '<p class="material-link">'. esc_html($course->course_material) . '</p>';
+                                        } else {
+                                            echo '<p class="material-link">[ Pas encore attribué ]</p>';
+                                        }
+                                        
+                                        if($course->course_material) { ?>
+                                    <a href="<?php echo esc_url($course->course_material) ?>" class="material-link-icon"
+                                        target="_blank">
+                                        <i class="fas fa-external-link-square-alt"></i>
+                                    </a>
+                                    <?php } ?>
+                                </div>
+
+                            </div>
+                            <?php
+                            }
+                        ?>
 
                         </div>
 

@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.1.0';
+    $custom_tables_version = '1.1.1';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -94,6 +94,7 @@ function create_custom_tables() {
         time_slot VARCHAR(30) NOT NULL,
         image VARCHAR(255) DEFAULT NULL,
         required_credit DECIMAL(10) NOT NULL,
+        course_material VARCHAR(255) DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) $charset_collate;";
