@@ -33,6 +33,9 @@ if ($edit_item_id > 0) {
 
     // Handle form submission for updating the category
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_course_category'])) {
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+
         // Sanitize user input
         $new_category = isset($_POST['category']) ? sanitize_text_field($_POST['category']) : '';
         $new_image = isset($_FILES['upload_image']) ? $_FILES['upload_image'] : null;
@@ -60,13 +63,29 @@ if ($edit_item_id > 0) {
                     }
 
                     // Upload the new image to the media library
-                    $uploaded_image = media_handle_upload('upload_image', 0); // 0 means no post association
+                    $uploaded_file = wp_handle_upload($new_image, ['test_form' => false]);
 
-                    if (is_wp_error($uploaded_image)) {
-                        $error_message = 'Erreur lors du téléchargement de l\'image.';
+                    if ($uploaded_file && !isset($uploaded_file['error'])) {
+                        // Insert the uploaded file into the media library
+                        $file = $uploaded_file['file'];
+                        $attachment = array(
+                            'guid'           => $uploaded_file['url'],
+                            'post_mime_type' => $new_image['type'],
+                            'post_title'     => sanitize_file_name($new_image['name']),
+                            'post_content'   => '',
+                            'post_status'    => 'inherit'
+                        );
+                        $attachment_id = wp_insert_attachment($attachment, $file);
+                        if (!is_wp_error($attachment_id)) {
+                            // Generate metadata for the attachment
+                            $attachment_data = wp_generate_attachment_metadata($attachment_id, $file);
+                            wp_update_attachment_metadata($attachment_id, $attachment_data);
+                            $new_image_url = wp_get_attachment_url($attachment_id); // URL to save in DB
+                        } else {
+                            $error_message = 'Erreur lors de l\'insertion de l\'image dans la bibliothèque de médias.';
+                        }
                     } else {
-                        // Get the URL of the new uploaded image
-                        $new_image_url = wp_get_attachment_url($uploaded_image);
+                        $error_message = 'Erreur lors du téléchargement de l\'image : ' . $uploaded_file['error'];
                     }
                 }
 

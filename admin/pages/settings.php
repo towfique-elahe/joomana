@@ -14,8 +14,9 @@ ob_start();
 $error_message = '';
 $success_message = '';
 
+$user_id = get_current_user_id(); // Assuming we get the current user ID
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = get_current_user_id(); // Assuming we get the current user ID
 
     // Sanitize user inputs
     $first_name = isset($_POST['first_name']) ? sanitize_text_field($_POST['first_name']) : '';

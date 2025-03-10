@@ -19,9 +19,34 @@ global $wpdb; // Access the global $wpdb object for database queries
 // Query the custom 'students' table
 $students = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}students");
 
+// Get total enrolled courses
+function get_total_enrolled_courses($student) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'student_courses';
 
+    $total_courses = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table_name WHERE student_id = %d",
+        $student->id
+    ));
 
-// Delete Logic
+    return (int) $total_courses;
+}
+
+// Get total payments
+function get_total_payments($student) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'payments';
+
+    $total = $wpdb->get_var($wpdb->prepare(
+        "SELECT SUM(amount) FROM {$table_name} WHERE user_id = %d",
+        $student->id
+    ));
+
+    // Return total payments or 0 if no payments found
+    return ($total) ? $total : 0;
+}
+
+// Delete Student Logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
     $delete_item_id = intval($_POST['delete_item_id']);
 
@@ -125,6 +150,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                 <tbody id="list">
                     <?php if (!empty($students)) : ?>
                     <?php foreach ($students as $student) : ?>
+                    <?php
+                        $total_courses = get_total_enrolled_courses($student);
+                        $total_payments = get_total_payments($student);
+                    ?>
                     <tr data-grade="<?php echo strtolower($student->grade); ?>"
                         data-level="<?php echo strtolower($student->level); ?>">
                         <td class="name">
@@ -140,11 +169,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                             <?php echo esc_html($student->level); ?>
                         </td>
                         <td>
-                            n/a
+                            <?php echo esc_html($total_courses); ?>
                         </td>
                         <td class="payment">
                             <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                            0
+                            <?php echo esc_html( intval($total_payments) ); ?>
                         </td>
                         <td class="action-buttons">
                             <a href="<?php echo esc_url(home_url('/admin/student-management/student-details/?id=' . $student->id)); ?>"

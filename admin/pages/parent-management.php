@@ -19,7 +19,35 @@ global $wpdb; // Access the global $wpdb object for database queries
 // Query the custom 'parents' table
 $parents = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}parents");
 
+// Get total childs
+function get_total_child_count($parent) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'students';
 
+    $child_count = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table_name WHERE parent_id = %d",
+        $parent->id
+    ));
+
+    return (int) $child_count;
+}
+
+// Get total payments
+function get_total_payments($parent) {
+    global $wpdb;
+    
+    // Replace 'prefix_' with your actual database prefix
+    $table_name = $wpdb->prefix . 'payments';
+
+    // Query to get total payments for the parent
+    $total = $wpdb->get_var($wpdb->prepare(
+        "SELECT SUM(amount) FROM {$table_name} WHERE user_id = %d",
+        $parent->id
+    ));
+
+    // Return total payments or 0 if no payments found
+    return ($total) ? $total : 0;
+}
 
 // Delete Logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
@@ -94,10 +122,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <?php if (!empty($parents)) : ?>
                     <?php foreach ($parents as $parent) : ?>
                     <?php
-                            // Example of fetching custom data for each parent
-                            $children_count = $parent->children_count ?? 0;
-                            $total_purchase = $parent->total_purchase ?? 0;
-                            ?>
+                        $total_children = get_total_child_count($parent);
+                        $total_payments = get_total_payments($parent);
+                    ?>
                     <tr>
                         <td class="name">
                             <a
@@ -106,11 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                             </a>
                         </td>
                         <td>
-                            <?php echo esc_html($children_count); ?>
+                            <?php echo esc_html($total_children); ?>
                         </td>
                         <td class="payment">
                             <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                            <?php echo esc_html($total_purchase); ?>
+                            <?php echo esc_html( intval($total_payments) ); ?>
                         </td>
                         <td class="action-buttons">
                             <a href="<?php echo esc_url(home_url('/admin/parent-management/parent-details/?id=' . $parent->id)); ?>"

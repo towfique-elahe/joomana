@@ -80,7 +80,7 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments");
                                 // If the user has the 'teacher' role
                             ?>
                             <a
-                                href="<?php echo esc_url(home_url('/admin/teacher-management/teacher-details/?id=' . $user->id)); ?>">
+                                href="<?php echo esc_url(home_url('/admin/teacher-management/teacher-details/?id=' . $user->ID)); ?>">
                                 <?php echo esc_html($user->first_name) . ' ' . esc_html($user->last_name); ?>
                             </a>
                             <?php

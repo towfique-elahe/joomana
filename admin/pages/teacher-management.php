@@ -19,7 +19,32 @@ global $wpdb; // Access the global $wpdb object for database queries
 // Query the custom 'teachers' table
 $teachers = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teachers");
 
+// Get total assigned courses
+function get_total_assigned_courses($teacher) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'teacher_courses';
 
+    $total_courses = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table_name WHERE teacher_id = %d",
+        $teacher->id
+    ));
+
+    return (int) $total_courses;
+}
+
+// Get total payments
+function get_total_payments($teacher) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'teacher_payments';
+
+    $total = $wpdb->get_var($wpdb->prepare(
+        "SELECT SUM(deposit) FROM {$table_name} WHERE user_id = %d",
+        $teacher->id
+    ));
+
+    // Return total payments or 0 if no payments found
+    return ($total) ? $total : 0;
+}
 
 // Delete Logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
@@ -126,7 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                 <thead>
                     <tr>
                         <th>Nom</th>
-                        <th>Compétence</th>
                         <th>Attribuer Un Cours</th>
                         <th>Paiement Total</th>
                         <th>Statut</th>
@@ -137,6 +161,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
 
                     <?php if (!empty($teachers)) : ?>
                     <?php foreach ($teachers as $teacher) : ?>
+                    <?php
+                        $total_courses = get_total_assigned_courses($teacher);
+                        $total_payments = get_total_payments($teacher);
+                    ?>
                     <tr class="teacher-row"
                         data-status="<?php echo strtolower(str_replace(' ', '-', $teacher->status)); ?>">
                         <td class="name">
@@ -145,11 +173,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                                 <?php echo esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name); ?>
                             </a>
                         </td>
-                        <td>n/a</td>
-                        <td>n/a</td>
+                        <td>
+                            <?php echo esc_html($total_courses); ?>
+                        </td>
                         <td class="payment">
                             <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                            0
+                            <?php echo esc_html( intval($total_payments) ); ?>
                         </td>
                         <td>
                             <span class="status <?php echo strtolower(str_replace(' ', '-', $teacher->status)); ?>">
@@ -173,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <?php endforeach; ?>
                     <?php else : ?>
                     <tr>
-                        <td colspan="7" class="no-data">Aucun professeur trouvé.</td>
+                        <td colspan="6" class="no-data">Aucun professeur trouvé.</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>
