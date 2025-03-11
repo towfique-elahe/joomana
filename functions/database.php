@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.1.1';
+    $custom_tables_version = '1.1.2';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -26,6 +26,7 @@ function create_custom_tables() {
     $communications_table      = $wpdb->prefix . 'communications';
     $student_courses_table     = $wpdb->prefix . 'student_courses';
     $teacher_courses_table     = $wpdb->prefix . 'teacher_courses';
+    $recurring_sessions_table  = $wpdb->prefix . 'recurring_class_sessions';
     $teacher_evaluations_table = $wpdb->prefix . 'teacher_evaluations';
     $course_class_links_table  = $wpdb->prefix . 'course_class_links';
     $course_assignments_table  = $wpdb->prefix . 'course_assignments';
@@ -88,14 +89,17 @@ function create_custom_tables() {
         max_students_per_group INT(11) NOT NULL DEFAULT 6,
         max_teachers INT(11) NOT NULL DEFAULT 25,
         duration INT(11) NOT NULL DEFAULT 2,
-        assigned_teachers TEXT DEFAULT NULL,
-        status ENUM('available', 'unavailable', 'pending', 'completed') NOT NULL DEFAULT 'available',
+        assigned_teachers TEXT DEFAULT NOT NULL,
+        status ENUM('ongoing', 'upcoming', 'completed') NOT NULL DEFAULT 'upcoming',
         start_date VARCHAR(20) NOT NULL,
+        end_date VARCHAR(20) NULL,
         time_slot VARCHAR(30) NOT NULL,
         image VARCHAR(255) DEFAULT NULL,
         required_credit DECIMAL(10) NOT NULL,
         course_material VARCHAR(255) DEFAULT NULL,
+        is_recurring BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) $charset_collate;";
 
@@ -127,6 +131,19 @@ function create_custom_tables() {
         course_id BIGINT(20) UNSIGNED NOT NULL,
         status ENUM('En cours', 'Complété') NOT NULL DEFAULT 'En cours',
         assigned_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    $recurring_sessions_sql = "CREATE TABLE $recurring_sessions_table (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        course_id BIGINT(20) UNSIGNED NOT NULL,
+        group_number INT(11) NOT NULL,
+        day VARCHAR(20) NOT NULL,
+        slot_number INT(11) NOT NULL,
+        start_time TIME NOT NULL,
+        end_time TIME NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) $charset_collate;";
@@ -344,6 +361,7 @@ function create_custom_tables() {
     dbDelta($communications_sql);
     dbDelta($student_courses_sql);
     dbDelta($teacher_courses_sql);
+    dbDelta($recurring_sessions_sql);
     dbDelta($teacher_evaluations_sql);
     dbDelta($course_class_links_sql);
     dbDelta($course_assignments_sql);
@@ -392,6 +410,9 @@ function add_foreign_keys() {
         "{$wpdb->prefix}teacher_courses" => [
             "fk_teacher_courses_teacher_id"  => "ALTER TABLE {$wpdb->prefix}teacher_courses ADD CONSTRAINT fk_teacher_courses_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;",
             "fk_teacher_courses_course_id"   => "ALTER TABLE {$wpdb->prefix}teacher_courses ADD CONSTRAINT fk_teacher_courses_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}recurring_class_sessions" => [
+            "fk_recurring_class_sessions_course_id"   => "ALTER TABLE {$wpdb->prefix}recurring_class_sessions ADD CONSTRAINT fk_recurring_class_sessions_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
         ],
         "{$wpdb->prefix}teacher_evaluations" => [
             "fk_teacher_evaluations_teacher_id"  => "ALTER TABLE {$wpdb->prefix}teacher_evaluations ADD CONSTRAINT fk_teacher_evaluations_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;",
