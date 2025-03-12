@@ -709,6 +709,11 @@
 }
 
 /* add course page */
+#adminAddCourse .recurring-dates,
+#adminAddCourse .recurring-days,
+#adminAddCourse .recurring-time-slots {
+  display: none;
+}
 #adminAddCourse .search-teacher .teacher-container,
 #adminAddCourse .selected-teachers {
   display: flex;
