@@ -944,6 +944,11 @@
   font-family: var(--accent-font-family);
   font-weight: var(--accent-font-weight);
   color: var(--dark-text-color);
+  text-decoration: none;
+}
+#adminSessionGroupDetails .teacher-name:hover,
+#adminSessionGroupDetails .student-name:hover {
+  color: var(--accent-color);
 }
 #adminSessionGroupDetails .teacher-name {
   font-size: 1.2rem;

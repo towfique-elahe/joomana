@@ -1,8 +1,8 @@
 <?php
 
-/* Template Name: Admin | Seesion Group Details */
+/* Template Name: Admin | Session Group Details */
 
-// page title
+// Page title
 global $pageTitle;
 $pageTitle = 'Détails Du Groupe';
 
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 
 $default_user_image = esc_url(get_stylesheet_directory_uri() . '/assets/image/user.png');
 
-// Get course id and group number from session
+// Get course ID and group number from session
 if (!isset($_GET['group_number']) || empty($_GET['group_number']) || !isset($_GET['course_id']) || empty($_GET['course_id'])) {
     wp_redirect(home_url('/admin/session-management/courses/groups/'));
     exit;
@@ -39,12 +39,11 @@ $teacher_id = $wpdb->get_var(
 );
 
 // Query to get teacher details
-$teacher_table = $wpdb->prefix. 'teachers';
+$teacher_table = $wpdb->prefix . 'teachers';
 $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $teacher_id));
 
 // Fetch existing class link for course_id and group_number
 $class_links_table = $wpdb->prefix . "course_class_links";
-// Check if a record already exists for this course and group
 $existing_class_link = $wpdb->get_row(
     $wpdb->prepare(
         "SELECT * FROM $class_links_table WHERE course_id = %d AND group_number = %d",
@@ -52,108 +51,173 @@ $existing_class_link = $wpdb->get_row(
     )
 );
 
-$student_courses_table  = $wpdb->prefix . 'student_courses';
-    // Fetch all student IDs enrolled in the course for the given teacher group
-    $enrolled_student_ids = $wpdb->get_col(
+// Fetch enrolled students
+$student_courses_table = $wpdb->prefix . 'student_courses';
+$enrolled_student_ids = $wpdb->get_col(
+    $wpdb->prepare(
+        "SELECT student_id FROM $student_courses_table WHERE course_id = %d AND teacher_id = %d",
+        $course_id,
+        $teacher_id
+    )
+);
+
+if (!empty($enrolled_student_ids)) {
+    $students_table = $wpdb->prefix . 'students';
+    $student_ids_placeholder = implode(',', array_map('intval', $enrolled_student_ids));
+
+    $enrolled_students = $wpdb->get_results(
         $wpdb->prepare(
-            "SELECT student_id FROM $student_courses_table WHERE course_id = %d AND teacher_id = %d",
+            "SELECT * FROM $students_table WHERE id IN ($student_ids_placeholder)"
+        )
+    );
+}
+
+// Fetch recurring sessions
+$recurring_sessions_table = $wpdb->prefix . 'recurring_class_sessions';
+
+$recurring_session = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT * FROM $recurring_sessions_table WHERE course_id = %d AND group_number = %d LIMIT 1",
+        $course_id,
+        $group_number
+    )
+);
+
+// Handle add/edit class links
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'save_class_link') {
+    global $wpdb;
+    $table_name = $wpdb->prefix . "course_class_links";
+
+    $class_link = esc_url($_POST['class_link']);
+    $class_link_id = isset($_POST['class_link_id']) ? intval($_POST['class_link_id']) : 0;
+
+    if ($class_link_id > 0) {
+        // Update existing record
+        $wpdb->update(
+            $table_name,
+            ['class_link' => $class_link, 'updated_at' => current_time('mysql')],
+            ['id' => $class_link_id]
+        );
+    } else {
+        // Check if a record already exists
+        $existing = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM $table_name WHERE course_id = %d AND group_number = %d",
+            $course_id, $group_number
+        ));
+        
+        if ($existing) {
+            $wpdb->update(
+                $table_name,
+                ['class_link' => $class_link, 'updated_at' => current_time('mysql')],
+                ['id' => $existing]
+            );
+        } else {
+            // Insert new record
+            $wpdb->insert(
+                $table_name,
+                [
+                    'course_id' => $course_id,
+                    'group_number' => $group_number,
+                    'class_link' => $class_link,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ]
+            );
+        }
+    }
+
+    wp_safe_redirect($_SERVER['REQUEST_URI']);
+    exit;
+}
+
+// Handle reschedule course class
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'reschedule_course') {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'courses';
+
+    // Sanitize user inputs
+    $start_date = sanitize_text_field($_POST['start_date']);
+    $time_slot = sanitize_text_field($_POST['time_slot']);
+
+    // Update course in the database
+    $wpdb->update(
+        $table_name,
+        ['start_date' => $start_date, 'time_slot' => $time_slot],
+        ['id' => $course_id],
+        ['%s', '%s'],
+        ['%d']
+    );
+
+    wp_safe_redirect($_SERVER['REQUEST_URI']);
+    exit;
+}
+
+// Handle reschedule recurring course class
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'reschedule_recurring_course') {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'recurring_class_sessions';
+
+    // Sanitize user inputs
+    $recurring_start_date = sanitize_text_field($_POST['recurring_start_date']);
+    $recurring_end_date = sanitize_text_field($_POST['recurring_end_date']);
+    $recurring_days = !empty($_POST['recurring_days']) ? json_encode(array_map('sanitize_text_field', $_POST['recurring_days'])) : json_encode([]);
+    $recurring_start_time_1 = sanitize_text_field($_POST['recurring_start_time_1']);
+    $recurring_end_time_1 = sanitize_text_field($_POST['recurring_end_time_1']);
+    $recurring_start_time_2 = sanitize_text_field($_POST['recurring_start_time_2']);
+    $recurring_end_time_2 = sanitize_text_field($_POST['recurring_end_time_2']);
+
+    // Check if the recurring session already exists
+    $existing_session_id = $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT id FROM $table_name WHERE course_id = %d AND group_number = %d",
             $course_id,
-            $teacher_id
+            $group_number
         )
     );
 
-    // Check if any student IDs were found
-    if (!empty($enrolled_student_ids)) {
-        // Fetch student details from the students table
-        $students_table = $wpdb->prefix . 'students';
-        $student_ids_placeholder = implode(',', array_map('intval', $enrolled_student_ids)); // Sanitize IDs
-
-        $enrolled_students = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM $students_table WHERE id IN ($student_ids_placeholder)"
-            )
-        );
-    }
-
-    // Handle add/edit class links
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'save_class_link') {
-        global $wpdb;
-        $table_name = $wpdb->prefix . "course_class_links";
-
-        $class_link = esc_url($_POST['class_link']);
-        $class_link_id = isset($_POST['class_link_id']) ? intval($_POST['class_link_id']) : 0;
-
-        if ($class_link_id > 0) {
-            // Update existing record
-            $wpdb->update(
-                $table_name,
-                [
-                    'class_link' => $class_link,
-                    'updated_at' => current_time('mysql')
-                ],
-                [ 'id' => $class_link_id ]
-            );
-        } else {
-            // Check if a record already exists for this course and group
-            $existing = $wpdb->get_var($wpdb->prepare(
-                "SELECT id FROM $table_name WHERE course_id = %d AND group_number = %d",
-                $course_id, $group_number
-            ));
-            
-            if ($existing) {
-                // Update the existing record
-                $wpdb->update(
-                    $table_name,
-                    [ 'class_link' => $class_link, 'updated_at' => current_time('mysql') ],
-                    [ 'id' => $existing ]
-                );
-            } else {
-                // Insert new record
-                $wpdb->insert(
-                    $table_name,
-                    [
-                        'course_id' => $course_id,
-                        'group_number' => $group_number,
-                        'class_link' => $class_link,
-                        'created_at' => current_time('mysql'),
-                        'updated_at' => current_time('mysql')
-                    ]
-                );
-            }
-        }
-
-        // Redirect to prevent resubmission
-        wp_safe_redirect($_SERVER['REQUEST_URI']);
-        exit;
-    }
-
-    // Handle reschedule course class
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'reschedule_course') {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'courses';
-
-        // Sanitize user inputs
-        $start_date = sanitize_text_field($_POST['start_date']);
-        $time_slot = sanitize_text_field($_POST['time_slot']);
-    
-        // Update course in the database
+    if ($existing_session_id) {
+        // Update existing recurring session
         $wpdb->update(
             $table_name,
             [
-                'start_date' => $start_date,
-                'time_slot'  => $time_slot,
+                'recurring_start_date' => $recurring_start_date,
+                'recurring_end_date' => $recurring_end_date,
+                'recurring_days' => $recurring_days,
+                'recurring_start_time_1' => $recurring_start_time_1,
+                'recurring_end_time_1' => $recurring_end_time_1,
+                'recurring_start_time_2' => $recurring_start_time_2,
+                'recurring_end_time_2' => $recurring_end_time_2,
+                'updated_at' => current_time('mysql')
             ],
-            ['id' => $course_id],
-            [
-                '%s', '%s',
-            ],
-            ['%d']
+            [ 'id' => $existing_session_id ],
+            [ '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ],
+            [ '%d' ]
         );
-    
-        // Redirect to prevent resubmission
-        wp_safe_redirect($_SERVER['REQUEST_URI']);
-        exit;
+    } else {
+        // Insert new recurring session if not found
+        $wpdb->insert(
+            $table_name,
+            [
+                'course_id' => $course_id,
+                'group_number' => $group_number,
+                'recurring_start_date' => $recurring_start_date,
+                'recurring_end_date' => $recurring_end_date,
+                'recurring_days' => $recurring_days,
+                'recurring_start_time_1' => $recurring_start_time_1,
+                'recurring_end_time_1' => $recurring_end_time_1,
+                'recurring_start_time_2' => $recurring_start_time_2,
+                'recurring_end_time_2' => $recurring_end_time_2,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ],
+            [ '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]
+        );
     }
+
+    // Redirect to prevent resubmission
+    wp_safe_redirect($_SERVER['REQUEST_URI']);
+    exit;
+}
 
 ?>
 
@@ -200,6 +264,15 @@ $student_courses_table  = $wpdb->prefix . 'student_courses';
                                 <h4 class="schedule-title">Horaire des cours</h4>
                                 <ul>
                                     <li>
+                                        Récurrent:
+                                        <span class="value">
+                                            <?php echo $course->is_recurring ? 'Oui' : 'Non'; ?>
+                                        </span>
+                                    </li>
+                                    <?php
+                                        if(!$course->is_recurring) {
+                                            ?>
+                                    <li>
                                         Date:
                                         <span class="value">
                                             <?php echo esc_html(date('M d, Y', strtotime($course->start_date))); ?>
@@ -211,6 +284,74 @@ $student_courses_table  = $wpdb->prefix . 'student_courses';
                                             <?php echo esc_html($course->time_slot);?>
                                         </span>
                                     </li>
+                                    <?php
+                                        }
+                                    ?>
+                                    <?php
+                                        if($course->is_recurring) {
+                                            ?>
+                                    <li>
+                                        Start Date:
+                                        <span class="value">
+                                            <?php echo esc_html(date('M d, Y', strtotime($recurring_session->recurring_start_date))); ?>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        End Date:
+                                        <span class="value">
+                                            <?php echo esc_html(date('M d, Y', strtotime($recurring_session->recurring_end_date))); ?>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        Jours récurrents :
+                                        <span class="value">
+                                            <?php 
+                                                $recurring_days = json_decode($recurring_session->recurring_days, true);
+                                                
+                                                // Mapping English days to French
+                                                $days_translation = [
+                                                    "Monday" => "Lundi",
+                                                    "Tuesday" => "Mardi",
+                                                    "Wednesday" => "Mercredi",
+                                                    "Thursday" => "Jeudi",
+                                                    "Friday" => "Vendredi",
+                                                    "Saturday" => "Samedi",
+                                                    "Sunday" => "Dimanche"
+                                                ];
+
+                                                if (!empty($recurring_days) && is_array($recurring_days)) {
+                                                    $translated_days = array_map(function($day) use ($days_translation) {
+                                                        return $days_translation[$day] ?? $day;
+                                                    }, $recurring_days);
+
+                                                    echo esc_html(implode(', ', $translated_days));
+                                                } else {
+                                                    echo "Aucun jour récurrent";
+                                                }
+                                            ?>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        1er créneau horaire:
+                                        <span class="value">
+                                            <?php 
+                                                echo date('h:i A', strtotime($recurring_session->recurring_start_time_1)) . ' - ' . 
+                                                    date('h:i A', strtotime($recurring_session->recurring_end_time_1)); 
+                                            ?>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        2ème créneau horaire:
+                                        <span class="value">
+                                            <?php 
+                                                echo date('h:i A', strtotime($recurring_session->recurring_start_time_2)) . ' - ' . 
+                                                    date('h:i A', strtotime($recurring_session->recurring_end_time_2)); 
+                                            ?>
+                                        </span>
+                                    </li>
+                                    <?php
+                                        }
+                                    ?>
                                 </ul>
                             </div>
 
@@ -218,16 +359,17 @@ $student_courses_table  = $wpdb->prefix . 'student_courses';
                             <div class="col teacher-details">
                                 <h4 class="teacher-title">Détails de l'enseignant</h4>
 
-                                <h4 class="teacher-name">
+                                <a href="<?php echo esc_url(home_url('/admin/teacher-management/teacher-details/?id=' . $teacher->id)); ?>"
+                                    class="teacher-name">
                                     <?php echo esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name); ?>
-                                </h4>
+                                    <a>
 
-                                <div class="row">
-                                    <img src="<?php echo !empty($teacher->image) ? esc_url($teacher->image) : $default_user_image; ?>"
-                                        alt="" class="teacher-image">
+                                        <div class="row">
+                                            <img src="<?php echo !empty($teacher->image) ? esc_url($teacher->image) : $default_user_image; ?>"
+                                                alt="" class="teacher-image">
 
-                                    <div class="col teacher-info">
-                                        <?php
+                                            <div class="col teacher-info">
+                                                <?php
                                             $countries = [
                                                 'Afghanistan' => 'af',
                                                 'Afrique du Sud' => 'za',
@@ -402,40 +544,40 @@ $student_courses_table  = $wpdb->prefix . 'student_courses';
                                             $country_name = $teacher->country;
                                             $country_code = isset($countries[$country_name]) ? $countries[$country_name] : 'un';
                                         ?>
-                                        <p class="teacher-data">
-                                            <span class="label">
-                                                <i class="fas fa-globe-europe"></i> Pays :
-                                            </span>
-                                            <img src="https://flagcdn.com/24x18/<?php echo $country_code; ?>.png"
-                                                alt="<?php echo esc_html($country_name); ?>"
-                                                style="vertical-align:middle; margin-right:5px;">
-                                            <?php echo esc_html($country_name); ?>
-                                        </p>
+                                                <p class="teacher-data">
+                                                    <span class="label">
+                                                        <i class="fas fa-globe-europe"></i> Pays :
+                                                    </span>
+                                                    <img src="https://flagcdn.com/24x18/<?php echo $country_code; ?>.png"
+                                                        alt="<?php echo esc_html($country_name); ?>"
+                                                        style="vertical-align:middle; margin-right:5px;">
+                                                    <?php echo esc_html($country_name); ?>
+                                                </p>
 
-                                        <p class="teacher-data">
-                                            <span class="label">
-                                                <i class="fas fa-envelope"></i> E-mail:
-                                            </span>
-                                            <a href="mailto:<?php echo esc_html($teacher->email);?>">
-                                                <?php echo esc_html($teacher->email);?>
-                                            </a>
-                                        </p>
-                                        <p class="teacher-data">
-                                            <span class="label">
-                                                <i class="fas fa-phone"></i> Téléphone:
-                                            </span>
-                                            <a href="tel:<?php echo esc_html($teacher->phone);?>">
-                                                <?php echo esc_html($teacher->phone);?>
-                                            </a>
-                                        </p>
-                                        <p class="teacher-data">
-                                            <span class="label">
-                                                <i class="fas fa-comment"></i> Motivation:
-                                            </span>
-                                            <?php echo esc_html($teacher->motivation_of_joining);?>
-                                        </p>
-                                    </div>
-                                </div>
+                                                <p class="teacher-data">
+                                                    <span class="label">
+                                                        <i class="fas fa-envelope"></i> E-mail:
+                                                    </span>
+                                                    <a href="mailto:<?php echo esc_html($teacher->email);?>">
+                                                        <?php echo esc_html($teacher->email);?>
+                                                    </a>
+                                                </p>
+                                                <p class="teacher-data">
+                                                    <span class="label">
+                                                        <i class="fas fa-phone"></i> Téléphone:
+                                                    </span>
+                                                    <a href="tel:<?php echo esc_html($teacher->phone);?>">
+                                                        <?php echo esc_html($teacher->phone);?>
+                                                    </a>
+                                                </p>
+                                                <p class="teacher-data">
+                                                    <span class="label">
+                                                        <i class="fas fa-comment"></i> Motivation:
+                                                    </span>
+                                                    <?php echo esc_html($teacher->motivation_of_joining);?>
+                                                </p>
+                                            </div>
+                                        </div>
 
                             </div>
 
@@ -458,12 +600,6 @@ $student_courses_table  = $wpdb->prefix . 'student_courses';
                                     <?php } ?>
                                 </div>
 
-                                <?php if($existing_class_link->class_link) { ?>
-                                <a href="<?php echo esc_url($existing_class_link->class_link); ?>" target="_blank"
-                                    class="button">
-                                    <i class="fas fa-external-link-square-alt"></i> Rejoindre
-                                </a>
-                                <?php } ?>
                             </div>
 
                             <!-- settings -->
@@ -473,10 +609,23 @@ $student_courses_table  = $wpdb->prefix . 'student_courses';
                                     <button type="button" class="button add-link open-modal" data-modal="addLinkModal">
                                         <i class="fas fa-link"></i> ajouter/mettre à jour le lien de classe
                                     </button>
+                                    <?php
+                                        if ($course->is_recurring) {
+                                            ?>
+                                    <button type="button" class="button reprogram open-modal"
+                                        data-modal="recurringReprogramModal">
+                                        <i class="fas fa-sync-alt"></i> Reprogrammer
+                                    </button>
+                                    <?php
+                                        } else {
+                                            ?>
                                     <button type="button" class="button reprogram open-modal"
                                         data-modal="reprogramModal">
                                         <i class="fas fa-sync-alt"></i> Reprogrammer
                                     </button>
+                                    <?php
+                                        }
+                                    ?>
                                     <form method="post" class="delete-form">
                                         <input type="hidden" name="cancel_course_id" value="<?php echo $course_id; ?>">
                                         <button type="button" class="button cancel open-modal" data-modal="cancelModal">
@@ -507,9 +656,10 @@ $student_courses_table  = $wpdb->prefix . 'student_courses';
                                             alt="" class="student-image">
 
                                         <div class="col student-info">
-                                            <h5 class="student-name">
+                                            <a href="<?php echo esc_url(home_url('/admin/student-management/student-details/?id=' . $student->id)); ?>"
+                                                class="student-name">
                                                 <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
-                                            </h5>
+                                            </a>
                                             <p class="student-data">
                                                 <?php echo esc_html($student->grade);?>
                                             </p>
@@ -583,6 +733,95 @@ $student_courses_table  = $wpdb->prefix . 'student_courses';
 
             <div class="modal-actions">
                 <button type="submit" class="modal-button confirm">Enregistrer</button>
+                <button type="button" class="modal-button cancel close-modal">Annuler</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Recurring Reprogrammer Modal -->
+<div id="recurringReprogramModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">
+            <i class="fas fa-times"></i>
+        </span>
+        <h4 class="modal-heading">Reprogrammer le cours</h4>
+        <form method="post" action="">
+            <input type="hidden" name="action" value="reschedule_recurring_course">
+
+            <div class="row recurring-dates">
+                <div class="col">
+                    <label for="recurring_start_date">Date de début <span class="required">*</span></label>
+                    <input type="date" id="recurring_start_date" name="recurring_start_date"
+                        value="<?php echo !empty($recurring_session->recurring_start_date) ? esc_attr($recurring_session->recurring_start_date) : ''; ?>">
+                </div>
+                <div class="col">
+                    <label for="recurring_end_date">Date de fin <span class="required">*</span></label>
+                    <input type="date" name="recurring_end_date" id="recurring_end_date"
+                        value="<?php echo !empty($recurring_session->recurring_end_date) ? esc_attr($recurring_session->recurring_end_date) : ''; ?>">
+                </div>
+            </div>
+
+            <div class="row recurring-days">
+                <div class="col">
+                    <label for="recurring_days">Jours</label>
+                    <div class="row checkbox-group">
+                        <?php
+                        $recurring_days = !empty($recurring_session->recurring_days) ? json_decode($recurring_session->recurring_days, true) : [];
+                        $days_translation = [
+                            "Monday" => "Lundi",
+                            "Tuesday" => "Mardi",
+                            "Wednesday" => "Mercredi",
+                            "Thursday" => "Jeudi",
+                            "Friday" => "Vendredi",
+                            "Saturday" => "Samedi",
+                            "Sunday" => "Dimanche"
+                        ];
+                        foreach ($days_translation as $eng => $fr) {
+                            $checked = in_array($eng, $recurring_days) ? 'checked' : '';
+                            echo "<label class='row'><input type='checkbox' name='recurring_days[]' value='$eng' $checked> $fr</label>";
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col recurring-time-slots slot-1">
+                <div class="row">
+                    <div class="col">
+                        <label for="recurring_start_time_1">Heure de début (Emplacement 1) <span
+                                class="required">*</span></label>
+                        <input type="time" name="recurring_start_time_1" id="recurring_start_time_1"
+                            value="<?php echo !empty($recurring_session->recurring_start_time_1) ? esc_attr($recurring_session->recurring_start_time_1) : ''; ?>">
+                    </div>
+                    <div class="col">
+                        <label for="recurring_end_time_1">Fin des temps (Emplacement 1) <span
+                                class="required">*</span></label>
+                        <input type="time" name="recurring_end_time_1" id="recurring_end_time_1"
+                            value="<?php echo !empty($recurring_session->recurring_end_time_1) ? esc_attr($recurring_session->recurring_end_time_1) : ''; ?>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col recurring-time-slots slot-2">
+                <div class="row">
+                    <div class="col">
+                        <label for="recurring_start_time_2">Heure de début (Emplacement 2) <span
+                                class="required">*</span></label>
+                        <input type="time" name="recurring_start_time_2" id="recurring_start_time_2"
+                            value="<?php echo !empty($recurring_session->recurring_start_time_2) ? esc_attr($recurring_session->recurring_start_time_2) : ''; ?>">
+                    </div>
+                    <div class="col">
+                        <label for="recurring_end_time_2">Fin des temps (Emplacement 2) <span
+                                class="required">*</span></label>
+                        <input type="time" name="recurring_end_time_2" id="recurring_end_time_2"
+                            value="<?php echo !empty($recurring_session->recurring_end_time_2) ? esc_attr($recurring_session->recurring_end_time_2) : ''; ?>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="modal-button confirm">Reprogrammer</button>
                 <button type="button" class="modal-button cancel close-modal">Annuler</button>
             </div>
         </form>
