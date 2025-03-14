@@ -876,6 +876,291 @@
   cursor: pointer;
 }
 
+/* session management page */
+#adminSessionManagement .table th:nth-child(1),
+#adminSessionManagement .table td:nth-child(1) {
+  text-align: left;
+}
+#adminSessionManagement .table th:last-child,
+#adminSessionManagement .table td:last-child {
+  width: 7rem;
+}
+
+/* session groups page */
+#adminSessionGroups .table th:nth-child(1),
+#adminSessionGroups .table td:nth-child(1) {
+  width: 10rem;
+}
+#adminSessionGroups .table th:nth-child(2),
+#adminSessionGroups .table td:nth-child(2) {
+  text-align: left;
+}
+#adminSessionGroups .table th:last-child,
+#adminSessionGroups .table td:last-child {
+  width: 7rem;
+}
+
+/* session group details */
+#adminSessionGroupDetails .course-details {
+  align-items: flex-start;
+}
+#adminSessionGroupDetails .course-info {
+  flex: 2;
+  background-color: #fff;
+  border: var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem 2rem 1.5rem;
+}
+#adminSessionGroupDetails .course-title {
+  font-size: 1.5rem;
+  font-family: var(--accent-font-family);
+  font-weight: var(--secondary-font-weight);
+  color: var(--dark-text-color);
+}
+#adminSessionGroupDetails .schedule-title,
+#adminSessionGroupDetails .teacher-title,
+#adminSessionGroupDetails .meeting-title,
+#adminSessionGroupDetails .settings-title,
+#adminSessionGroupDetails .sidebar-title {
+  width: 100%;
+  font-size: 1.2rem;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  color: var(--primary-color);
+  border-bottom: var(--border);
+  margin-top: 1rem;
+  padding-bottom: 0.5rem;
+}
+#adminSessionGroupDetails .class-schedule ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+#adminSessionGroupDetails .class-schedule li,
+#adminSessionGroupDetails .teacher-name,
+#adminSessionGroupDetails .student-name {
+  font-size: var(--accent-font-size);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  color: var(--dark-text-color);
+}
+#adminSessionGroupDetails .teacher-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+#adminSessionGroupDetails .class-schedule .value,
+#adminSessionGroupDetails .teacher-data,
+#adminSessionGroupDetails .student-data {
+  font-size: var(--text-font-size);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  color: var(--text-color);
+}
+#adminSessionGroupDetails .teacher-data {
+  border-bottom: var(--border);
+  padding-bottom: 1rem;
+}
+#adminSessionGroupDetails .teacher-data:last-of-type {
+  border: none;
+}
+#adminSessionGroupDetails .teacher-data .label {
+  color: var(--dark-text-color);
+  font-weight: var(--accent-font-weight);
+  margin-right: 0.5rem;
+}
+#adminSessionGroupDetails .teacher-data a {
+  text-decoration: none;
+  color: var(--primary-color);
+  border-bottom: var(--border);
+  border-color: var(--primary-color);
+  font-weight: var(--accent-font-weight);
+}
+#adminSessionGroupDetails .teacher-data a:hover {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+#adminSessionGroupDetails .teacher-image {
+  width: 10rem;
+  height: 12rem;
+  object-fit: cover;
+  border: var(--border);
+  border-radius: 0.5rem;
+}
+#adminSessionGroupDetails .meeting-details {
+  align-items: flex-start;
+}
+#adminSessionGroupDetails .meeting-link-container {
+  background-color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  border-radius: 0.3rem;
+}
+#adminSessionGroupDetails .meeting-link {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+}
+#adminSessionGroupDetails .meeting-link-copy {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#adminSessionGroupDetails .meeting-link-copy:hover {
+  color: var(--primary-color);
+}
+#adminSessionGroupDetails .settings .buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+#adminSessionGroupDetails .meeting-details .button,
+#adminSessionGroupDetails .settings .button {
+  outline: none;
+  border: var(--border);
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: capitalize;
+  font-size: var(--accent-font-size);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 1rem 2rem;
+  border-radius: 0.3rem;
+  transition: ease 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+#adminSessionGroupDetails .settings .button {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+#adminSessionGroupDetails .settings .button.cancel {
+  background-color: rgb(255, 224, 230);
+  color: crimson;
+}
+#adminSessionGroupDetails .meeting-details .button:hover,
+#adminSessionGroupDetails .settings .button:hover {
+  opacity: 0.8;
+}
+#adminSessionGroupDetails .course-sidebar {
+  flex: 1;
+  background-color: #fff;
+  border: var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem 2rem 1.5rem;
+}
+#adminSessionGroupDetails .course-sidebar .list {
+  list-style: none;
+}
+#adminSessionGroupDetails .sidebar-title {
+  margin: 0;
+}
+#adminSessionGroupDetails .list-item {
+  border-bottom: var(--border);
+  padding-bottom: 0.7rem;
+}
+#adminSessionGroupDetails .list-item:last-of-type {
+  border: none;
+  padding: none;
+}
+#adminSessionGroupDetails .course-sidebar .student-image {
+  width: 4rem;
+  height: 4rem;
+  object-fit: cover;
+  border: var(--border);
+  border-radius: 0.3rem;
+}
+#adminSessionGroupDetails .material-link-container {
+  align-items: center;
+}
+#adminSessionGroupDetails .material-link {
+  word-break: break-all;
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+}
+#adminSessionGroupDetails .material-link-icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  border: none;
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+#adminSessionGroupDetails .material-link-icon:hover {
+  color: var(--accent-color);
+}
+/* add/update class link modal */
+#addLinkModal .modal-content {
+  background-color: var(--gray-background-color);
+  margin: 5% auto;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 45rem;
+  position: relative;
+}
+#addLinkModal .modal-heading {
+  width: 100%;
+  text-align: center;
+}
+#addLinkModal form {
+  width: 100% !important;
+}
+#addLinkModal label {
+  text-align: left;
+}
+#addLinkModal .modal-button.confirm {
+  background-color: var(--primary-color);
+  color: white;
+}
+/* reprogram class modal */
+#reprogramModal .modal-content {
+  background-color: var(--gray-background-color);
+  margin: 3% auto;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 60rem;
+  position: relative;
+}
+#reprogramModal form {
+  width: 100% !important;
+}
+#reprogramModal label {
+  text-align: left;
+}
+#reprogramModal .modal-button.confirm {
+  background-color: var(--primary-color);
+  color: white;
+}
+/* cancel class modal */
+#cancelModal .modal-content {
+  background-color: var(--gray-background-color);
+  margin: 5% auto;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 45rem;
+  position: relative;
+}
+#cancelModal form {
+  width: 100% !important;
+}
+#cancelModal label {
+  text-align: left;
+}
+
 /* payments page */
 #adminPayments .filter-container {
   flex-direction: row-reverse;

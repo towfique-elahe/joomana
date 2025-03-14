@@ -60,6 +60,11 @@
             </ul>
         </li>
         <li class="sidebar-item">
+            <a href="<?php echo home_url('/admin/session-management/courses/'); ?>">
+                <i class="fas fa-clipboard-list"></i> Gestion des sessions
+            </a>
+        </li>
+        <li class="sidebar-item">
             <a href="<?php echo home_url('/admin/payments/'); ?>">
                 <i class="fas fa-exchange-alt"></i> Paiements
             </a>
