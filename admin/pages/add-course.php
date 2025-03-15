@@ -179,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
                                         'group_number'         => $group_number, // Use the same group number as the teacher
                                         'recurring_start_date' => $start_date,
                                         'recurring_end_date'   => $end_date,
-                                        'recurring_days'      => $recurring_days_json,
+                                        'recurring_days'       => $recurring_days_json,
                                         'recurring_start_time_1' => $recurring_start_time_1,
                                         'recurring_end_time_1'   => $recurring_end_time_1,
                                         'recurring_start_time_2' => $recurring_start_time_2,
@@ -193,6 +193,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
                                 if ($insert_recurring_session === false) {
                                     error_log("Error inserting recurring session for group $group_number: " . $wpdb->last_error);
                                 }
+                            } else {
+
+                                // Insert non-recurring session data into the class_sessions table for this group
+                                $insert_class_session = $wpdb->insert(
+                                    $wpdb->prefix . 'class_sessions',
+                                    [
+                                        'course_id'    => $course_id,
+                                        'group_number' => $group_number, // Use the same group number as the teacher
+                                        'start_date'   => $start_date,
+                                        'time_slot'    => $time_slot,
+                                    ],
+                                    [
+                                        '%d', '%d', '%s', '%s'
+                                    ]
+                                );
+
+                                if ($insert_class_session === false) {
+                                    error_log("Error inserting class session for group $group_number: " . $wpdb->last_error);
+                                }
+                            }
+
+                            // Insert payment for the teacher
+                            $teacher_table = $wpdb->prefix . 'teachers';
+                            $payments_table = $wpdb->prefix . 'teacher_payments';
+
+                            // Fetch teacher data
+                            $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $teacher_id));
+
+                            // Generate a unique invoice number
+                            do {
+                                $invoice_number = 'JMI-' . uniqid() . '-' . bin2hex(random_bytes(4));
+                                $exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $payments_table WHERE invoice_number = %s", $invoice_number));
+                            } while ($exists > 0);
+
+                            // Set payment details
+                            $currency = 'EUR';
+                            $payment_method = 'Bank';
+                            $status = 'in progress';
+                            $deposit = ($teacher->country === 'France') ? 26 : 13; // Set deposit amount based on teacher's country
+
+                            $due = floatval($teacher->due); // Get past due amount
+
+                            // Insert payment into the database
+                            $inserted_payment = $wpdb->insert(
+                                $payments_table,
+                                [
+                                    'invoice_number'        => $invoice_number,
+                                    'teacher_id'           => $teacher_id,
+                                    'due'                  => $due,
+                                    'deposit'             => $deposit,
+                                    'currency'            => $currency,
+                                    'payment_method'      => $payment_method,
+                                    'status'              => $status,
+                                ],
+                                [
+                                    '%s', '%d', '%f', '%s', '%s', '%s',
+                                ]
+                            );
+
+                            if ($inserted_payment === false) {
+                                error_log("Error inserting payment for teacher $teacher_id: " . $wpdb->last_error);
                             }
                         }
                     }

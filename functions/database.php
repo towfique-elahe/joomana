@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.1.8';
+    $custom_tables_version = '1.2.3';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -149,6 +149,8 @@ function create_custom_tables() {
         recurring_end_time_1 VARCHAR(30) NOT NULL,
         recurring_start_time_2 VARCHAR(30) NOT NULL,
         recurring_end_time_2 VARCHAR(30) NOT NULL,
+        status ENUM('active', 'cancelled') NOT NULL DEFAULT 'active',
+        cancelled_reason TEXT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
@@ -160,6 +162,8 @@ function create_custom_tables() {
         group_number INT(11) NOT NULL,
         start_date VARCHAR(20) NOT NULL,
         time_slot VARCHAR(30) NOT NULL,
+        status ENUM('active', 'cancelled') NOT NULL DEFAULT 'active',
+        cancelled_reason TEXT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
@@ -380,12 +384,12 @@ function create_custom_tables() {
     $teacher_payments_sql = "CREATE TABLE $teacher_payments_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         invoice_number VARCHAR(255) NOT NULL,
-        user_id BIGINT(20) UNSIGNED NOT NULL,
+        teacher_id BIGINT(20) UNSIGNED NOT NULL,
         currency VARCHAR(10) NOT NULL,
         due DECIMAL(10,2) NOT NULL,
         deposit DECIMAL(10,2) NOT NULL,
         payment_method VARCHAR(50) NOT NULL,
-        status ENUM('En attente', 'Complété', 'Échoué') NOT NULL DEFAULT 'En attente',
+        status ENUM('in progress', 'due', 'completed') NOT NULL DEFAULT 'in progress',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) $charset_collate;";
@@ -486,6 +490,9 @@ function add_foreign_keys() {
         "{$wpdb->prefix}teacher_attendance" => [
             "fk_teacher_attendance_course_id"   => "ALTER TABLE {$wpdb->prefix}teacher_attendance ADD CONSTRAINT fk_teacher_attendance_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;",
             "fk_teacher_attendance_teacher_id"  => "ALTER TABLE {$wpdb->prefix}teacher_attendance ADD CONSTRAINT fk_teacher_attendance_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}teacher_payments" => [
+            "fk_teacher_payments_teacher_id"  => "ALTER TABLE {$wpdb->prefix}teacher_payments ADD CONSTRAINT fk_teacher_payments_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;"
         ]
     ];
 

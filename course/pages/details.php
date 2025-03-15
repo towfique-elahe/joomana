@@ -237,7 +237,18 @@ if (in_array('parent', (array) $user->roles)) {
         $course_id, $group_number
     ));
 
-    // Fetch recurring sessions
+    // Fetch class sessions
+    $class_sessions_table = $wpdb->prefix . 'class_sessions';
+
+    $class_session = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT * FROM $class_sessions_table WHERE course_id = %d AND group_number = %d LIMIT 1",
+            $course_id,
+            $group_number
+        )
+    );
+
+    // Fetch recurring class sessions
     $recurring_sessions_table = $wpdb->prefix . 'recurring_class_sessions';
 
     $recurring_session = $wpdb->get_row(
@@ -245,6 +256,16 @@ if (in_array('parent', (array) $user->roles)) {
             "SELECT * FROM $recurring_sessions_table WHERE course_id = %d AND group_number = %d LIMIT 1",
             $course_id,
             $group_number
+        )
+    );
+
+    // Check if the teacher is already marked as present
+    $teacher_attendance_table = $wpdb->prefix . "teacher_attendance";
+    $teacher_attendance_status = $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT attendance FROM $teacher_attendance_table 
+            WHERE teacher_id = %d AND course_id = %d AND group_number = %d",
+            $teacher_id, $course_id, $group_number
         )
     );
 
@@ -303,7 +324,7 @@ if (in_array('parent', (array) $user->roles)) {
     // Handle reschedule course class
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'reschedule_course') {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'courses';
+        $table_name = $wpdb->prefix . 'class_sessions';
 
         // Sanitize user inputs
         $start_date = sanitize_text_field($_POST['start_date']);
@@ -312,10 +333,15 @@ if (in_array('parent', (array) $user->roles)) {
         // Update course in the database
         $wpdb->update(
             $table_name,
-            ['start_date' => $start_date, 'time_slot' => $time_slot],
-            ['id' => $course_id],
-            ['%s', '%s'],
-            ['%d']
+            [
+                'start_date' => $start_date,
+                'time_slot' => $time_slot,
+                'cancelled_reason' => null, // Set cancelled_reason to NULL
+                'status' => 'active' // Update status to active
+            ],
+            ['course_id' => $course_id, 'group_number' => $group_number], // Conditions
+            ['%s', '%s', '%s', '%s'], // Data format
+            ['%d', '%d'] // Condition format
         );
 
         wp_safe_redirect($_SERVER['REQUEST_URI']);
@@ -357,10 +383,12 @@ if (in_array('parent', (array) $user->roles)) {
                     'recurring_end_time_1' => $recurring_end_time_1,
                     'recurring_start_time_2' => $recurring_start_time_2,
                     'recurring_end_time_2' => $recurring_end_time_2,
+                    'cancelled_reason' => null, // Set cancelled_reason to NULL
+                    'status' => 'active', // Update status to active
                     'updated_at' => current_time('mysql')
                 ],
                 [ 'id' => $existing_session_id ],
-                [ '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ],
+                [ '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ],
                 [ '%d' ]
             );
         } else {
@@ -377,10 +405,12 @@ if (in_array('parent', (array) $user->roles)) {
                     'recurring_end_time_1' => $recurring_end_time_1,
                     'recurring_start_time_2' => $recurring_start_time_2,
                     'recurring_end_time_2' => $recurring_end_time_2,
+                    'cancelled_reason' => null, // Set cancelled_reason to NULL
+                    'status' => 'active', // Set status to active
                     'created_at' => current_time('mysql'),
                     'updated_at' => current_time('mysql')
                 ],
-                [ '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]
+                [ '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]
             );
         }
 
@@ -432,6 +462,149 @@ if (in_array('parent', (array) $user->roles)) {
         wp_safe_redirect($_SERVER['REQUEST_URI']);
         exit;
     }
+
+    // Handle teacher attendance
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'teacher_attendance') {
+        global $wpdb;
+
+        // Update teacher paymment
+        $teacher_table = $wpdb->prefix . 'teachers';
+        $payments_table = $wpdb->prefix . 'teacher_payments';
+
+        // Fetch teacher data
+        $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $teacher_id));
+
+        // deposit is null, so we need to calculate it 📌
+        $past_due = floatval($teacher->due); // Get past due amount
+        $present_due = floatval($deposit); // Get current deposit amount
+        $new_due = $past_due + $present_due; // Update due amount
+
+        // Update the teacher's due amount
+        $wpdb->update(
+            $teacher_table, 
+            array(
+                'due' => $new_due, // Update due amount
+            ), 
+            array('id' => intval($teacher_id)), // WHERE condition (ensure teacher_id is an integer)
+            array('%f', '%s'), // Data formats: float for due, string for status
+            array('%d') // ID format: integer
+        );
+
+        // Update the teacher's payment status to 'due'
+        $wpdb->update(
+            $payments_table, 
+            array(
+                'due' => $new_due, // Update due amount
+                'status' => 'due'  // Update status column
+            ), 
+            array('id' => intval($teacher_id)), // WHERE condition (ensure teacher_id is an integer)
+            array('%f', '%s'), // Data formats: float for due, string for status
+            array('%d') // ID format: integer
+        );
+        
+        // Get form data and sanitize
+        $teacher_id = intval($_POST['teacher_id']);
+        $course_id = intval($_POST['course_id']);
+        $group_number = intval($_POST['group_number']);
+        $attendance = sanitize_text_field($_POST['teacher_attendance']);
+
+        $table_name = $wpdb->prefix . "teacher_attendance";
+
+        // Check if a record already exists
+        $existing_record = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT id FROM $table_name 
+                WHERE teacher_id = %d AND course_id = %d AND group_number = %d",
+                $teacher_id, $course_id, $group_number
+            )
+        );
+
+        if ($existing_record) {
+            // Update existing record
+            $wpdb->update(
+                $table_name,
+                array('attendance' => $attendance),
+                array('id' => $existing_record)
+            );
+        } else {
+            // Insert new record
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'teacher_id' => $teacher_id,
+                    'course_id' => $course_id,
+                    'group_number' => $group_number,
+                    'attendance' => $attendance
+                )
+            );
+        }
+
+        // Redirect to the same URL to prevent form resubmission
+        wp_safe_redirect($_SERVER['REQUEST_URI']);
+        exit;
+    }
+
+    // Handle class cancelling
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cancel_class') {
+        // Retrieve form data
+        $course_id = isset($_POST['course_id']) ? intval($_POST['course_id']) : 0;
+        $group_number = isset($_POST['group_number']) ? intval($_POST['group_number']) : 0;
+        $cancelled_reason = isset($_POST['cancelled_reason']) ? sanitize_text_field($_POST['cancelled_reason']) : '';
+
+        // Validate input
+        if ($course_id <= 0 || $group_number <= 0 || empty($cancelled_reason)) {
+            wp_die('Invalid input.');
+        }
+
+        // Check if the course is recurring
+        global $wpdb;
+        $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM wp_courses WHERE id = %d", $course_id));
+        if (!$course) {
+            wp_die('Course not found.');
+        }
+
+        // Determine which table to update based on whether the course is recurring
+        $table_name = $course->is_recurring ? 'wp_recurring_class_sessions' : 'wp_class_sessions';
+
+        // Prepare the data to be updated
+        $data = array(
+            'status' => 'cancelled',
+            'cancelled_reason' => $cancelled_reason,
+        );
+
+        // If the course is recurring, set recurring columns to NULL
+        if ($course->is_recurring) {
+            $data['recurring_start_date'] = null;
+            $data['recurring_end_date'] = null;
+            $data['recurring_days'] = null;
+            $data['recurring_start_time_1'] = null;
+            $data['recurring_end_time_1'] = null;
+            $data['recurring_start_time_2'] = null;
+            $data['recurring_end_time_2'] = null;
+        } else {
+            // If the course is not recurring, set non-recurring columns to NULL
+            $data['start_date'] = null;
+            $data['time_slot'] = null;
+        }
+
+        // Prepare the where clause
+        $where = array(
+            'course_id' => $course_id,
+            'group_number' => $group_number,
+        );
+
+        // Update the database
+        $updated = $wpdb->update($table_name, $data, $where);
+
+        if ($updated === false) {
+            wp_die('Error updating the database.');
+        } else {
+            // Redirect to the same URL to prevent form resubmission
+            wp_safe_redirect($_SERVER['REQUEST_URI']);
+            exit;
+        }
+    }
+
 }
 
 ?>
@@ -506,17 +679,35 @@ if (in_array('parent', (array) $user->roles)) {
                                         if(!$course->is_recurring) {
                                             ?>
                                     <li>
-                                        Date:
+                                        Statut:
                                         <span class="value">
-                                            <?php echo esc_html(date('M d, Y', strtotime($course->start_date))); ?>
+                                            <?php echo esc_html($class_session->status);?>
                                         </span>
                                     </li>
+                                    <?php if (!empty($class_session->cancelled_reason)) : ?>
+                                    <li>
+                                        Motif d'annulation:
+                                        <span class="value">
+                                            <?php echo esc_html($class_session->cancelled_reason); ?>
+                                        </span>
+                                    </li>
+                                    <?php endif; ?>
+                                    <?php if (!empty($class_session->start_date)) : ?>
+                                    <li>
+                                        Date:
+                                        <span class="value">
+                                            <?php echo esc_html(date('M d, Y', strtotime($class_session->start_date))); ?>
+                                        </span>
+                                    </li>
+                                    <?php endif; ?>
+                                    <?php if (!empty($class_session->time_slot)) : ?>
                                     <li>
                                         Temps:
                                         <span class="value">
-                                            <?php echo esc_html($course->time_slot);?>
+                                            <?php echo esc_html($class_session->time_slot);?>
                                         </span>
                                     </li>
+                                    <?php endif; ?>
                                     <?php
                                         }
                                     ?>
@@ -524,17 +715,37 @@ if (in_array('parent', (array) $user->roles)) {
                                         if($course->is_recurring) {
                                             ?>
                                     <li>
+                                        Statut:
+                                        <span class="value">
+                                            <?php echo esc_html($recurring_session->status);?>
+                                        </span>
+                                    </li>
+                                    </li>
+                                    <?php if (!empty($recurring_session->cancelled_reason)) : ?>
+                                    <li>
+                                        Motif d'annulation:
+                                        <span class="value">
+                                            <?php echo esc_html($recurring_session->cancelled_reason); ?>
+                                        </span>
+                                    </li>
+                                    <?php endif; ?>
+                                    <?php if (!empty($recurring_session->recurring_start_date)) : ?>
+                                    <li>
                                         Date de début:
                                         <span class="value">
                                             <?php echo esc_html(date('M d, Y', strtotime($recurring_session->recurring_start_date))); ?>
                                         </span>
                                     </li>
+                                    <?php endif; ?>
+                                    <?php if (!empty($recurring_session->recurring_end_date)) : ?>
                                     <li>
                                         Date de fin:
                                         <span class="value">
                                             <?php echo esc_html(date('M d, Y', strtotime($recurring_session->recurring_end_date))); ?>
                                         </span>
                                     </li>
+                                    <?php endif; ?>
+                                    <?php if (!empty($recurring_session->recurring_days)) : ?>
                                     <li>
                                         Jours récurrents :
                                         <span class="value">
@@ -564,6 +775,8 @@ if (in_array('parent', (array) $user->roles)) {
                                             ?>
                                         </span>
                                     </li>
+                                    <?php endif; ?>
+                                    <?php if (!empty($recurring_session->recurring_start_time_1)) : ?>
                                     <li>
                                         1er créneau horaire:
                                         <span class="value">
@@ -573,6 +786,8 @@ if (in_array('parent', (array) $user->roles)) {
                                             ?>
                                         </span>
                                     </li>
+                                    <?php endif; ?>
+                                    <?php if (!empty($recurring_session->recurring_start_time_2)) : ?>
                                     <li>
                                         2ème créneau horaire:
                                         <span class="value">
@@ -582,6 +797,7 @@ if (in_array('parent', (array) $user->roles)) {
                                             ?>
                                         </span>
                                     </li>
+                                    <?php endif; ?>
                                     <?php
                                         }
                                     ?>
@@ -886,9 +1102,13 @@ if (in_array('parent', (array) $user->roles)) {
                             <div class="col settings">
                                 <h4 class="settings-title">Paramètres</h4>
                                 <div class="buttons">
+
+                                    <!-- class link -->
                                     <button type="button" class="button add-link open-modal" data-modal="addLinkModal">
                                         <i class="fas fa-link"></i> ajouter/mettre à jour le lien de classe
                                     </button>
+
+                                    <!-- reprogram -->
                                     <?php
                                         if ($course->is_recurring) {
                                             ?>
@@ -906,12 +1126,27 @@ if (in_array('parent', (array) $user->roles)) {
                                     <?php
                                         }
                                     ?>
+
+                                    <!-- teacher attendance -->
+                                    <?php if ($teacher_attendance_status !== 'present') : ?>
+                                    <button type="button" class="button teacher-attendance open-modal"
+                                        data-modal="teacherAttendanceModal">
+                                        <i class="fas fa-user-check"></i> Marquer ma présence
+                                    </button>
+                                    <?php endif; ?>
+
+                                    <!-- cancel class -->
+                                    <?php if (($course->is_recurring == 0 && $class_session->status !== 'cancelled') || ($course->is_recurring == 1 && $recurring_session->status !== 'cancelled')) : ?>
                                     <form method="post" class="delete-form">
-                                        <input type="hidden" name="cancel_course_id" value="<?php echo $course_id; ?>">
+                                        <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+                                        <input type="hidden" name="group_number" value="<?php echo $course_id; ?>">
+
                                         <button type="button" class="button cancel open-modal" data-modal="cancelModal">
                                             <i class="fas fa-times"></i> Annuler
                                         </button>
                                     </form>
+                                    <?php endif; ?>
+
                                 </div>
                             </div>
                             <?php
@@ -1068,9 +1303,9 @@ if (in_array('parent', (array) $user->roles)) {
                 <div class="calendar col">
                     <!-- Hidden inputs for date and time -->
                     <input type="hidden" id="start_date" name="start_date"
-                        value="<?php echo esc_attr($course->start_date); ?>">
+                        value="<?php echo esc_attr($class_session->start_date); ?>">
                     <input type="hidden" id="time_slot" name="time_slot"
-                        value="<?php echo esc_attr($course->time_slot); ?>">
+                        value="<?php echo esc_attr($class_session->time_slot); ?>">
 
                     <div class="calendar-header row">
                         <div class="buttons">
@@ -1262,17 +1497,44 @@ if (in_array('parent', (array) $user->roles)) {
         <p class="modal-info">Etes-vous sûr de vouloir annuler le cours ?</p>
         <form action="" method="post">
             <input type="hidden" name="action" value="cancel_class">
+            <input type="hidden" name="course_id" value="<?php echo esc_attr($course_id); ?>">
+            <input type="hidden" name="group_number" value="<?php echo esc_attr($group_number); ?>">
 
             <div class="row">
                 <div class="col">
-                    <label for="reason">Raison</label>
-                    <textarea name="reason" id="reason" required></textarea>
+                    <label for="cancelled_reason">Raison</label>
+                    <textarea name="cancelled_reason" id="cancelled_reason" required></textarea>
                 </div>
             </div>
 
             <div class="modal-actions">
                 <button id="confirmCancel" class="modal-button delete">Confirmer</button>
                 <button class="modal-button cancel close-modal">Annuler</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Teacher Attendance Modal -->
+<div id="teacherAttendanceModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">
+            <i class="fas fa-times"></i>
+        </span>
+        <h4 class="modal-heading">
+            <i class="fas fa-exclamation-triangle" style="color: crimson"></i> Avertissement
+        </h4>
+        <p class="modal-info">« Vous prétendez avoir assisté au cours, notez-le ? »</p>
+        <form method="post" action="">
+            <input type="hidden" name="action" value="teacher_attendance">
+            <input type="hidden" name="teacher_id" value="<?php echo esc_attr($teacher_id); ?>">
+            <input type="hidden" name="course_id" value="<?php echo esc_attr($course_id); ?>">
+            <input type="hidden" name="group_number" value="<?php echo esc_attr($group_number); ?>">
+            <input type="hidden" name="teacher_attendance" value="present">
+
+            <div class="modal-actions">
+                <button type="submit" id="confirmTeacherAttendance" class="modal-button confirm">Confirmer</button>
+                <button type="button" class="modal-button cancel close-modal">Annuler</button>
             </div>
         </form>
     </div>
@@ -1295,6 +1557,31 @@ function copyToClipboard() {
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+jQuery(document).ready(function($) {
+    // Handle form submission
+    $('#teacherAttendanceModal form').on('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
+
+        // Submit the form via AJAX or standard POST
+        $.ajax({
+            url: '', // Submit to the same page
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                // Redirect or show a success message
+                window.location.reload(); // Reload the page to reflect changes
+            },
+            error: function(xhr, status, error) {
+                console.error('Error submitting form:', error);
+            }
+        });
+
+        // Close the modal after submission
+        $('#teacherAttendanceModal').hide();
+    });
+});
+</script>
 <script>
 jQuery(document).ready(function($) {
     // Handle change event for attendance select

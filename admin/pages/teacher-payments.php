@@ -66,7 +66,7 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments");
                     <?php if (!empty($payments)) : ?>
                     <?php 
                         foreach ($payments as $payment) : 
-                            $user = get_user_by('id', $payment->user_id);
+                            $user = get_user_by('id', $payment->teacher_id);
                             $user_roles = $user->roles;
                     ?>
                     <tr>
