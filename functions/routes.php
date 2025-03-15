@@ -30,7 +30,8 @@ function admin_portal_rewrite_rules() {
     add_rewrite_rule('^admin/session-management/courses/?$', 'index.php?admin_page=session-management', 'top');
     add_rewrite_rule('^admin/session-management/courses/groups/?$', 'index.php?admin_page=session-groups', 'top');
     add_rewrite_rule('^admin/session-management/courses/groups/group-details/?$', 'index.php?admin_page=session-group-details', 'top');
-    add_rewrite_rule('^admin/session-management/courses/groups/edit-group/?$', 'index.php?admin_page=session-group-edit', 'top');
+    add_rewrite_rule('^admin/session-management/courses/groups/group-resources/?$', 'index.php?admin_page=session-group-resources', 'top');
+    add_rewrite_rule('^admin/session-management/courses/groups/group-submissions/?$', 'index.php?admin_page=session-group-submissions', 'top');
     add_rewrite_rule('^admin/payments/?$', 'index.php?admin_page=payments', 'top');
     add_rewrite_rule('^admin/payments/parent-invoice/?$', 'index.php?admin_page=parent-invoice', 'top');
     add_rewrite_rule('^admin/payments/parent-invoice/pdf/?$', 'index.php?admin_page=parent-invoice-pdf', 'top');

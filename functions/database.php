@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.1.5';
+    $custom_tables_version = '1.1.8';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -27,10 +27,13 @@ function create_custom_tables() {
     $student_courses_table     = $wpdb->prefix . 'student_courses';
     $teacher_courses_table     = $wpdb->prefix . 'teacher_courses';
     $recurring_sessions_table  = $wpdb->prefix . 'recurring_class_sessions';
+    $class_sessions_table      = $wpdb->prefix . 'class_sessions';
     $teacher_evaluations_table = $wpdb->prefix . 'teacher_evaluations';
     $course_class_links_table  = $wpdb->prefix . 'course_class_links';
     $course_assignments_table  = $wpdb->prefix . 'course_assignments';
     $course_slides_table       = $wpdb->prefix . 'course_slides';
+    $student_attendance_table  = $wpdb->prefix . 'student_attendance';
+    $teacher_attendance_table  = $wpdb->prefix . 'teacher_attendance';
     $students_table            = $wpdb->prefix . 'students';
     $student_reports_table     = $wpdb->prefix . 'student_reports';
     $student_submissions_table = $wpdb->prefix . 'student_submissions';
@@ -138,7 +141,6 @@ function create_custom_tables() {
     $recurring_sessions_sql = "CREATE TABLE $recurring_sessions_table (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         course_id BIGINT(20) UNSIGNED NOT NULL,
-        teacher_id BIGINT(20) UNSIGNED NOT NULL,
         group_number INT(11) NOT NULL,
         recurring_start_date VARCHAR(20) NOT NULL,
         recurring_end_date VARCHAR(20) NULL,
@@ -147,6 +149,17 @@ function create_custom_tables() {
         recurring_end_time_1 VARCHAR(30) NOT NULL,
         recurring_start_time_2 VARCHAR(30) NOT NULL,
         recurring_end_time_2 VARCHAR(30) NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    $class_sessions_sql = "CREATE TABLE $class_sessions_table (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        course_id BIGINT(20) UNSIGNED NOT NULL,
+        group_number INT(11) NOT NULL,
+        start_date VARCHAR(20) NOT NULL,
+        time_slot VARCHAR(30) NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
@@ -192,6 +205,28 @@ function create_custom_tables() {
         teacher_id BIGINT(20) UNSIGNED NOT NULL,
         file VARCHAR(255) DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    $student_attendance_sql = "CREATE TABLE $student_attendance_table (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        course_id BIGINT(20) UNSIGNED NOT NULL,
+        group_number INT(11) NOT NULL,
+        student_id BIGINT(20) UNSIGNED NOT NULL,
+        attendance ENUM('absent', 'present') NOT NULL DEFAULT 'absent',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    $teacher_attendance_sql = "CREATE TABLE $teacher_attendance_table (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        course_id BIGINT(20) UNSIGNED NOT NULL,
+        group_number INT(11) NOT NULL,
+        teacher_id BIGINT(20) UNSIGNED NOT NULL,
+        attendance ENUM('absent', 'present') NOT NULL DEFAULT 'absent',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) $charset_collate;";
 
@@ -366,10 +401,13 @@ function create_custom_tables() {
     dbDelta($student_courses_sql);
     dbDelta($teacher_courses_sql);
     dbDelta($recurring_sessions_sql);
+    dbDelta($class_sessions_sql);
     dbDelta($teacher_evaluations_sql);
     dbDelta($course_class_links_sql);
     dbDelta($course_assignments_sql);
     dbDelta($course_slides_sql);
+    dbDelta($student_attendance_sql);
+    dbDelta($teacher_attendance_sql);
     dbDelta($students_sql);
     dbDelta($student_reports_sql);
     dbDelta($student_submissions_sql);
@@ -416,8 +454,10 @@ function add_foreign_keys() {
             "fk_teacher_courses_course_id"   => "ALTER TABLE {$wpdb->prefix}teacher_courses ADD CONSTRAINT fk_teacher_courses_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
         ],
         "{$wpdb->prefix}recurring_class_sessions" => [
-            "fk_recurring_class_sessions_course_id"   => "ALTER TABLE {$wpdb->prefix}recurring_class_sessions ADD CONSTRAINT fk_recurring_class_sessions_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;",
-            "fk_recurring_class_sessions_teacher_id"  => "ALTER TABLE {$wpdb->prefix}recurring_class_sessions ADD CONSTRAINT fk_recurring_class_sessions_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;"
+            "fk_recurring_class_sessions_course_id"   => "ALTER TABLE {$wpdb->prefix}recurring_class_sessions ADD CONSTRAINT fk_recurring_class_sessions_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}class_sessions" => [
+            "fk_class_sessions_course_id"   => "ALTER TABLE {$wpdb->prefix}class_sessions ADD CONSTRAINT fk_class_sessions_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
         ],
         "{$wpdb->prefix}teacher_evaluations" => [
             "fk_teacher_evaluations_teacher_id"  => "ALTER TABLE {$wpdb->prefix}teacher_evaluations ADD CONSTRAINT fk_teacher_evaluations_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;",
@@ -438,6 +478,14 @@ function add_foreign_keys() {
         "{$wpdb->prefix}course_slides" => [
             "fk_course_slides_teacher_id"  => "ALTER TABLE {$wpdb->prefix}course_slides ADD CONSTRAINT fk_course_slides_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;",
             "fk_course_slides_course_id"   => "ALTER TABLE {$wpdb->prefix}course_slides ADD CONSTRAINT fk_course_slides_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}student_attendance" => [
+            "fk_student_attendance_course_id"   => "ALTER TABLE {$wpdb->prefix}student_attendance ADD CONSTRAINT fk_student_attendance_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;",
+            "fk_student_attendance_student_id"  => "ALTER TABLE {$wpdb->prefix}student_attendance ADD CONSTRAINT fk_student_attendance_student_id FOREIGN KEY (student_id) REFERENCES {$wpdb->prefix}students(id) ON DELETE CASCADE;"
+        ],
+        "{$wpdb->prefix}teacher_attendance" => [
+            "fk_teacher_attendance_course_id"   => "ALTER TABLE {$wpdb->prefix}teacher_attendance ADD CONSTRAINT fk_teacher_attendance_course_id FOREIGN KEY (course_id) REFERENCES {$wpdb->prefix}courses(id) ON DELETE CASCADE;",
+            "fk_teacher_attendance_teacher_id"  => "ALTER TABLE {$wpdb->prefix}teacher_attendance ADD CONSTRAINT fk_teacher_attendance_teacher_id FOREIGN KEY (teacher_id) REFERENCES {$wpdb->prefix}teachers(id) ON DELETE CASCADE;"
         ]
     ];
 

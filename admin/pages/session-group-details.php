@@ -291,13 +291,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                         if($course->is_recurring) {
                                             ?>
                                     <li>
-                                        Start Date:
+                                        Date de début:
                                         <span class="value">
                                             <?php echo esc_html(date('M d, Y', strtotime($recurring_session->recurring_start_date))); ?>
                                         </span>
                                     </li>
                                     <li>
-                                        End Date:
+                                        Date de fin:
                                         <span class="value">
                                             <?php echo esc_html(date('M d, Y', strtotime($recurring_session->recurring_end_date))); ?>
                                         </span>
@@ -600,6 +600,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                     <?php } ?>
                                 </div>
 
+                            </div>
+
+                            <!-- resources and submissions -->
+                            <div class="col settings">
+                                <h4 class="settings-title">Ressources et soumissions</h4>
+                                <div class="buttons">
+                                    <a href="<?php echo esc_url(home_url('/admin/session-management/courses/groups/group-resources/?group_number=' . $group_number . '&course_id=' . $course_id)); ?>"
+                                        class="button">
+                                        <i class="fas fa-folder-open"></i> Ressources du cours
+                                    </a>
+                                    <a href="<?php echo esc_url(home_url('/admin/session-management/courses/groups/group-submissions/?group_number=' . $group_number . '&course_id=' . $course_id)); ?>"
+                                        class="button">
+                                        <i class="fas fa-tasks"></i> Soumissions des étudiants
+                                    </a>
+                                </div>
                             </div>
 
                             <!-- settings -->

@@ -1166,6 +1166,236 @@
   text-align: left;
 }
 
+/* session group resources page */
+#adminSessionGroupResources .button.add-resource {
+  outline: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-transform: capitalize;
+  border: var(--border);
+  background-color: var(--accent-color);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  opacity: 0.8;
+  transition: ease 0.3s;
+}
+#adminSessionGroupResources .button.add-resource:hover {
+  opacity: 1;
+}
+#adminSessionGroupResources .file-container {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  row-gap: 1rem;
+}
+#adminSessionGroupResources .file-card {
+  width: calc((100% / 4) - 0.54rem);
+  border: var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+#adminSessionGroupResources .file-top {
+  position: relative;
+  width: 100%;
+  background-color: rgb(236, 236, 236);
+}
+#adminSessionGroupResources .file-icon {
+  font-size: 5rem;
+  text-align: center;
+  padding: 4rem 1rem 1rem 1rem;
+  opacity: 0.2;
+}
+#adminSessionGroupResources .file-type {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1;
+  padding: 0.3rem 0.5rem;
+  border: var(--border);
+  border-radius: 0.3rem;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+#adminSessionGroupResources .file-type.assignment {
+  background-color: rgb(255, 224, 230);
+  color: crimson;
+  border-color: crimson;
+}
+#adminSessionGroupResources .file-type.report {
+  background-color: rgb(255, 237, 231);
+  color: orangered;
+  border-color: orangered;
+}
+#adminSessionGroupResources .file-type.slide {
+  background-color: rgb(228, 252, 252);
+  color: darkcyan;
+  border-color: darkcyan;
+}
+#adminSessionGroupResources .file-bottom {
+  width: 100%;
+  background-color: var(--gray-background-color);
+  padding: 1rem;
+}
+#adminSessionGroupResources .file-bottom .col {
+  flex: content;
+  justify-content: center;
+}
+#adminSessionGroupResources .file-title {
+  color: var(--dark-text-color);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+}
+#adminSessionGroupResources .file-info {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: 0.8rem;
+}
+#adminSessionGroupResources .file-info .accent {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: var(--accent-font-weight);
+}
+#adminSessionGroupResources .file-info .accent:hover {
+  color: var(--accent-color);
+}
+#adminSessionGroupResources .download-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  opacity: 0.7;
+  transition: ease 0.3s;
+}
+#adminSessionGroupResources .download-button:hover {
+  opacity: 1;
+}
+
+/* submissions page */
+#adminSessionGroupSubmissions .upload-file-button {
+  width: fit-content;
+  background-color: #fdf2ef;
+  border-radius: 5px;
+}
+#adminSessionGroupSubmissions .upload-file-button:hover {
+  background-color: var(--accent-color);
+}
+#adminSessionGroupSubmissions .upload-file-label {
+  padding: 1rem 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--accent-color);
+  font-family: var(--accent-font-family);
+  font-size: var(--accent-font-size);
+  font-weight: var(--accent-font-weight);
+}
+#adminSessionGroupSubmissions .upload-file-button:hover .upload-file-label {
+  color: white;
+}
+#adminSessionGroupSubmissions .upload-file-input {
+  display: none; /* Hidden input */
+}
+#adminSessionGroupSubmissions .file-name {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+}
+#adminSessionGroupSubmissions .file-container {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  row-gap: 1rem;
+}
+#adminSessionGroupSubmissions .file-card {
+  width: calc((100% / 4) - 0.54rem);
+  border: var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+#adminSessionGroupSubmissions .file-top {
+  position: relative;
+  width: 100%;
+  background-color: rgb(236, 236, 236);
+}
+#adminSessionGroupSubmissions .file-icon {
+  font-size: 5rem;
+  text-align: center;
+  padding: 4rem 1rem 1rem 1rem;
+  opacity: 0.2;
+}
+#adminSessionGroupSubmissions .file-type {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1;
+  padding: 0.3rem 0.5rem;
+  border: var(--border);
+  border-radius: 0.3rem;
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+#adminSessionGroupSubmissions .file-type.submission {
+  background-color: rgb(228, 235, 255);
+  color: royalblue;
+  border-color: royalblue;
+}
+#adminSessionGroupSubmissions .file-bottom {
+  width: 100%;
+  background-color: var(--gray-background-color);
+  padding: 1rem;
+}
+#adminSessionGroupSubmissions .file-bottom .col {
+  flex: content;
+  justify-content: center;
+}
+#adminSessionGroupSubmissions .file-title {
+  color: var(--dark-text-color);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+}
+#adminSessionGroupSubmissions .file-info {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: 0.8rem;
+}
+#adminSessionGroupSubmissions .file-info .accent {
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: var(--accent-font-weight);
+}
+#adminSessionGroupSubmissions .file-info .accent:hover {
+  color: var(--accent-color);
+}
+#adminSessionGroupSubmissions .download-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  opacity: 0.7;
+  transition: ease 0.3s;
+}
+#adminSessionGroupSubmissions .download-button:hover {
+  opacity: 1;
+}
+
 /* payments page */
 #adminPayments .filter-container {
   flex-direction: row-reverse;

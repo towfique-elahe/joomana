@@ -114,6 +114,17 @@ if (in_array('parent', (array) $user->roles)) {
         $course_id, $group_number
     ));
 
+    // Fetch recurring sessions
+    $recurring_sessions_table = $wpdb->prefix . 'recurring_class_sessions';
+
+    $recurring_session = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT * FROM $recurring_sessions_table WHERE course_id = %d AND group_number = %d LIMIT 1",
+            $course_id,
+            $group_number
+        )
+    );
+
 } elseif (in_array('student', (array) $user->roles)) {
     $student_id = $user->ID;
     // Query the custom table to get the student's teacher_id
@@ -168,6 +179,17 @@ if (in_array('parent', (array) $user->roles)) {
         $course_id, $group_number
     ));
 
+    // Fetch recurring sessions
+    $recurring_sessions_table = $wpdb->prefix . 'recurring_class_sessions';
+
+    $recurring_session = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT * FROM $recurring_sessions_table WHERE course_id = %d AND group_number = %d LIMIT 1",
+            $course_id,
+            $group_number
+        )
+    );
+
 } elseif (in_array('teacher', (array) $user->roles)) {
     // Query the custom table to get the student's teacher_id
     $student_courses_table  = $wpdb->prefix . 'student_courses'; // Ensure the table name is correct
@@ -214,6 +236,17 @@ if (in_array('parent', (array) $user->roles)) {
         "SELECT * FROM $class_links_table WHERE course_id = %d AND group_number = %d",
         $course_id, $group_number
     ));
+
+    // Fetch recurring sessions
+    $recurring_sessions_table = $wpdb->prefix . 'recurring_class_sessions';
+
+    $recurring_session = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT * FROM $recurring_sessions_table WHERE course_id = %d AND group_number = %d LIMIT 1",
+            $course_id,
+            $group_number
+        )
+    );
 
     // Handle add/edit class links
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'save_class_link') {
@@ -275,22 +308,127 @@ if (in_array('parent', (array) $user->roles)) {
         // Sanitize user inputs
         $start_date = sanitize_text_field($_POST['start_date']);
         $time_slot = sanitize_text_field($_POST['time_slot']);
-    
+
         // Update course in the database
         $wpdb->update(
             $table_name,
-            [
-                'start_date' => $start_date,
-                'time_slot'  => $time_slot,
-            ],
+            ['start_date' => $start_date, 'time_slot' => $time_slot],
             ['id' => $course_id],
-            [
-                '%s', '%s',
-            ],
+            ['%s', '%s'],
             ['%d']
         );
-    
+
+        wp_safe_redirect($_SERVER['REQUEST_URI']);
+        exit;
+    }
+
+    // Handle reschedule recurring course class
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'reschedule_recurring_course') {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'recurring_class_sessions';
+
+        // Sanitize user inputs
+        $recurring_start_date = sanitize_text_field($_POST['recurring_start_date']);
+        $recurring_end_date = sanitize_text_field($_POST['recurring_end_date']);
+        $recurring_days = !empty($_POST['recurring_days']) ? json_encode(array_map('sanitize_text_field', $_POST['recurring_days'])) : json_encode([]);
+        $recurring_start_time_1 = sanitize_text_field($_POST['recurring_start_time_1']);
+        $recurring_end_time_1 = sanitize_text_field($_POST['recurring_end_time_1']);
+        $recurring_start_time_2 = sanitize_text_field($_POST['recurring_start_time_2']);
+        $recurring_end_time_2 = sanitize_text_field($_POST['recurring_end_time_2']);
+
+        // Check if the recurring session already exists
+        $existing_session_id = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT id FROM $table_name WHERE course_id = %d AND group_number = %d",
+                $course_id,
+                $group_number
+            )
+        );
+
+        if ($existing_session_id) {
+            // Update existing recurring session
+            $wpdb->update(
+                $table_name,
+                [
+                    'recurring_start_date' => $recurring_start_date,
+                    'recurring_end_date' => $recurring_end_date,
+                    'recurring_days' => $recurring_days,
+                    'recurring_start_time_1' => $recurring_start_time_1,
+                    'recurring_end_time_1' => $recurring_end_time_1,
+                    'recurring_start_time_2' => $recurring_start_time_2,
+                    'recurring_end_time_2' => $recurring_end_time_2,
+                    'updated_at' => current_time('mysql')
+                ],
+                [ 'id' => $existing_session_id ],
+                [ '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ],
+                [ '%d' ]
+            );
+        } else {
+            // Insert new recurring session if not found
+            $wpdb->insert(
+                $table_name,
+                [
+                    'course_id' => $course_id,
+                    'group_number' => $group_number,
+                    'recurring_start_date' => $recurring_start_date,
+                    'recurring_end_date' => $recurring_end_date,
+                    'recurring_days' => $recurring_days,
+                    'recurring_start_time_1' => $recurring_start_time_1,
+                    'recurring_end_time_1' => $recurring_end_time_1,
+                    'recurring_start_time_2' => $recurring_start_time_2,
+                    'recurring_end_time_2' => $recurring_end_time_2,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ],
+                [ '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]
+            );
+        }
+
         // Redirect to prevent resubmission
+        wp_safe_redirect($_SERVER['REQUEST_URI']);
+        exit;
+    }
+
+    // Handle student attendance
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['student_attendance'])) {
+        global $wpdb;
+
+        // Get form data
+        $student_id = intval($_POST['student_id']);
+        $course_id = intval($_POST['course_id']);
+        $group_number = intval($_POST['group_number']);
+        $attendance = sanitize_text_field($_POST['student_attendance']);
+
+        // Check if a record already exists
+        $existing_record = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}student_attendance 
+                WHERE student_id = %d AND course_id = %d AND group_number = %d",
+                $student_id, $course_id, $group_number
+            )
+        );
+
+        if ($existing_record) {
+            // Update existing record
+            $wpdb->update(
+                "{$wpdb->prefix}student_attendance",
+                array('attendance' => $attendance),
+                array('id' => $existing_record)
+            );
+        } else {
+            // Insert new record
+            $wpdb->insert(
+                "{$wpdb->prefix}student_attendance",
+                array(
+                    'student_id' => $student_id,
+                    'course_id' => $course_id,
+                    'group_number' => $group_number,
+                    'attendance' => $attendance
+                )
+            );
+        }
+
+        // Redirect to the same URL to prevent form resubmission
         wp_safe_redirect($_SERVER['REQUEST_URI']);
         exit;
     }
@@ -359,6 +497,15 @@ if (in_array('parent', (array) $user->roles)) {
                                 <h4 class="schedule-title">Horaire des cours</h4>
                                 <ul>
                                     <li>
+                                        Récurrent:
+                                        <span class="value">
+                                            <?php echo $course->is_recurring ? 'Oui' : 'Non'; ?>
+                                        </span>
+                                    </li>
+                                    <?php
+                                        if(!$course->is_recurring) {
+                                            ?>
+                                    <li>
                                         Date:
                                         <span class="value">
                                             <?php echo esc_html(date('M d, Y', strtotime($course->start_date))); ?>
@@ -370,6 +517,74 @@ if (in_array('parent', (array) $user->roles)) {
                                             <?php echo esc_html($course->time_slot);?>
                                         </span>
                                     </li>
+                                    <?php
+                                        }
+                                    ?>
+                                    <?php
+                                        if($course->is_recurring) {
+                                            ?>
+                                    <li>
+                                        Date de début:
+                                        <span class="value">
+                                            <?php echo esc_html(date('M d, Y', strtotime($recurring_session->recurring_start_date))); ?>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        Date de fin:
+                                        <span class="value">
+                                            <?php echo esc_html(date('M d, Y', strtotime($recurring_session->recurring_end_date))); ?>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        Jours récurrents :
+                                        <span class="value">
+                                            <?php 
+                                                $recurring_days = json_decode($recurring_session->recurring_days, true);
+                                                
+                                                // Mapping English days to French
+                                                $days_translation = [
+                                                    "Monday" => "Lundi",
+                                                    "Tuesday" => "Mardi",
+                                                    "Wednesday" => "Mercredi",
+                                                    "Thursday" => "Jeudi",
+                                                    "Friday" => "Vendredi",
+                                                    "Saturday" => "Samedi",
+                                                    "Sunday" => "Dimanche"
+                                                ];
+
+                                                if (!empty($recurring_days) && is_array($recurring_days)) {
+                                                    $translated_days = array_map(function($day) use ($days_translation) {
+                                                        return $days_translation[$day] ?? $day;
+                                                    }, $recurring_days);
+
+                                                    echo esc_html(implode(', ', $translated_days));
+                                                } else {
+                                                    echo "Aucun jour récurrent";
+                                                }
+                                            ?>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        1er créneau horaire:
+                                        <span class="value">
+                                            <?php 
+                                                echo date('h:i A', strtotime($recurring_session->recurring_start_time_1)) . ' - ' . 
+                                                    date('h:i A', strtotime($recurring_session->recurring_end_time_1)); 
+                                            ?>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        2ème créneau horaire:
+                                        <span class="value">
+                                            <?php 
+                                                echo date('h:i A', strtotime($recurring_session->recurring_start_time_2)) . ' - ' . 
+                                                    date('h:i A', strtotime($recurring_session->recurring_end_time_2)); 
+                                            ?>
+                                        </span>
+                                    </li>
+                                    <?php
+                                        }
+                                    ?>
                                 </ul>
                             </div>
 
@@ -674,10 +889,23 @@ if (in_array('parent', (array) $user->roles)) {
                                     <button type="button" class="button add-link open-modal" data-modal="addLinkModal">
                                         <i class="fas fa-link"></i> ajouter/mettre à jour le lien de classe
                                     </button>
+                                    <?php
+                                        if ($course->is_recurring) {
+                                            ?>
+                                    <button type="button" class="button reprogram open-modal"
+                                        data-modal="recurringReprogramModal">
+                                        <i class="fas fa-sync-alt"></i> Reprogrammer
+                                    </button>
+                                    <?php
+                                        } else {
+                                            ?>
                                     <button type="button" class="button reprogram open-modal"
                                         data-modal="reprogramModal">
                                         <i class="fas fa-sync-alt"></i> Reprogrammer
                                     </button>
+                                    <?php
+                                        }
+                                    ?>
                                     <form method="post" class="delete-form">
                                         <input type="hidden" name="cancel_course_id" value="<?php echo $course_id; ?>">
                                         <button type="button" class="button cancel open-modal" data-modal="cancelModal">
@@ -698,13 +926,21 @@ if (in_array('parent', (array) $user->roles)) {
                                 <h4 class="sidebar-title">Liste des étudiants</h4>
 
                                 <ul class="list">
-
                                     <?php
-                                            // Check if any student IDs were found
-                                            if (!empty($enrolled_student_ids)) {
-                                                // Output or process the enrolled students
-                                                if (!empty($enrolled_students)) {
-                                                    foreach ($enrolled_students as $student) {
+                                        // Check if any student IDs were found
+                                        if (!empty($enrolled_student_ids)) {
+                                            // Output or process the enrolled students
+                                            if (!empty($enrolled_students)) {
+                                                foreach ($enrolled_students as $student) {
+                                                    $student_id = $student->id;
+                                                    // Fetch the attendance record
+                                                    $attendance = $wpdb->get_var(
+                                                        $wpdb->prepare(
+                                                            "SELECT attendance FROM {$wpdb->prefix}student_attendance 
+                                                            WHERE student_id = %d AND course_id = %d AND group_number = %d",
+                                                            $student_id, $course_id, $group_number
+                                                        )
+                                                    );
                                         ?>
                                     <li class="row list-item">
                                         <img src="<?php echo !empty($student->image) ? esc_url($student->image) : $default_user_image; ?>"
@@ -718,6 +954,27 @@ if (in_array('parent', (array) $user->roles)) {
                                                 <?php echo esc_html($student->grade);?>
                                             </p>
                                         </div>
+
+                                        <div class="col">
+                                            <form method="post" class="attendance-form"
+                                                data-student-id="<?php echo $student_id; ?>">
+                                                <input type="hidden" name="student_id"
+                                                    value="<?php echo $student_id; ?>">
+                                                <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+                                                <input type="hidden" name="group_number"
+                                                    value="<?php echo $group_number; ?>">
+                                                <select name="student_attendance" class="form-select attendance-select">
+                                                    <option value="" disabled <?= !$attendance ? 'selected' : ''; ?>>
+                                                        Présence</option>
+                                                    <option value="absent"
+                                                        <?= ($attendance == 'absent') ? 'selected' : ''; ?>>Absent
+                                                    </option>
+                                                    <option value="present"
+                                                        <?= ($attendance == 'present') ? 'selected' : ''; ?>>Présent
+                                                    </option>
+                                                </select>
+                                            </form>
+                                        </div>
                                     </li>
                                     <?php
                                                 }
@@ -727,9 +984,7 @@ if (in_array('parent', (array) $user->roles)) {
                                         } else {
                                             echo "Pourtant, aucun étudiant n'est inscrit à ce cours pour vous.";
                                         }
-    
-                                    ?>
-
+                                        ?>
                                 </ul>
                             </div>
 
@@ -906,6 +1161,95 @@ if (in_array('parent', (array) $user->roles)) {
     </div>
 </div>
 
+<!-- Recurring Reprogrammer Modal -->
+<div id="recurringReprogramModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">
+            <i class="fas fa-times"></i>
+        </span>
+        <h4 class="modal-heading">Reprogrammer le cours</h4>
+        <form method="post" action="">
+            <input type="hidden" name="action" value="reschedule_recurring_course">
+
+            <div class="row recurring-dates">
+                <div class="col">
+                    <label for="recurring_start_date">Date de début <span class="required">*</span></label>
+                    <input type="date" id="recurring_start_date" name="recurring_start_date"
+                        value="<?php echo !empty($recurring_session->recurring_start_date) ? esc_attr($recurring_session->recurring_start_date) : ''; ?>">
+                </div>
+                <div class="col">
+                    <label for="recurring_end_date">Date de fin <span class="required">*</span></label>
+                    <input type="date" name="recurring_end_date" id="recurring_end_date"
+                        value="<?php echo !empty($recurring_session->recurring_end_date) ? esc_attr($recurring_session->recurring_end_date) : ''; ?>">
+                </div>
+            </div>
+
+            <div class="row recurring-days">
+                <div class="col">
+                    <label for="recurring_days">Jours</label>
+                    <div class="row checkbox-group">
+                        <?php
+                        $recurring_days = !empty($recurring_session->recurring_days) ? json_decode($recurring_session->recurring_days, true) : [];
+                        $days_translation = [
+                            "Monday" => "Lundi",
+                            "Tuesday" => "Mardi",
+                            "Wednesday" => "Mercredi",
+                            "Thursday" => "Jeudi",
+                            "Friday" => "Vendredi",
+                            "Saturday" => "Samedi",
+                            "Sunday" => "Dimanche"
+                        ];
+                        foreach ($days_translation as $eng => $fr) {
+                            $checked = in_array($eng, $recurring_days) ? 'checked' : '';
+                            echo "<label class='row'><input type='checkbox' name='recurring_days[]' value='$eng' $checked> $fr</label>";
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col recurring-time-slots slot-1">
+                <div class="row">
+                    <div class="col">
+                        <label for="recurring_start_time_1">Heure de début (Emplacement 1) <span
+                                class="required">*</span></label>
+                        <input type="time" name="recurring_start_time_1" id="recurring_start_time_1"
+                            value="<?php echo !empty($recurring_session->recurring_start_time_1) ? esc_attr($recurring_session->recurring_start_time_1) : ''; ?>">
+                    </div>
+                    <div class="col">
+                        <label for="recurring_end_time_1">Fin des temps (Emplacement 1) <span
+                                class="required">*</span></label>
+                        <input type="time" name="recurring_end_time_1" id="recurring_end_time_1"
+                            value="<?php echo !empty($recurring_session->recurring_end_time_1) ? esc_attr($recurring_session->recurring_end_time_1) : ''; ?>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col recurring-time-slots slot-2">
+                <div class="row">
+                    <div class="col">
+                        <label for="recurring_start_time_2">Heure de début (Emplacement 2) <span
+                                class="required">*</span></label>
+                        <input type="time" name="recurring_start_time_2" id="recurring_start_time_2"
+                            value="<?php echo !empty($recurring_session->recurring_start_time_2) ? esc_attr($recurring_session->recurring_start_time_2) : ''; ?>">
+                    </div>
+                    <div class="col">
+                        <label for="recurring_end_time_2">Fin des temps (Emplacement 2) <span
+                                class="required">*</span></label>
+                        <input type="time" name="recurring_end_time_2" id="recurring_end_time_2"
+                            value="<?php echo !empty($recurring_session->recurring_end_time_2) ? esc_attr($recurring_session->recurring_end_time_2) : ''; ?>">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="modal-button confirm">Reprogrammer</button>
+                <button type="button" class="modal-button cancel close-modal">Annuler</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Cancel Modal -->
 <div id="cancelModal" class="modal">
     <div class="modal-content">
@@ -948,6 +1292,17 @@ function copyToClipboard() {
 
     alert("Lien copié: " + classLink);
 }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+jQuery(document).ready(function($) {
+    // Handle change event for attendance select
+    $('.attendance-select').on('change', function() {
+        var form = $(this).closest('.attendance-form');
+        form.submit(); // Submit the form
+    });
+});
 </script>
 
 <?php require_once(get_template_directory() . '/course/templates/footer.php'); ?>

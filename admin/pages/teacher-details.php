@@ -461,7 +461,17 @@ if (!$teacher) {
                             <td><?= $bankinfo->bank_name ?></td>
                         </tr>
                         <tr>
+                            <?php
+                                if ($teacher->country == 'France') {
+                            ?>
+                            <th>IBAN</th>
+                            <?php
+                                } else {
+                            ?>
                             <th>Numéro de compte</th>
+                            <?php
+                                }
+                            ?>
                             <td><?= $bankinfo->account_number ?></td>
                         </tr>
                         <tr>

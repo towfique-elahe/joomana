@@ -22,6 +22,12 @@ if (!defined('ABSPATH')) {
 $teacher_id = get_current_user_id();
 
 global $wpdb;
+
+// Fetch teacher details
+$teacher = $wpdb->get_row(
+    $wpdb->prepare("SELECT * FROM {$wpdb->prefix}teachers WHERE id = %d", $teacher_id)
+);
+
 $teacher_bankinfo_table = $wpdb->prefix . 'teacher_bank_details';
 
 // Fetch teacher data
@@ -142,7 +148,17 @@ ob_end_clean();
                             </td>
                         </tr>
                         <tr>
+                            <?php
+                                if ($teacher->country == 'France') {
+                            ?>
+                            <th>IBAN</th>
+                            <?php
+                                } else {
+                            ?>
                             <th>Numéro de compte</th>
+                            <?php
+                                }
+                            ?>
                             <td>
                                 <?= !empty($bankinfo->account_number) ? $bankinfo->account_number : '---' ?>
                             </td>
@@ -202,7 +218,17 @@ ob_end_clean();
                                 value="<?php echo esc_attr($bankinfo->bank_name); ?>" required>
                         </div>
                         <div class="col">
+                            <?php
+                                if ($teacher->country == 'France') {
+                            ?>
+                            <label for="account_number">IBAN <span class="required">*</span></label>
+                            <?php
+                                } else {
+                            ?>
                             <label for="account_number">Numéro de Compte <span class="required">*</span></label>
+                            <?php
+                                }
+                            ?>
                             <input type="text" id="account_number" name="account_number" placeholder="Numéro de Compte"
                                 value="<?php echo esc_attr($bankinfo->account_number); ?>" required>
                         </div>
