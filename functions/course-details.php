@@ -12,7 +12,7 @@ function render_course_details_section() {
     $course_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
     if ($course_id <= 0) {
-        return '<p>Course not found.</p>';
+        return '<p>Cours non trouvé.</p>';
     }
 
     $course = $wpdb->get_row(
@@ -223,7 +223,7 @@ function render_course_details_section() {
                 ?>
                 <li class="list-item">
                     <span class="item-name">
-                        <i class="fas fa-user-tie"></i> Enseignants:
+                        <i class="fas fa-user-tie"></i> Prof:
                     </span>
                     <span class="item-value">
                         <?php echo esc_html($teacher_count); ?>
@@ -241,7 +241,7 @@ function render_course_details_section() {
                 ?>
                 <li class="list-item">
                     <span class="item-name">
-                        <i class="fas fa-user-graduate"></i> Étudiants:
+                        <i class="fas fa-user-graduate"></i> Eléves:
                     </span>
                     <span class="item-value">
                         <?php echo esc_html($student_count); ?>

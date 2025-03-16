@@ -346,7 +346,7 @@ function custom_parent_registration_form() {
         </div>
     </section>
 
-    <button type="submit" class="submit-button" name="submit_registration">Registre</button>
+    <button type="submit" class="submit-button" name="submit_registration">Valider</button>
 </form>
 <?php
     return ob_get_clean();
@@ -379,7 +379,7 @@ function handle_parent_registration_form() {
         // Check required fields
         if (empty($first_name) || empty($last_name) || empty($email) || empty($phone) || empty($address) || 
             empty($city) || empty($zipcode) || empty($country) || empty($password)) {
-            $_SESSION['registration_error'] = 'All required fields must be filled.';
+            $_SESSION['registration_error'] = 'Tous les champs obligatoires doivent être remplis.';
             return;
         }
 
@@ -397,13 +397,13 @@ function handle_parent_registration_form() {
 
         // Check password confirmation
         if ($password !== $password_confirmation) {
-            $_SESSION['registration_error'] = 'Passwords do not match.';
+            $_SESSION['registration_error'] = 'Les mots de passe ne correspondent pas.';
             return;
         }
 
         // Ensure email is unique
         if (email_exists($email)) {
-            $_SESSION['registration_error'] = 'The email is already registered.';
+            $_SESSION['registration_error'] = "L'email est déjà enregistré.";
             return;
         }
 
@@ -440,14 +440,14 @@ function handle_parent_registration_form() {
             ]);
 
             // Set success message
-            $_SESSION['registration_success'] = 'Registration successful. Welcome!';
+            $_SESSION['registration_success'] = 'Inscription réussie. Bienvenue sur Joomaths !';
 
             // Redirect to the current page to prevent form resubmission
             wp_safe_redirect($_SERVER['REQUEST_URI']);
             exit;
         } else {
             // If the role is not 'parent', display an error (should not happen in this context)
-            $_SESSION['registration_error'] = 'Failed to assign the parent role. Registration aborted.';
+            $_SESSION['registration_error'] = "Échec de l'attribution du rôle parent. Inscription interrompue.";
         }
     }
 }

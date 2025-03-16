@@ -36,7 +36,7 @@ function course_categories_section() {
         <?php endforeach; ?>
         <?php else : ?>
         <div class="course-card">
-            <p>No category found</p>
+            <p>Aucune catégorie trouvée</p>
         </div>
         <?php endif; ?>
     </div>
@@ -70,7 +70,7 @@ function course_filter_page_shortcode() {
     <div class="sidebar col">
         <!-- category filter -->
         <div class="filter-section">
-            <h3 class="filter-section-heading">Filter by Categories</h3>
+            <h3 class="filter-section-heading">Filtrer par Catégories</h3>
             <div>
                 <?php
                     global $wpdb; // Access the global $wpdb object for database queries
@@ -85,7 +85,7 @@ function course_filter_page_shortcode() {
                             echo '<label><input type="checkbox" class="filter" data-filter="category" value="' . esc_attr($category->category) . '" ' . $is_checked . '>' . esc_html($category->category) . '</label>';
                         }
                     } else {
-                        echo '<option disabled>No categories found</option>';
+                        echo '<option disabled>Aucune catégorie trouvée</option>';
                     }
                 ?>
             </div>
@@ -93,7 +93,7 @@ function course_filter_page_shortcode() {
 
         <!-- grade filter -->
         <div class="filter-section">
-            <h3 class="filter-section-heading">Filtrer par Grade</h3>
+            <h3 class="filter-section-heading">Filtrer par Classe</h3>
             <div>
                 <?php
                     global $wpdb; // Access the global $wpdb object for database queries
@@ -107,7 +107,7 @@ function course_filter_page_shortcode() {
                             echo '<label><input type="checkbox" class="filter" data-filter="grade" value="' . esc_attr($grade->grade) . '">' . esc_html($grade->grade) . '</label>';
                         }
                     } else {
-                        echo '<option disabled>No grade found</option>';
+                        echo '<option disabled>Aucune classe trouvée</option>';
                     }
                 ?>
             </div>
@@ -129,7 +129,7 @@ function course_filter_page_shortcode() {
                             echo '<label><input type="checkbox" class="filter" data-filter="level" value="' . esc_attr($level->level) . '">' . esc_html($level->level) . '</label>';
                         }
                     } else {
-                        echo '<option disabled>No level found</option>';
+                        echo '<option disabled>Aucune niveau trouvée</option>';
                     }
                 ?>
             </div>
@@ -285,7 +285,7 @@ function render_available_courses($atts = [], $content = null) {
                 <span class="course-price">
                     <span class="amount"><?php echo esc_html($course->required_credit); ?></span> Credit
                 </span>
-                <a href="<?php echo site_url('/course-details/?id=' . $course->id); ?>" class="course-btn">Inscrire</a>
+                <a href="<?php echo site_url('/course-details/?id=' . $course->id); ?>" class="course-btn">Détails</a>
             </div>
         </div>
         <?php endforeach; ?>
@@ -293,7 +293,7 @@ function render_available_courses($atts = [], $content = null) {
 </section>
 <?php
     } else {
-        echo '<p>No courses found for the selected topic or category.</p>';
+        echo '<p>Aucun cours trouvé pour le sujet ou la catégorie sélectionné.</p>';
     }
 
     // Return the buffered content

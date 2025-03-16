@@ -430,7 +430,7 @@ function custom_teacher_registration_form() {
                                 echo '<label class="row"><input type="checkbox" name="subjects_of_interest[]" value="' . esc_attr($category->category) . '">' . esc_html($category->category) . '</label>';
                             }
                         } else {
-                            echo '<option disabled>No Sujets found</option>';
+                            echo '<option disabled>Aucun sujet trouvé</option>';
                         }
                     ?>
                 </div>
@@ -441,14 +441,14 @@ function custom_teacher_registration_form() {
 
     <!-- Motivation -->
     <section class="section col motivation">
-        <h3 class="section-heading">Veuillez décrire votre motivation pour rejoindre Joomana</h3>
+        <h3 class="section-heading">Veuillez décrire votre motivation pour rejoindre Joomaths</h3>
 
         <div class="row">
             <div class="col">
                 <textarea id="motivation_of_joining" name="motivation_of_joining"
                     placeholder="Décrivez votre motivation"></textarea>
-                <p class="text">Décrivez votre motivation pour rejoindre Joomana Class en tant que Professeur/Coach de
-                    Mathématiques (3 lignes maximum)</p>
+                <p class="text">Décrivez votre motivation pour rejoindre Joomaths en tant que Prof chez Joomaths (3
+                    lignes maximum)</p>
             </div>
         </div>
     </section>
@@ -630,7 +630,7 @@ function custom_teacher_registration_form() {
         <input type="date" name="signature_date" id="signature_date" class="declaration-input signature-date" required>
     </div>
 
-    <button type="submit" class="submit-button" name="submit_teacher_registration">Registre</button>
+    <button type="submit" class="submit-button" name="submit_teacher_registration">Valider</button>
 </form>
 <?php
         return ob_get_clean(); // Return the form's HTML
@@ -684,19 +684,19 @@ function custom_teacher_registration_form() {
     
             // Validate required fields
             if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($confirm_password)) {
-                $_SESSION['registration_error'] = 'All required fields must be filled.';
+                $_SESSION['registration_error'] = 'Tous les champs obligatoires doivent être remplis.';
                 return;
             }
     
             // Check password confirmation
             if ($password !== $confirm_password) {
-                $_SESSION['registration_error'] = 'Passwords do not match.';
+                $_SESSION['registration_error'] = 'Les mots de passe ne correspondent pas.';
                 return;
             }
     
             // Ensure email is unique
             if (email_exists($email)) {
-                $_SESSION['registration_error'] = 'The email is already registered.';
+                $_SESSION['registration_error'] = "L'email est déjà enregistré.";
                 return;
             }
     
@@ -791,19 +791,19 @@ function custom_teacher_registration_form() {
                                         wp_update_attachment_metadata($attachment_id, $attach_data);
                                         $uploaded_files[$file_key] = wp_get_attachment_url($attachment_id);
                                     } else {
-                                        $_SESSION['registration_error'] = 'Error inserting the file into the media library.';
+                                        $_SESSION['registration_error'] = "Erreur lors de l'insertion du fichier dans la médiathèque.";
                                         return;
                                     }
                                 } else {
-                                    $_SESSION['registration_error'] = 'File upload error: ' . $uploaded_file['error'];
+                                    $_SESSION['registration_error'] = 'Erreur de téléchargement de fichier: ' . $uploaded_file['error'];
                                     return;
                                 }
                             } else {
-                                $_SESSION['registration_error'] = 'The file size exceeds the allowed limit for ' . $file_key . '.';
+                                $_SESSION['registration_error'] = 'La taille du fichier dépasse la limite autorisée pour ' . $file_key . '.';
                                 return;
                             }
                         } else {
-                            $_SESSION['registration_error'] = 'Invalid file type for ' . $file_key . '.';
+                            $_SESSION['registration_error'] = 'Type de fichier non valide pour ' . $file_key . '.';
                             return;
                         }
                     }
@@ -850,15 +850,15 @@ function custom_teacher_registration_form() {
                     'created_at' => current_time('mysql'),
                 ]);
 
-                $_SESSION['registration_success'] = 'Registration successful. Welcome to Joomana!';
+                $_SESSION['registration_success'] = 'Registration successful. Welcome to Joomaths!';
 
                 // Send email to the student
                 $to = $email;
-                $subject = 'Welcome to Our Platform!';
-                $message = "Hello $first_name,\n\nThank you for registering with us. Your account has been successfully created.\n\n";
-                $message .= "Username: $username\n";
-                $message .= "Password: (the password you entered during registration)\n\n";
-                $message .= "We look forward to seeing you on our platform!\n\nBest regards,\nThe Team";
+                $subject = 'Bienvenue sur Joomaths !';
+                $message = "Bonjour $first_name,\n\nMerci de votre inscription. Votre compte a bien été créé.\n\n";
+                $message .= "Nom d'utilisateur: $username\n";
+                $message .= "Mot de passe: (le mot de passe que vous avez saisi lors de l'inscription)\n\n";
+                $message .= "Nous avons hâte de vous voir sur notre plateforme !\n\nCordialement,\nL'équipe Joomaths";
 
                 // Send the email
                 wp_mail($to, $subject, $message);
@@ -867,7 +867,7 @@ function custom_teacher_registration_form() {
                 wp_safe_redirect($_SERVER['REQUEST_URI']);
                 exit;
             } else {
-                $_SESSION['registration_error'] = 'Failed to assign the teacher role. Registration aborted.';
+                $_SESSION['registration_error'] = "Échec de l'attribution du rôle d'enseignant. Inscription interrompue.";
             }
         }
     }

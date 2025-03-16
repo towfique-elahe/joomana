@@ -102,7 +102,7 @@ function custom_student_registration_form() {
                                     echo '<option value="' . esc_attr($grade->grade) . '">' . esc_html($grade->grade) . '</option>';
                                 }
                             } else {
-                                echo '<option disabled>No grade found</option>';
+                                echo '<option disabled>Aucune classe trouvée</option>';
                             }
                         ?>
 
@@ -117,7 +117,7 @@ function custom_student_registration_form() {
                 <div class="custom-select-wrapper">
                     <!-- Hidden select element to store the actual level (Fort/Débutant) -->
                     <select id="level" name="level" required style="display: none;">
-                        <option value="" disabled selected>Select a level</option>
+                        <option value="" disabled selected>Sélectionnez un niveau</option>
                         <option value="Fort">Fort</option>
                         <option value="Débutant">Débutant</option>
                     </select>
@@ -158,7 +158,7 @@ function custom_student_registration_form() {
                 document.querySelector('form').addEventListener('submit', function(e) {
                     if (!levelSelect.value) {
                         e.preventDefault(); // Prevent form submission if no level is selected
-                        alert('Please select a valid level.');
+                        alert('Veuillez sélectionner un niveau valide.');
                     }
                 });
             });
@@ -180,7 +180,7 @@ function custom_student_registration_form() {
                         echo '<label class="row"><input type="checkbox" name="subject_of_interest[]" value="' . esc_attr($category->category) . '">' . esc_html($category->category) . '</label>';
                     }
                 } else {
-                    echo '<option disabled>No category found</option>';
+                    echo '<option disabled>Aucune catégorie trouvée</option>';
                 }
             ?>
         </div>
@@ -348,7 +348,7 @@ function custom_student_registration_form() {
     </div>
 
     <!-- Submit Button -->
-    <button type="submit" class="submit-button" name="submit_student_registration">Registre</button>
+    <button type="submit" class="submit-button" name="submit_student_registration">Valider</button>
 </form>
 <?php
     return ob_get_clean(); // Return the form's HTML
@@ -394,7 +394,7 @@ function handle_student_registration_form() {
         // Check required fields
         if (empty($first_name) || empty($last_name) || empty($date_of_birth) || empty($gender) || empty($school) ||
             empty($grade) || empty($level) || empty($email) || empty($parent_consent) || empty($password)) {
-            $_SESSION['registration_error'] = 'All required fields must be filled.';
+            $_SESSION['registration_error'] = 'Tous les champs obligatoires doivent être remplis.';
             return;
         }
 
@@ -412,13 +412,13 @@ function handle_student_registration_form() {
 
         // Check password confirmation
         if ($password !== $confirm_password) {
-            $_SESSION['registration_error'] = 'Passwords do not match.';
+            $_SESSION['registration_error'] = 'Les mots de passe ne correspondent pas.';
             return;
         }
 
         // Ensure email is unique
         if (email_exists($email)) {
-            $_SESSION['registration_error'] = 'The email is already registered.';
+            $_SESSION['registration_error'] = "L'email est déjà enregistré.";
             return;
         }
 
@@ -464,15 +464,15 @@ function handle_student_registration_form() {
             ]);
 
             // Set success message
-            $_SESSION['registration_success'] = 'Registration successful. Welcome!';
+            $_SESSION['registration_success'] = 'Inscription réussie. Bienvenue sur Joomaths !';
 
             // Send email to the student
             $to = $email;
-            $subject = 'Welcome to Our Platform!';
-            $message = "Hello $first_name,\n\nThank you for registering with us. Your account has been successfully created.\n\n";
-            $message .= "Username: $username\n";
-            $message .= "Password: (the password you entered during registration)\n\n";
-            $message .= "We look forward to seeing you on our platform!\n\nBest regards,\nThe Team";
+            $subject = 'Bienvenue sur Joomaths !';
+            $message = "Bonjour $first_name,\n\nMerci de votre inscription. Votre compte a bien été créé.\n\n";
+            $message .= "Nom d'utilisateur: $username\n";
+            $message .= "Mot de passe: (le mot de passe que vous avez saisi lors de l'inscription)\n\n";
+            $message .= "Nous avons hâte de vous voir sur notre plateforme !\n\nCordialement,\nL'équipe Joomaths";
 
             // Send the email
             wp_mail($to, $subject, $message);
@@ -482,7 +482,7 @@ function handle_student_registration_form() {
             exit;
         } else {
             // If the role is not 'student', display an error (should not happen in this context)
-            $_SESSION['registration_error'] = 'Failed to assign the student role. Registration aborted.';
+            $_SESSION['registration_error'] = "Échec de l'attribution du rôle d'étudiant. Inscription interrompue.";
         }
     }
 }
