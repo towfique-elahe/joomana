@@ -4,6 +4,7 @@
 // shortcode [course_details]
 
 function render_course_details_section() {
+    
     global $wpdb;
 
     // Get the current user
@@ -26,10 +27,11 @@ function render_course_details_section() {
     if ($course) {
         // Extract the start date and time slot
         $start_date = strtotime($course->start_date); // Convert start date to a Unix timestamp
+        $start_date = strtotime($course->start_date); // Convert start date to a Unix timestamp
         $year = date('Y', $start_date); // Get the year
         $month = date('m', $start_date); // Get the month (numeric)
         $day = date('d', $start_date); // Get the day
-        $time_slot = $course->time_slot; // The time slot
+        $time_slot = null; // The time slot
 
         // Define months in French for the month name
         $months = [
@@ -50,7 +52,7 @@ function render_course_details_section() {
         if (in_array('student', (array) $user->roles)) {
             if (isset($_POST['enroll_student'])) {
                 $student_id = get_current_user_id();
-                $result = enroll_student_in_course($course_id, $student_id);
+                $result = enroll_in_course($course_id, $student_id);
     
                 if (is_wp_error($result)) {
                     $error_message = $result->get_error_message();
@@ -77,7 +79,7 @@ function render_course_details_section() {
             
             if (isset($_POST['enroll_child'])) {
                 $student_id = sanitize_text_field($_POST['student_id']);
-                $result = enroll_child_in_course($course_id, $student_id, $parent_id);
+                $result = enroll_in_course($course_id, $student_id, $parent_id);
     
                 if (is_wp_error($result)) {
                     $error_message = $result->get_error_message();
@@ -96,7 +98,38 @@ function render_course_details_section() {
         }
 
         ob_start();
-        ?>
+
+        // Get total teacher assigned count
+        function get_total_assigned_teachers($course_id) {
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'courses';
+        
+            // Get the count of teachers by checking the length of the assigned_teachers JSON array
+            $total_teachers = $wpdb->get_var($wpdb->prepare(
+                "SELECT JSON_LENGTH(assigned_teachers) FROM $table_name WHERE id = %d",
+                $course_id
+            ));
+        
+            return (int) $total_teachers; // Return as an integer
+        }
+        $total_teachers = get_total_assigned_teachers($course_id);
+
+        // Get total student enrolled count
+        function get_total_enrolled_students($course_id) {
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'courses';
+        
+            // Get the count of teachers by checking the length of the assigned_teachers JSON array
+            $total_students = $wpdb->get_var($wpdb->prepare(
+                "SELECT JSON_LENGTH(enrolled_students) FROM $table_name WHERE id = %d",
+                $course_id
+            ));
+        
+            return (int) $total_students; // Return as an integer
+        }
+        $total_students = get_total_enrolled_students($course_id);
+?>
+
 <div id="courseDetails" class="container row">
     <div class="left-column">
         <h2 class="title">
@@ -211,40 +244,20 @@ function render_course_details_section() {
                         <?php echo esc_html($course->duration); ?> heures
                     </span>
                 </li>
-                <?php
-                    $teacher_courses_table = "{$wpdb->prefix}teacher_courses";
-                    $teacher_count = $wpdb->get_var($wpdb->prepare(
-                        "SELECT COUNT(*) FROM $teacher_courses_table WHERE course_id = %d",
-                        $course_id
-                    ));
-                    if (!$teacher_count) {
-                        $teacher_count = 'n/a';
-                    }
-                ?>
                 <li class="list-item">
                     <span class="item-name">
                         <i class="fas fa-user-tie"></i> Prof:
                     </span>
                     <span class="item-value">
-                        <?php echo esc_html($teacher_count); ?>
+                        <?php echo esc_html($total_teachers); ?>
                     </span>
                 </li>
-                <?php
-                    $student_courses_table = "{$wpdb->prefix}student_courses";
-                    $student_count = $wpdb->get_var($wpdb->prepare(
-                        "SELECT COUNT(*) FROM $student_courses_table WHERE course_id = %d",
-                        $course_id
-                    ));
-                    if (!$student_count) {
-                        $student_count = 'n/a';
-                    }
-                ?>
                 <li class="list-item">
                     <span class="item-name">
                         <i class="fas fa-user-graduate"></i> Eléves:
                     </span>
                     <span class="item-value">
-                        <?php echo esc_html($student_count); ?>
+                        <?php echo esc_html($total_students); ?>
                     </span>
                 </li>
             </ul>
@@ -332,8 +345,8 @@ function render_course_details_section() {
 add_shortcode('course_details', 'render_course_details_section');
 
 
-// Student Enrollment Function
-function enroll_student_in_course($course_id, $student_id) {
+// Function to enroll students in the course
+function enroll_in_course($course_id, $student_id, $parent_id = null) {
     global $wpdb;
 
     // Get course details
@@ -345,202 +358,259 @@ function enroll_student_in_course($course_id, $student_id) {
         return new WP_Error('course_not_found', 'Cours non trouvé.');
     }
 
-    // Get all teachers assigned to this course along with their groups, ordered by group_number
-    $teachers = $wpdb->get_results(
-        $wpdb->prepare("SELECT teacher_id, group_number FROM {$wpdb->prefix}teacher_courses WHERE course_id = %d ORDER BY group_number ASC", $course_id)
+    // Get all teachers assigned to this course
+    $assigned_teachers_array = $wpdb->get_var(
+        $wpdb->prepare("SELECT assigned_teachers FROM {$wpdb->prefix}courses WHERE id = %d", $course_id)
     );
 
-    if (empty($teachers)) {
-        
+    if (empty($assigned_teachers_array)) {
         return new WP_Error('no_teachers_assigned', "Aucun enseignant n'est affecté à ce cours.");
-        
+    }
+
+    // Check if the student is already enrolled in this course
+    $enrolled_students = $wpdb->get_var(
+        $wpdb->prepare("SELECT enrolled_students FROM {$wpdb->prefix}courses WHERE id = %d", $course_id)
+    );
+    $enrolled_students_array = json_decode($enrolled_students, true);
+
+    if (in_array($student_id, $enrolled_students_array)) {
+        return new WP_Error('already_enrolled', 'Vous êtes déjà inscrit à ce cours.');
+    }
+
+    // Determine if the enrollment is for a student or a parent's child
+    if ($parent_id) {
+        // Enrollment for a parent's child
+        $user_table = $wpdb->prefix . 'parents';
+        $user_id = $parent_id;
     } else {
-        // Check if the student is already enrolled in this course
-        $is_enrolled = $wpdb->get_var(
-            $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d", $student_id, $course_id)
-        );
-
-        if ($is_enrolled) {
-            return new WP_Error('already_enrolled', 'Vous êtes déjà inscrit à ce cours.');
-        }
-
-        // Check if the student has sufficient credits
-        $student_credit = $wpdb->get_var(
-            $wpdb->prepare("SELECT credit FROM {$wpdb->prefix}students WHERE id = %d", $student_id)
-        );
-
-        if ($student_credit < $course->required_credit) {
-            return new WP_Error('insufficient_credit', "Crédit insuffisant pour s'inscrire à ce cours.");
-        }
-
-        // Deduct credits from the student
-        $wpdb->query(
-            $wpdb->prepare("UPDATE {$wpdb->prefix}students SET credit = credit - %f WHERE id = %d", $course->required_credit, $student_id)
-        );
-
-        // Insert data into the credits table
-        $credits_table = $wpdb->prefix . 'credits';
-        $total_credit = $course->required_credit;
-        $wpdb->insert(
-            $credits_table,
-            [
-                'user_id' => $student_id,
-                'credit' => $total_credit, // Total credit from all products in the order
-                'transaction_type' => 'Débité', // Set transaction_type to 'Débité'
-                'transaction_reason' => 'Cours acheté', // Set transaction_reason to 'Débité'
-                'created_at' => current_time('mysql'), // Current timestamp
-            ],
-            [
-                '%d', // user_id
-                '%f', // credit
-                '%s', // transaction_type
-                '%s', // transaction_reason
-                '%s', // created_at
-            ]
-        );
+        // Enrollment for a student
+        $user_table = $wpdb->prefix . 'students';
+        $user_id = $student_id;
     }
 
-    // Assign student to the next available group
-    $assigned = false;
-
-    foreach ($teachers as $teacher) {
-        // Count students in the current group
-        $student_count = $wpdb->get_var(
-        $wpdb->prepare(
-                "SELECT COUNT(*) FROM {$wpdb->prefix}student_courses 
-                WHERE teacher_id = %d AND course_id = %d AND group_number = %d",
-                $teacher->teacher_id, $course_id, $teacher->group_number
-            )
-        );
-
-        if ($student_count < $course->max_students_per_group) {
-            // Assign student to this group
-            $wpdb->insert(
-                "{$wpdb->prefix}student_courses",
-                array(
-                    'student_id'   => $student_id,
-                    'course_id'    => $course_id,
-                    'teacher_id'   => $teacher->teacher_id,
-                    'group_number' => $teacher->group_number
-                ),
-                array('%d', '%d', '%d', '%d')
-            );
-            $assigned = true;
-            break;
-        }
-
-        if (!$assigned) {
-            // If no group has space, return an error or handle it as per your requirement
-            return new WP_Error('no_available_groups', "Tous les groupes sont complets. Impossible d'inscrire l'élève.");
-        }
-    }
-
-    return true;
-}
-
-// Student Enrollment Function
-function enroll_child_in_course($course_id, $student_id, $parent_id) {
-    global $wpdb;
-
-    // Get course details
-    $course = $wpdb->get_row(
-        $wpdb->prepare("SELECT * FROM {$wpdb->prefix}courses WHERE id = %d", $course_id)
+    // Check if the user (student or parent) has sufficient credits
+    $user_credit = $wpdb->get_var(
+        $wpdb->prepare("SELECT credit FROM {$user_table} WHERE id = %d", $user_id)
     );
 
-    if (!$course) {
-        return new WP_Error('course_not_found', 'Cours non trouvé.');
+    if ($user_credit < $course->required_credit) {
+        return new WP_Error('insufficient_credit', "Crédit insuffisant pour s'inscrire à ce cours.");
     }
 
-    // Get all teachers assigned to this course along with their groups, ordered by group_number
-    $teachers = $wpdb->get_results(
-        $wpdb->prepare("SELECT teacher_id, group_number FROM {$wpdb->prefix}teacher_courses WHERE course_id = %d ORDER BY group_number ASC", $course_id)
+    // Deduct credits from the user (student or parent)
+    $wpdb->query(
+        $wpdb->prepare("UPDATE {$user_table} SET credit = credit - %f WHERE id = %d", $course->required_credit, $user_id)
     );
 
-    if (empty($teachers)) {
-        
-        return new WP_Error('no_teachers_assigned', "Aucun enseignant n'est affecté à ce cours.");
-        
-    } else {
-        
-        // Check if the student is already enrolled in this course
-        $is_enrolled = $wpdb->get_var(
-            $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d", $student_id, $course_id)
-        );
+    // Insert data into the credits table
+    $credits_table = $wpdb->prefix . 'credits';
+    $wpdb->insert(
+        $credits_table,
+        [
+            'user_id' => $user_id,
+            'credit' => $course->required_credit,
+            'transaction_type' => 'Débité',
+            'transaction_reason' => 'Cours acheté',
+            'created_at' => current_time('mysql'),
+        ],
+        [
+            '%d', '%f', '%s', '%s', '%s'
+        ]
+    );
 
-        if ($is_enrolled) {
-            return new WP_Error('already_enrolled', 'Vous êtes déjà inscrit à ce cours.');
+    // Enroll student to the next available group
+    $enrolled = false;
+    $course_sessions_table = $wpdb->prefix . 'course_sessions';
+    $course_slots_table = $wpdb->prefix . 'course_slots'; // Table for course slots
+    $assigned_teachers = json_decode($assigned_teachers_array, true);
+    $max_students_per_group = $course->max_students_per_group;
+
+    // Get the current date
+    $current_day = new DateTime();
+    $current_day_str = $current_day->format('Y-m-d');
+
+    // Calculate session days
+    $start_date_obj = new DateTime($course->start_date);
+    $end_date_obj = new DateTime($course->end_date);
+    $recurring_days = json_decode($course->days, true);
+    $session_dates = [];
+
+    while ($start_date_obj <= $end_date_obj) {
+        $current_day_name = $start_date_obj->format('l'); // Get day name (e.g., 'Tuesday')
+        if (in_array($current_day_name, $recurring_days)) {
+            $session_dates[] = $start_date_obj->format('Y-m-d'); // Store session date
+        }
+        $start_date_obj->modify('+1 day');
+    }
+
+    // Iterate through session days
+    foreach ($session_dates as $session_date) {
+        // Skip past or current session days
+        if ($session_date <= $current_day_str) {
+            continue;
         }
 
-        // Check if the parent has sufficient credits
-        $parent_credit = $wpdb->get_var(
-            $wpdb->prepare("SELECT credit FROM {$wpdb->prefix}parents WHERE id = %d", $parent_id)
+        // Get the day of the session date (e.g., 'Tuesday')
+        $session_day = (new DateTime($session_date))->format('l');
+
+        // Fetch slot times from course_slots table
+        $course_slot = $wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM {$course_slots_table} WHERE course_id = %d AND session_day = %s", $course_id, $session_day)
         );
 
-        if ($parent_credit < $course->required_credit) {
-            return new WP_Error('insufficient_credit', "Crédit insuffisant pour s'inscrire à ce cours.");
+        if (!$course_slot) {
+            continue; // Skip if no slot is found for this session day
         }
 
-        // Deduct credits from the parent
-        $wpdb->query(
-            $wpdb->prepare("UPDATE {$wpdb->prefix}parents SET credit = credit - %f WHERE id = %d", $course->required_credit, $parent_id)
+        // Fetch existing groups for this session day
+        $existing_groups = $wpdb->get_results(
+            $wpdb->prepare("SELECT * FROM {$course_sessions_table} WHERE course_id = %d AND session_date = %s ORDER BY group_number", $course_id, $session_date)
         );
 
-        // Insert data into the credits table
-        $credits_table = $wpdb->prefix . 'credits';
-        $total_credit = $course->required_credit;
-        $wpdb->insert(
-            $credits_table,
-            [
-                'user_id' => $parent_id,
-                'credit' => $total_credit, // Total credit from all products in the order
-                'transaction_type' => 'Débité', // Set transaction_type to 'Débité'
-                'transaction_reason' => 'Cours acheté', // Set transaction_reason to 'Débité'
-                'created_at' => current_time('mysql'), // Current timestamp
-            ],
-            [
-                '%d', // user_id
-                '%f', // credit
-                '%s', // transaction_type
-                '%s', // transaction_reason
-                '%s', // created_at
-            ]
-        );
+        // Track assigned teachers for this session day
+        $assigned_teachers_for_day = [];
+        foreach ($existing_groups as $group) {
+            $assigned_teachers_for_day[] = $group->teacher_id;
+        }
 
-        // Assign student to the next available group
-        $assigned = false;
-
-        foreach ($teachers as $teacher) {
-            // Count students in the current group
-            $student_count = $wpdb->get_var(
-                $wpdb->prepare(
-                    "SELECT COUNT(*) FROM {$wpdb->prefix}student_courses 
-                    WHERE teacher_id = %d AND course_id = %d AND group_number = %d",
-                    $teacher->teacher_id, $course_id, $teacher->group_number
-                )
-            );
-
-            if ($student_count < $course->max_students_per_group) {
-                // Assign student to this group
-                $wpdb->insert(
-                    "{$wpdb->prefix}student_courses",
-                    array(
-                        'student_id'   => $student_id,
-                        'course_id'    => $course_id,
-                        'teacher_id'   => $teacher->teacher_id,
-                        'group_number' => $teacher->group_number
-                    ),
-                    array('%d', '%d', '%d', '%d')
+        // Check if the student can be added to an existing group
+        foreach ($existing_groups as $group) {
+            $group_students = json_decode($group->enrolled_students, true);
+            if (count($group_students) < $max_students_per_group) {
+                $group_students[] = $student_id;
+                $wpdb->update(
+                    $course_sessions_table,
+                    ['enrolled_students' => json_encode($group_students)],
+                    ['id' => $group->id],
+                    ['%s'],
+                    ['%d']
                 );
-                $assigned = true;
-                break;
+                $enrolled = true;
+                break 2; // Exit both loops
             }
         }
 
-        if (!$assigned) {
-            // If no group has space, return an error or handle it as per your requirement
-            return new WP_Error('no_available_groups', "Tous les groupes sont complets. Impossible d'inscrire l'élève.");
+        // If not enrolled yet, create a new group
+        if (!$enrolled) {
+            // Shuffle the list of assigned teachers to randomize the order
+            shuffle($assigned_teachers);
+
+            // Find the next available teacher who is not already assigned to a group for this session day
+            $available_teacher = null;
+            foreach ($assigned_teachers as $teacher_id) {
+                if (!in_array($teacher_id, $assigned_teachers_for_day)) {
+                    $available_teacher = $teacher_id;
+                    break;
+                }
+            }
+
+            if (!$available_teacher) {
+                continue; // Skip to the next session day
+            }
+
+            // Determine the next group number
+            $next_group_number = 1;
+            if (!empty($existing_groups)) {
+                $next_group_number = count($existing_groups) + 1;
+            }
+
+            // Assign the available teacher to the new group
+            $wpdb->insert(
+                $course_sessions_table,
+                [
+                    'course_id'   => $course_id,
+                    'session_date' => $session_date,
+                    'teacher_id'  => $available_teacher,
+                    'group_number' => $next_group_number,
+                    'enrolled_students' => json_encode([$student_id]),
+                    'slot1_start_time' => $course_slot->slot1_start_time,
+                    'slot1_end_time'   => $course_slot->slot1_end_time,
+                    'slot2_start_time' => $course_slot->slot2_start_time,
+                    'slot2_end_time'   => $course_slot->slot2_end_time,
+                    'class_link'       => null,
+                    'status'           => 'active',
+                    'cancelled_reason' => null
+                ],
+                [
+                    '%d', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s'
+                ]
+            );
+
+            // Insert payment for the teacher
+            $teacher_table = $wpdb->prefix . 'teachers';
+            $payments_table = $wpdb->prefix . 'teacher_payments';
+
+            // Fetch teacher data
+            $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $available_teacher));
+
+            // Validate teacher payment details
+            if (!$teacher || !isset($teacher->due) || !isset($teacher->country)) {
+                return new WP_Error('teacher_payment_error', "Les informations de paiement de l'enseignant sont manquantes ou invalides.");
+            }
+
+            // Generate a unique invoice number
+            do {
+                $invoice_number = 'JMI-' . uniqid() . '-' . bin2hex(random_bytes(4));
+                $exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $payments_table WHERE invoice_number = %s", $invoice_number));
+            } while ($exists > 0);
+
+            // Set payment details
+            $currency = 'EUR';
+            $payment_method = 'Bank';
+            $status = 'in progress';
+            $deposit = 0;
+            $old_due = floatval($teacher->due); // Get past due amount
+            $due = ($teacher->country === 'France') ? 26 : 13; // Set due amount based on teacher's country
+            $new_due = $old_due + $due;
+
+            // Insert payment into the database
+            $inserted_payment = $wpdb->insert(
+                $payments_table,
+                [
+                    'invoice_number'        => $invoice_number,
+                    'teacher_id'           => $available_teacher,
+                    'due'                  => $due,
+                    'deposit'             => $deposit,
+                    'currency'            => $currency,
+                    'payment_method'      => $payment_method,
+                    'status'              => $status,
+                ],
+                [
+                    '%s', '%d', '%f', '%f', '%s', '%s', '%s'
+                ]
+            );
+
+            if (!$inserted_payment) {
+                return new WP_Error('payment_failed', "Échec de l'enregistrement du paiement pour l'enseignant.");
+            }
+
+            // Update the 'due' column in the teachers table
+            $updated_due = $wpdb->update(
+                $teacher_table, // Table name
+                [ 'due' => $new_due ], // Data to update
+                [ 'id' => $available_teacher ], // Condition (where clause)
+                [ '%f' ], // Format for the updated value
+                [ '%d' ]  // Format for the where condition (teacher ID)
+            );
+
+            $enrolled = true;
+            break; // Exit the loop
         }
     }
+
+    if (!$enrolled) {
+        return new WP_Error('no_available_groups', "Tous les groupes sont complets. Impossible d'inscrire l'élève.");
+    }
+
+    // Add the student to the course's enrolled_students list
+    $enrolled_students_array[] = $student_id;
+    $wpdb->update(
+        $wpdb->prefix . 'courses',
+        ['enrolled_students' => json_encode($enrolled_students_array)],
+        ['id' => $course_id],
+        ['%s'],
+        ['%d']
+    );
 
     return true;
 }

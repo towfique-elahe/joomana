@@ -27,6 +27,7 @@
 <script src="<?php echo get_template_directory_uri() . '/assets/js/modal.js'; ?>"></script>
 <script src="<?php echo get_template_directory_uri() . '/assets/js/teacher-selection.js'; ?>"></script>
 <script src="<?php echo get_template_directory_uri() . '/assets/js/custom-calender.js'; ?>"></script>
+<script src="<?php echo get_template_directory_uri() . '/assets/js/tab.js'; ?>"></script>
 
 <!-- Initialize TinyMCE -->
 <script>

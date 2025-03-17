@@ -42,6 +42,23 @@ if (!$parent) {
     wp_die("Le parent demandé n'a pas pu être trouvé.");
 }
 
+$parent_id = $parent->id;
+
+// Function to get childrens
+function get_childs($parent_id) {
+    global $wpdb;
+    $students_table = $wpdb->prefix . 'students';
+
+    // Prepare the SQL query to fetch students where parent_id matches
+    $query = $wpdb->prepare(
+        "SELECT * FROM $students_table WHERE parent_id = %d",
+        $parent_id
+    );
+
+    return $wpdb->get_results($query);
+}
+$childs = get_childs($parent_id);
+
 ?>
 
 <div class="content-area">
@@ -93,7 +110,7 @@ if (!$parent) {
                         <div class="row detail-row">
                             <span class="col detail-label">Paiement total:</span>
                             <span class="col detail-value">
-                                <?php echo esc_html($parentTotalPayment); ?>
+                                <?php echo esc_html($parentTotalPayment !== null ? $parentTotalPayment : 0); ?>
                             </span>
                         </div>
                         <div class="row detail-row">
@@ -107,7 +124,47 @@ if (!$parent) {
 
                 <div class="col section user-courses">
                     <h3 class="section-heading">Informations sur l'enfant</h3>
-
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Grade</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <?php 
+                                    if ($childs) {
+                                        // Start the table body and prepare an array for rows
+                                        $rows = [];
+                                    
+                                        // Loop through the fetched childs and prepare the rows
+                                        foreach ($childs as $child) {
+                                            $rows[] = sprintf(
+                                                '<tr>
+                                                    <td>%s</td>
+                                                    <td>%s</td>
+                                                    <td>%s</td>
+                                                    <td>
+                                                        <div class="action-buttons">
+                                                            <a href="%s" class="action-button edit"><i class="fas fa-info-circle"></i></a>
+                                                        </div>
+                                                    </td>
+                                                </tr>',
+                                                esc_html($child->first_name . ' ' . $child->last_name),
+                                                esc_html($child->gender),
+                                                esc_html($child->grade),
+                                                esc_url(home_url('/admin/student-management/student-details/?id=' . $child->id)),
+                                            );
+                                        }
+                                    
+                                        // Output all rows in one go
+                                        echo '<tbody id="list">' . implode('', $rows) . '</tbody>';
+                                    } else {
+                                        echo '<tr><td colspan="4" class="no-data">Aucun enfant trouvé.</td></tr>';
+                                    }
+                                ?>
+                    </table>
                 </div>
             </div>
 

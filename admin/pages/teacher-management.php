@@ -22,11 +22,11 @@ $teachers = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teachers");
 // Get total assigned courses
 function get_total_assigned_courses($teacher) {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'teacher_courses';
+    $table_name = $wpdb->prefix . 'courses';
 
     $total_courses = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table_name WHERE teacher_id = %d",
-        $teacher->id
+        "SELECT COUNT(*) FROM $table_name WHERE JSON_CONTAINS(assigned_teachers, %s)",
+        json_encode((string) $teacher->id) // Convert to string to match JSON structure
     ));
 
     return (int) $total_courses;
@@ -38,7 +38,7 @@ function get_total_payments($teacher) {
     $table_name = $wpdb->prefix . 'teacher_payments';
 
     $total = $wpdb->get_var($wpdb->prepare(
-        "SELECT SUM(deposit) FROM {$table_name} WHERE user_id = %d",
+        "SELECT SUM(deposit) FROM {$table_name} WHERE teacher_id = %d",
         $teacher->id
     ));
 

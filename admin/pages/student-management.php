@@ -22,11 +22,11 @@ $students = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}students");
 // Get total enrolled courses
 function get_total_enrolled_courses($student) {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'student_courses';
+    $table_name = $wpdb->prefix . 'courses';
 
     $total_courses = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table_name WHERE student_id = %d",
-        $student->id
+        "SELECT COUNT(*) FROM $table_name WHERE JSON_CONTAINS(enrolled_students, %s)",
+        json_encode((string) $student->id) // Convert to string since JSON stores numeric and string IDs
     ));
 
     return (int) $total_courses;

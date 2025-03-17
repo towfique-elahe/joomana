@@ -13,58 +13,40 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Query to fetch all users with the role 'course'
-global $wpdb; // Access the global $wpdb object for database queries
+global $wpdb;
 
-// Query the custom 'courses' table
-$courses = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}courses");
+$course_sessions = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_sessions");
 
-// Function to get group count, course wise
-function get_group_count_by_course_id($course_id) {
+// Function to get course title
+function get_course_title($course_id) {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'teacher_courses';
+    $table_name = $wpdb->prefix . 'courses';
 
-    // Query to get the count of distinct group numbers for the given course_id
-    $group_count = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT COUNT(DISTINCT group_number) FROM $table_name WHERE course_id = %d",
-            $course_id
-        )
-    );
+    // Fetch the course title where the course ID matches
+    $course_title = $wpdb->get_var($wpdb->prepare(
+        "SELECT title FROM $table_name WHERE id = %d",
+        $course_id
+    ));
 
-    return intval($group_count);
+    return $course_title ? $course_title : 'Course not found'; // Return title or fallback message
 }
 
-// Function to get teacher count, course wise
-function get_teacher_count_by_course_id($course_id) {
+// Function to get enrolled students count
+function get_enrolled_students_count($session_id) {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'teacher_courses';
+    $table_name = $wpdb->prefix . 'course_sessions';
 
-    // Query to get the count of distinct teacher IDs for the given course_id
-    $teacher_count = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT COUNT(DISTINCT teacher_id) FROM $table_name WHERE course_id = %d",
-            $course_id
-        )
-    );
+    // Fetch the enrolled_students array where the session ID matches
+    $enrolled_students = $wpdb->get_var($wpdb->prepare(
+        "SELECT enrolled_students FROM $table_name WHERE id = %d",
+        $session_id
+    ));
 
-    return intval($teacher_count);
-}
+    // Decode the JSON array if it's stored as a JSON string
+    $enrolled_students_array = json_decode($enrolled_students, true);
 
-// Function to get student count, course wise
-function get_student_count_by_course_id($course_id) {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'student_courses';
-
-    // Query to get the count of distinct student IDs for the given course_id
-    $student_count = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT COUNT(DISTINCT student_id) FROM $table_name WHERE course_id = %d",
-            $course_id
-        )
-    );
-
-    return intval($student_count);
+    // Return the count of enrolled students or 0 if the array is empty or not found
+    return is_array($enrolled_students_array) ? count($enrolled_students_array) : 0;
 }
 
 ?>
@@ -91,7 +73,7 @@ function get_student_count_by_course_id($course_id) {
                 <div class="filter-bar">
                     <div class="search-bar">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" placeholder="Rechercher Un Cours" onkeyup="filterUser()">
+                        <input type="text" placeholder="Rechercher une session" onkeyup="filterUser()">
                     </div>
                 </div>
             </div>
@@ -99,46 +81,54 @@ function get_student_count_by_course_id($course_id) {
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Titre</th>
-                        <th>Récurrent</th>
-                        <th>Groupes</th>
-                        <th>Enseignants</th>
+                        <th>Date</th>
+                        <th>Cours</th>
+                        <th>Groupe</th>
                         <th>Étudiants</th>
+                        <th>Temp 1</th>
+                        <th>Temp 2</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="list">
 
-                    <?php if (!empty($courses)) : ?>
-                    <?php foreach ($courses as $course) : ?>
+                    <?php if (!empty($course_sessions)) : ?>
+                    <?php foreach ($course_sessions as $session) : ?>
                     <?php
-                        $course_id = $course->id;
-                        $group_count = get_group_count_by_course_id($course_id);
-                        $teacher_count = get_teacher_count_by_course_id($course_id);
-                        $student_count = get_student_count_by_course_id($course_id);
+                        $session_id  = $session->id;
+                        $session_date  = $session->session_date;
+                        $course_id = $session->course_id;
+                        $group_number = $session->group_number;
+                        $course_title = get_course_title($course_id);
+                        $enrolled_students_count = get_enrolled_students_count($session_id);
+                        $slot_1 = date('h:i A', strtotime($session->slot1_start_time)) . ' - ' . date('h:i A', strtotime($session->slot1_end_time));
+                        $slot_2 = date('h:i A', strtotime($session->slot2_start_time)) . ' - ' . date('h:i A', strtotime($session->slot2_end_time));
                     ?>
                     <tr class="course-row">
-                        <td class="name title">
+                        <td class="name">
                             <a
-                                href="<?php echo esc_url(home_url('/admin/session-management/courses/groups/?course_id=' . $course->id)); ?>">
-                                <?php echo esc_html($course->title); ?>
+                                href="<?php echo esc_url(home_url('/admin/session-management/session-details/?session_id=' . $session_id)); ?>">
+                                <?php echo esc_html($session_date); ?>
                             </a>
                         </td>
-                        <td>
-                            <?php echo esc_html($course->is_recurring ? 'Oui' : 'Non'); ?>
+                        <td class="name title">
+                            <?php echo esc_html($course_title); ?>
                         </td>
                         <td>
-                            <?php echo esc_html($group_count); ?>
+                            <?php echo esc_html($group_number); ?>
                         </td>
                         <td>
-                            <?php echo esc_html($teacher_count); ?>
+                            <?php echo esc_html($enrolled_students_count); ?>
                         </td>
                         <td>
-                            <?php echo esc_html($student_count); ?>
+                            <?php echo esc_html($slot_1); ?>
+                        </td>
+                        <td>
+                            <?php echo esc_html($slot_2); ?>
                         </td>
                         <td class="action-buttons">
-                            <a href="<?php echo esc_url(home_url('/admin/session-management/courses/groups/?course_id=' . $course->id)); ?>"
-                                class="action-button edit">
+                            <a href="<?php echo esc_url(home_url('/admin/session-management/session-details/?session_id=' . $session_id)); ?>"
+                                class=" action-button edit">
                                 <i class="fas fa-info-circle"></i>
                             </a>
                         </td>
@@ -146,7 +136,7 @@ function get_student_count_by_course_id($course_id) {
                     <?php endforeach; ?>
                     <?php else : ?>
                     <tr>
-                        <td colspan="6" class="no-data">Aucun cours trouvé.</td>
+                        <td colspan="7" class="no-data">Aucune session trouvée.</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>

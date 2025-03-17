@@ -36,7 +36,7 @@ $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id 
 $bankinfo = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_bankinfo_table WHERE teacher_id = %d", $id));
 $payments = $wpdb->get_results(
     $wpdb->prepare(
-        "SELECT * FROM $teacher_payments_table WHERE user_id = %d",
+        "SELECT * FROM $teacher_payments_table WHERE teacher_id = %d",
         $id
     )
 );
@@ -81,6 +81,20 @@ if (!$teacher) {
         } else {
             $error_message = 'Veuillez choisir un statut valide.';
         }
+    }
+
+    // Function to get courses assigned to a teacher
+    function get_teacher_assigned_courses($teacher_id) {
+        global $wpdb;
+        $courses_table = $wpdb->prefix . 'courses';
+
+        // Fetch courses where the assigned_teachers column contains the teacher ID
+        $query = $wpdb->prepare(
+            "SELECT * FROM $courses_table WHERE JSON_CONTAINS(assigned_teachers, %s)",
+            json_encode($teacher_id)
+        );
+
+        return $wpdb->get_results($query);
     }
 
 ?>
@@ -383,6 +397,11 @@ if (!$teacher) {
         <div class="row content-section list">
             <div class="col">
                 <!-- assigned courses -->
+                <?php
+                    $teacher_id = $teacher->id;
+                    $courses = get_teacher_assigned_courses($teacher_id);
+                    if ($courses) {
+                ?>
                 <div class="assigned-courses">
                     <h3 class="section-heading">Cours assignés</h3>
                     <table class="table">
@@ -391,63 +410,36 @@ if (!$teacher) {
                                 <th>Titre</th>
                                 <th>Statut</th>
                                 <th>Date de début</th>
-                                <th>Détails</th>
+                                <th>Date de fin</th>
                             </tr>
                         </thead>
                         <tbody id="list">
+                            <?php
+                                foreach ($courses as $course) {
+                            ?>
                             <tr>
-                                <td>Cours 1: Lorem, ipsum dolor...</td>
-                                <td>Complété</td>
-                                <td>Sep 29, 2024</td>
-                                <td class="action-buttons">
-                                    <a href="#" class="action-button edit">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
+                                <td>
+                                    <?php echo esc_html($course->title); ?>
+                                </td>
+                                <td>
+                                    <?php echo esc_html($course->status); ?>
+                                </td>
+                                <td>
+                                    <?php echo esc_html(date('M d, Y', strtotime($course->start_date))); ?>
+                                </td>
+                                <td>
+                                    <?php echo esc_html(date('M d, Y', strtotime($course->end_date))); ?>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>Cours 2: Lorem, ipsum dolor...</td>
-                                <td>Complété</td>
-                                <td>Dec 16, 2024</td>
-                                <td class="action-buttons">
-                                    <a href="#" class="action-button edit">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Cours 3: Lorem, ipsum dolor...</td>
-                                <td>En cours</td>
-                                <td>Jan 11, 2025</td>
-                                <td class="action-buttons">
-                                    <a href="#" class="action-button edit">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Cours 4: Lorem, ipsum dolor...</td>
-                                <td>En attente</td>
-                                <td>Feb 12, 2025</td>
-                                <td class="action-buttons">
-                                    <a href="#" class="action-button edit">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Cours 5: Lorem, ipsum dolor...</td>
-                                <td>En attente</td>
-                                <td>Mar 1, 2025</td>
-                                <td class="action-buttons">
-                                    <a href="#" class="action-button edit">
-                                        <i class="fas fa-info-circle"></i>
-                                    </a>
-                                </td>
-                            </tr>
+                            <?php
+                                }
+                            ?>
                         </tbody>
                     </table>
                 </div>
+                <?php
+                    }
+                ?>
 
                 <!-- bank details -->
                 <?php
@@ -514,7 +506,7 @@ if (!$teacher) {
                             <?php if (!empty($payments)) : ?>
                             <?php 
                         foreach ($payments as $payment) : 
-                            $user = get_user_by('id', $payment->user_id);
+                            $user = get_user_by('id', $payment->teacher_id);
                     ?>
                             <tr>
                                 <td class="invoice-number">

@@ -42,6 +42,42 @@ if (!$student) {
     wp_die("L'étudiant demandé n'a pas pu être trouvé.");
 }
 
+$student_id = $student->id;
+
+// Function to get active courses assigned to a student
+function get_student_assigned_active_courses($student_id) {
+    global $wpdb;
+    $courses_table = $wpdb->prefix . 'courses';
+
+    // Prepare the SQL query to fetch active courses where the student is assigned
+    $query = $wpdb->prepare(
+        "SELECT * FROM $courses_table 
+        WHERE JSON_CONTAINS(enrolled_students, %s) 
+        AND status IN ('ongoing', 'upcoming')",
+        json_encode($student_id)
+    );
+
+    return $wpdb->get_results($query);
+}
+$active_courses = get_student_assigned_active_courses($student_id);
+
+// Function to get active courses assigned to a student
+function get_student_assigned_completed_courses($student_id) {
+    global $wpdb;
+    $courses_table = $wpdb->prefix . 'courses';
+
+    // Prepare the SQL query to fetch active courses where the student is assigned
+    $query = $wpdb->prepare(
+        "SELECT * FROM $courses_table 
+        WHERE JSON_CONTAINS(enrolled_students, %s) 
+        AND status IN ('completed')",
+        json_encode($student_id)
+    );
+
+    return $wpdb->get_results($query);
+}
+$completed_courses = get_student_assigned_completed_courses($student_id);
+
 ?>
 
 <div class="content-area">
@@ -113,7 +149,7 @@ if (!$student) {
                         <div class="row detail-row">
                             <span class="col detail-label">Paiement total:</span>
                             <span class="col detail-value">
-                                <?php echo esc_html($studentTotalPayment); ?>
+                                <?php echo esc_html($studentTotalPayment !== null ? $studentTotalPayment : 0); ?>
                             </span>
                         </div>
                         <div class="row detail-row">
@@ -126,22 +162,86 @@ if (!$student) {
                 </div>
 
                 <div class="col section user-courses">
+
                     <h3 class="section-heading">Cours Enregistrés</h3>
-                    <!-- <div class="course-list">
-                        <div class="course-item">
-                            <div class="course-image">
-                                <img src="<?php echo get_stylesheet_directory_uri(). '/assets/image/image-placeholder.png';?>"
-                                    alt="Course Image">
-                            </div>
-                            <div class="course-details">
-                                <h4 class="course-title">Mathématiques</h4>
-                                <span class="course-student">Six</span>
-                                <span class="course-level">Débutant</span>
-                                <span class="course-payment">20.00</span>
+
+                    <ul class="nav nav-tabs" id="courseTabs">
+                        <a class="nav-link active" data-toggle="tab" href="#active">Cours en cours</a>
+                        <a class="nav-link" data-toggle="tab" href="#completed">Cours terminés</a>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="active">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="courses">
+                                        <?php 
+                                    $default_image = get_template_directory_uri() . '/assets/image/image-placeholder.png';
+                                    if (!empty($active_courses)): 
+                                        foreach ($active_courses as $course): 
+                                ?>
+                                        <div class="course-card">
+                                            <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
+                                                alt="Course Image" class="course-image">
+                                            <span class="course-tag in-progress">En cours</span>
+                                            <h3 class="course-title">
+                                                <?php echo esc_html($course->title); ?>
+                                            </h3>
+                                            <div class="course-info">
+                                                <p class="date">
+                                                    Date de début:
+                                                    <?php echo esc_html(date('M d, Y', strtotime($course->start_date))); ?>
+                                                </p>
+                                                <p class="date">
+                                                    Date de fin:
+                                                    <?php echo esc_html(date('M d, Y', strtotime($course->end_date))); ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; else: ?>
+                                        <p class="no-data">Aucun cours en cours.</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div> -->
+
+                        <div class="tab-pane fade" id="completed">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="courses">
+                                        <?php if (!empty($completed_courses)): 
+                                foreach ($completed_courses as $course): ?>
+                                        <div class="course-card">
+                                            <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
+                                                alt="Course Image" class="course-image">
+                                            <span class="course-tag in-progress">En cours</span>
+                                            <h3 class="course-title">
+                                                <?php echo esc_html($course->title); ?>
+                                            </h3>
+                                            <div class="course-info">
+                                                <p class="date">
+                                                    Date de début:
+                                                    <?php echo esc_html(date('M d, Y', strtotime($course->start_date))); ?>
+                                                </p>
+                                                <p class="date">
+                                                    Date de fin:
+                                                    <?php echo esc_html(date('M d, Y', strtotime($course->end_date))); ?>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; else: ?>
+                                        <p class="no-data">Aucun cours terminé.</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
 
             <div class="row list">

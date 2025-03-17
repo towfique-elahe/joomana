@@ -54,8 +54,6 @@
   color: rgb(106, 0, 255);
 }
 
-/* management pages */
-
 /* teacher management */
 #adminTeacherManagement .list th:nth-child(1),
 #adminTeacherManagement .list td:nth-child(1) {
@@ -280,6 +278,14 @@
 #adminTeacherDetails .table td:last-of-type {
   width: 5rem;
 }
+#adminTeacherDetails .assigned-courses .table th:nth-child(3),
+#adminTeacherDetails .assigned-courses .table td:nth-child(3) {
+  width: 15rem;
+}
+#adminTeacherDetails .assigned-courses .table th:nth-child(4),
+#adminTeacherDetails .assigned-courses .table td:nth-child(4) {
+  width: 10rem;
+}
 #adminTeacherDetails .table .invoice {
   color: var(--accent-color);
 }
@@ -441,6 +447,131 @@
   font-size: var(--text-font-size);
   color: var(--text-color);
 }
+#adminStudentDetails .tab-content .tab-pane {
+  display: none;
+}
+#adminStudentDetails .tab-content .tab-pane.show.active {
+  display: block;
+}
+#adminStudentDetails .nav-tabs {
+  display: flex;
+  gap: 1rem;
+}
+#adminStudentDetails .nav-tabs .nav-link {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  text-decoration: none;
+  text-transform: capitalize;
+  font-family: var(--accent-font-family);
+  font-size: var(--accent-font-size);
+  font-weight: var(--accent-font-weight);
+  padding: 0.5rem 1rem;
+  border-bottom: var(--border);
+  border-radius: 0.3rem 0.3rem 0 0;
+  transition: 0.3s;
+}
+#adminStudentDetails .nav-tabs .nav-link.active {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+#adminStudentDetails .courses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+#adminStudentDetails .course-card {
+  background: #fff;
+  border: var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  width: calc(50% - 0.5rem);
+  display: flex;
+  flex-direction: column;
+}
+#adminStudentDetails .course-image {
+  width: 100%;
+  height: 12rem;
+  object-fit: cover;
+  border-bottom: var(--border);
+}
+#adminStudentDetails .course-tag {
+  display: inline;
+  width: fit-content;
+  margin: 1rem;
+  padding: 0.5rem 1rem;
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-size: 0.9rem;
+  font-weight: var(--accent-font-weight);
+  border: var(--border);
+  border-radius: 0.3rem;
+}
+#adminStudentDetails .course-tag.in-progress {
+  background-color: #e8f9ff;
+  color: #155e95;
+  border-color: #155e95;
+}
+#adminStudentDetails .course-tag.completed {
+  background-color: #eafaea;
+  color: #6e8e59;
+  border-color: #6e8e59;
+}
+#adminStudentDetails .course-title {
+  margin: 0 15px;
+  height: 50px;
+  color: var(--dark-text-color) !important;
+  font-family: var(--accent-font-family) !important;
+  font-size: var(--accent-font-size) !important;
+  font-weight: var(--accent-font-weight) !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+#adminStudentDetails .course-info {
+  margin: 0 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+#adminStudentDetails .course-info p {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-size: var(--text-font-size);
+  font-weight: var(--text-font-weight);
+}
+#adminStudentDetails .course-footer {
+  margin: 2rem 1rem 1.5rem 1rem;
+  display: flex;
+}
+#adminStudentDetails .course-price {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+}
+#adminStudentDetails .course-price .amount {
+  font-family: var(--accent-font-family);
+  font-size: 24px;
+  font-weight: var(--accent-font-weight);
+  color: var(--accent-color);
+}
+#adminStudentDetails .course-btn {
+  width: 100%;
+  text-align: center;
+  padding: 8px 16px;
+  background-color: var(--primary-color);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-family: var(--accent-font-family) !important;
+  font-size: var(--accent-font-size) !important;
+  font-weight: var(--accent-font-weight) !important;
+  transition: 0.3s ease;
+}
+#adminStudentDetails .course-btn:hover {
+  background-color: var(--accent-color);
+}
+
 #adminStudentDetails .table {
   width: 100%;
 }
@@ -709,11 +840,6 @@
 }
 
 /* add course page */
-#adminAddCourse .recurring-dates,
-#adminAddCourse .recurring-days,
-#adminAddCourse .recurring-time-slots {
-  display: none;
-}
 #adminAddCourse .search-teacher .teacher-container,
 #adminAddCourse .selected-teachers {
   display: flex;
@@ -879,6 +1005,10 @@
 /* session management page */
 #adminSessionManagement .table th:nth-child(1),
 #adminSessionManagement .table td:nth-child(1) {
+  width: 10rem;
+}
+#adminSessionManagement .table th:nth-child(2),
+#adminSessionManagement .table td:nth-child(2) {
   text-align: left;
 }
 #adminSessionManagement .table th:last-child,
@@ -886,42 +1016,28 @@
   width: 7rem;
 }
 
-/* session groups page */
-#adminSessionGroups .table th:nth-child(1),
-#adminSessionGroups .table td:nth-child(1) {
-  width: 10rem;
-}
-#adminSessionGroups .table th:nth-child(2),
-#adminSessionGroups .table td:nth-child(2) {
-  text-align: left;
-}
-#adminSessionGroups .table th:last-child,
-#adminSessionGroups .table td:last-child {
-  width: 7rem;
-}
-
-/* session group details */
-#adminSessionGroupDetails .course-details {
+/* session details */
+#adminSessionDetails .course-details {
   align-items: flex-start;
 }
-#adminSessionGroupDetails .course-info {
+#adminSessionDetails .course-info {
   flex: 2;
   background-color: #fff;
   border: var(--border);
   border-radius: 0.5rem;
   padding: 1rem 1.5rem 2rem 1.5rem;
 }
-#adminSessionGroupDetails .course-title {
+#adminSessionDetails .course-title {
   font-size: 1.5rem;
   font-family: var(--accent-font-family);
   font-weight: var(--secondary-font-weight);
   color: var(--dark-text-color);
 }
-#adminSessionGroupDetails .schedule-title,
-#adminSessionGroupDetails .teacher-title,
-#adminSessionGroupDetails .meeting-title,
-#adminSessionGroupDetails .settings-title,
-#adminSessionGroupDetails .sidebar-title {
+#adminSessionDetails .schedule-title,
+#adminSessionDetails .teacher-title,
+#adminSessionDetails .meeting-title,
+#adminSessionDetails .settings-title,
+#adminSessionDetails .sidebar-title {
   width: 100%;
   font-size: 1.2rem;
   font-family: var(--accent-font-family);
@@ -931,71 +1047,68 @@
   margin-top: 1rem;
   padding-bottom: 0.5rem;
 }
-#adminSessionGroupDetails .class-schedule ul {
+#adminSessionDetails .session-details ul {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
-#adminSessionGroupDetails .class-schedule li,
-#adminSessionGroupDetails .teacher-name,
-#adminSessionGroupDetails .student-name {
+#adminSessionDetails .session-details li,
+#adminSessionDetails .teacher-name,
+#adminSessionDetails .student-name {
   font-size: var(--accent-font-size);
   font-family: var(--accent-font-family);
   font-weight: var(--accent-font-weight);
   color: var(--dark-text-color);
   text-decoration: none;
 }
-#adminSessionGroupDetails .teacher-name:hover,
-#adminSessionGroupDetails .student-name:hover {
+#adminSessionDetails .teacher-name:hover,
+#adminSessionDetails .student-name:hover {
   color: var(--accent-color);
 }
-#adminSessionGroupDetails .teacher-name {
+#adminSessionDetails .teacher-name {
   font-size: 1.2rem;
   font-weight: 700;
 }
-#adminSessionGroupDetails .class-schedule .value,
-#adminSessionGroupDetails .teacher-data,
-#adminSessionGroupDetails .student-data {
+#adminSessionDetails .session-details .value,
+#adminSessionDetails .teacher-data,
+#adminSessionDetails .student-data {
   font-size: var(--text-font-size);
   font-family: var(--text-font-family);
   font-weight: var(--text-font-weight);
   color: var(--text-color);
 }
-#adminSessionGroupDetails .teacher-data {
+#adminSessionDetails .teacher-data {
   border-bottom: var(--border);
   padding-bottom: 1rem;
 }
-#adminSessionGroupDetails .teacher-data:last-of-type {
+#adminSessionDetails .teacher-data:last-of-type {
   border: none;
 }
-#adminSessionGroupDetails .teacher-data .label {
+#adminSessionDetails .teacher-data .label {
   color: var(--dark-text-color);
   font-weight: var(--accent-font-weight);
   margin-right: 0.5rem;
 }
-#adminSessionGroupDetails .teacher-data a {
+#adminSessionDetails .teacher-data a {
   text-decoration: none;
   color: var(--primary-color);
-  border-bottom: var(--border);
-  border-color: var(--primary-color);
   font-weight: var(--accent-font-weight);
 }
-#adminSessionGroupDetails .teacher-data a:hover {
+#adminSessionDetails .teacher-data a:hover {
   color: var(--accent-color);
-  border-color: var(--accent-color);
 }
-#adminSessionGroupDetails .teacher-image {
+#adminSessionDetails .teacher-image {
   width: 10rem;
   height: 12rem;
   object-fit: cover;
   border: var(--border);
   border-radius: 0.5rem;
 }
-#adminSessionGroupDetails .meeting-details {
+#adminSessionDetails .meeting-details {
   align-items: flex-start;
 }
-#adminSessionGroupDetails .meeting-link-container {
+#adminSessionDetails .meeting-link-container {
   background-color: var(--secondary-color);
   display: flex;
   align-items: center;
@@ -1003,29 +1116,29 @@
   padding: 1rem 2rem;
   border-radius: 0.3rem;
 }
-#adminSessionGroupDetails .meeting-link {
+#adminSessionDetails .meeting-link {
   color: var(--dark-text-color);
   font-family: var(--text-font-family);
   font-weight: var(--text-font-weight);
   font-size: var(--text-font-size);
 }
-#adminSessionGroupDetails .meeting-link-copy {
+#adminSessionDetails .meeting-link-copy {
   border: none;
   outline: none;
   background-color: transparent;
   cursor: pointer;
   transition: ease 0.3s;
 }
-#adminSessionGroupDetails .meeting-link-copy:hover {
+#adminSessionDetails .meeting-link-copy:hover {
   color: var(--primary-color);
 }
-#adminSessionGroupDetails .settings .buttons {
+#adminSessionDetails .settings .buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
 }
-#adminSessionGroupDetails .meeting-details .button,
-#adminSessionGroupDetails .settings .button {
+#adminSessionDetails .meeting-details .button,
+#adminSessionDetails .settings .button {
   outline: none;
   border: var(--border);
   cursor: pointer;
@@ -1044,57 +1157,57 @@
   justify-content: center;
   gap: 0.5rem;
 }
-#adminSessionGroupDetails .settings .button {
+#adminSessionDetails .settings .button {
   background-color: var(--secondary-color);
   color: var(--primary-color);
 }
-#adminSessionGroupDetails .settings .button.cancel {
+#adminSessionDetails .settings .button.cancel {
   background-color: rgb(255, 224, 230);
   color: crimson;
 }
-#adminSessionGroupDetails .meeting-details .button:hover,
-#adminSessionGroupDetails .settings .button:hover {
+#adminSessionDetails .meeting-details .button:hover,
+#adminSessionDetails .settings .button:hover {
   opacity: 0.8;
 }
-#adminSessionGroupDetails .course-sidebar {
+#adminSessionDetails .course-sidebar {
   flex: 1;
   background-color: #fff;
   border: var(--border);
   border-radius: 0.5rem;
   padding: 1rem 1.5rem 2rem 1.5rem;
 }
-#adminSessionGroupDetails .course-sidebar .list {
+#adminSessionDetails .course-sidebar .list {
   list-style: none;
 }
-#adminSessionGroupDetails .sidebar-title {
+#adminSessionDetails .sidebar-title {
   margin: 0;
 }
-#adminSessionGroupDetails .list-item {
+#adminSessionDetails .list-item {
   border-bottom: var(--border);
   padding-bottom: 0.7rem;
 }
-#adminSessionGroupDetails .list-item:last-of-type {
+#adminSessionDetails .list-item:last-of-type {
   border: none;
   padding: none;
 }
-#adminSessionGroupDetails .course-sidebar .student-image {
+#adminSessionDetails .course-sidebar .student-image {
   width: 4rem;
   height: 4rem;
   object-fit: cover;
   border: var(--border);
   border-radius: 0.3rem;
 }
-#adminSessionGroupDetails .material-link-container {
+#adminSessionDetails .material-link-container {
   align-items: center;
 }
-#adminSessionGroupDetails .material-link {
+#adminSessionDetails .material-link {
   word-break: break-all;
   color: var(--dark-text-color);
   font-family: var(--text-font-family);
   font-weight: var(--text-font-weight);
   font-size: var(--text-font-size);
 }
-#adminSessionGroupDetails .material-link-icon {
+#adminSessionDetails .material-link-icon {
   font-size: 1.5rem;
   color: var(--primary-color);
   border: none;
@@ -1102,7 +1215,7 @@
   background-color: transparent;
   cursor: pointer;
 }
-#adminSessionGroupDetails .material-link-icon:hover {
+#adminSessionDetails .material-link-icon:hover {
   color: var(--accent-color);
 }
 /* add/update class link modal */
@@ -1130,22 +1243,22 @@
   color: white;
 }
 /* reprogram class modal */
-#reprogramModal .modal-content {
+#sessionReprogramModal .modal-content {
   background-color: var(--gray-background-color);
   margin: 3% auto;
   padding: 2rem;
   border-radius: 0.5rem;
   width: 100%;
-  max-width: 60rem;
+  max-width: 50rem;
   position: relative;
 }
-#reprogramModal form {
+#sessionReprogramModal form {
   width: 100% !important;
 }
-#reprogramModal label {
+#sessionReprogramModal label {
   text-align: left;
 }
-#reprogramModal .modal-button.confirm {
+#sessionReprogramModal .modal-button.confirm {
   background-color: var(--primary-color);
   color: white;
 }

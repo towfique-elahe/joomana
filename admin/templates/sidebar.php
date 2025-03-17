@@ -60,7 +60,7 @@
             </ul>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/admin/session-management/courses/'); ?>">
+            <a href="<?php echo home_url('/admin/session-management/'); ?>">
                 <i class="fas fa-clipboard-list"></i> Gestion des sessions
             </a>
         </li>

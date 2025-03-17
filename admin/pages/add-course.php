@@ -21,43 +21,57 @@ $success_message = ''; // Initialize success message variable
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
     global $wpdb;
 
-    $error_message = '';
-    $success_message = '';
-
     // Check if at least one teacher is selected
     $assigned_teachers_array = isset($_POST['assigned_teachers']) ? $_POST['assigned_teachers'] : array();
     if (empty($assigned_teachers_array)) {
         $error_message = 'Veuillez sélectionner au moins un enseignant.';
     }
-    
+
     // Proceed only if there are no errors
     if (empty($error_message)) {
-        // Sanitize user inputs
-        $is_recurring = isset($_POST['is_recurring']) ? filter_var($_POST['is_recurring'], FILTER_VALIDATE_BOOLEAN) : false;
-        $title = sanitize_text_field($_POST['title']);
-        $description = wp_kses_post($_POST['description']);
-        $category = sanitize_text_field($_POST['category']);
-        $topic = sanitize_text_field($_POST['topic']);
-        $grade = sanitize_text_field($_POST['grade']);
-        $level = sanitize_text_field($_POST['level']);
+        // Sanitize and validate input data
+        $title                = sanitize_text_field($_POST['title']);
+        $description          = wp_kses_post($_POST['description']);
+        $category             = sanitize_text_field($_POST['category']);
+        $topic                = sanitize_text_field($_POST['topic']);
+        $grade                = sanitize_text_field($_POST['grade']);
+        $level                = sanitize_text_field($_POST['level']);
+        $max_student_groups   = intval($_POST['max_student_groups']);
         $max_students_per_group = intval($_POST['max_students_per_group']);
-        $max_student_groups = intval($_POST['max_student_groups']);
-        $max_teachers = intval($_POST['max_teachers']);
-        $duration = intval($_POST['duration']);
-        $required_credit = intval($_POST['required_credit']);
-        $course_material = esc_url_raw($_POST['course_material']);
-        $time_slot = sanitize_text_field($_POST['time_slot']);
-        $assigned_teachers_array = isset($_POST['assigned_teachers']) ? $_POST['assigned_teachers'] : array();
-        $assigned_teachers_json = json_encode($assigned_teachers_array);
+        $max_teachers         = intval($_POST['max_teachers']);
+        $duration             = intval($_POST['duration']);
+        $required_credit      = floatval($_POST['required_credit']);
+        $course_material      = esc_url_raw($_POST['course_material']);
+        $start_date           = sanitize_text_field($_POST['start_date']);
+        $end_date             = sanitize_text_field($_POST['end_date']);
 
-        // Handle start_date and end_date based on is_recurring
-        if ($is_recurring) {
-            $start_date = sanitize_text_field($_POST['recurring_start_date']);
-            $end_date = sanitize_text_field($_POST['recurring_end_date']);
-        } else {
-            $start_date = sanitize_text_field($_POST['start_date']);
-            $end_date = null; // No end_date for non-recurring courses
+        // Convert dates to DateTime format
+        $start_date_obj = new DateTime($start_date);
+        $end_date_obj   = new DateTime($end_date);
+
+        // Get the selected days (recurring days)
+        $recurring_days = isset($_POST['days']) ? $_POST['days'] : [];
+
+        // Convert array inputs to JSON format
+        $days_json           = json_encode($_POST['days'] ?? []);
+        $assigned_teachers_json = json_encode($_POST['assigned_teachers'] ?? []);
+        $enrolled_students_json = json_encode($_POST['enrolled_students'] ?? []);
+
+        // Calculate total occurrences of recurring days between start and end date
+        $total_days = 0;
+        $session_days = [];
+        $current_date = clone $start_date_obj;
+
+        while ($current_date <= $end_date_obj) {
+            $current_day_name = $current_date->format('l'); // Get day name (e.g., 'Tuesday')
+            if (in_array($current_day_name, $recurring_days)) {
+                $total_days++;
+                $session_days[] = $current_date->format('Y-m-d'); // Store session date
+            }
+            $current_date->modify('+1 day'); // Move to the next day
         }
+
+        $session_days_json = json_encode($session_days);
 
         // Handle image upload (unchanged)
         $uploaded_image_path = '';
@@ -99,12 +113,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
         }
 
         if (empty($error_message)) {
-            // Insert course into the database
-            $table_name = $wpdb->prefix . 'courses';
+            // Database table
+            $courses_table = $wpdb->prefix . 'courses';
+
+            // Insert data into the courses table
             $inserted = $wpdb->insert(
-                $wpdb->prefix . 'courses',
+                $courses_table,
                 [
-                    'is_recurring'         => (int) $is_recurring,
                     'title'                => $title,
                     'description'          => $description,
                     'category'             => $category,
@@ -115,152 +130,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
                     'max_student_groups'   => $max_student_groups,
                     'max_teachers'         => $max_teachers,
                     'duration'             => $duration,
+                    'image'                => $uploaded_image_path,
                     'required_credit'      => $required_credit,
                     'course_material'      => $course_material,
                     'start_date'           => $start_date,
                     'end_date'             => $end_date,
-                    'time_slot'            => $time_slot,
+                    'days'                 => $days_json,
+                    'total_days'           => $total_days,
+                    'session_days'         => $session_days_json,
                     'assigned_teachers'    => $assigned_teachers_json,
-                    'image'                => $uploaded_image_path,
+                    'enrolled_students'    => $enrolled_students_json,
                 ],
                 [
-                    '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s',
+                    '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%f', '%s', '%s', '%s', '%s', '%d', '%s', '%s'
                 ]
             );
 
-            // Get course ID AFTER successful insertion
-            if ($inserted === false) {
-                error_log("Error inserting course: " . $wpdb->last_error);
-                exit("Error inserting course: " . esc_html($wpdb->last_error)); // Stop execution if failed
-            }
-
-            $course_id = $wpdb->insert_id;
-
             if ($inserted === false) {
                 $error_message = 'Erreur: ' . esc_html($wpdb->last_error);
+                error_log('SQL Error: ' . $wpdb->last_error);
+                exit('Error inserting course: ' . esc_html($wpdb->last_error));
             } else {
-                // Assign teachers to the course
-                if ($course_id) {
-                    if (!empty($assigned_teachers_array) && is_array($assigned_teachers_array)) {
-                        $total_teachers = count($assigned_teachers_array);
-                        for ($i = 0; $i < min($total_teachers, $max_teachers); $i++) {
-                            $teacher_id = intval($assigned_teachers_array[$i]);
-                            $group_number = $i + 1; // For group numbering
+                $course_id = $wpdb->insert_id; // Get the ID of the newly inserted course
 
-                            $insert_teacher = $wpdb->insert(
-                                $wpdb->prefix . 'teacher_courses',
-                                [
-                                    'teacher_id'   => $teacher_id,
-                                    'course_id'    => $course_id,
-                                    'group_number' => $group_number,
-                                ],
-                                [ '%d', '%d', '%d' ]
-                            );
+                // Insert course slots into the course_slots table
+                foreach ($recurring_days as $day) {
+                    $slot1_start_time = sanitize_text_field($_POST[strtolower($day) . '_slot1_start_time']);
+                    $slot1_end_time   = sanitize_text_field($_POST[strtolower($day) . '_slot1_end_time']);
+                    $slot2_start_time = sanitize_text_field($_POST[strtolower($day) . '_slot2_start_time']);
+                    $slot2_end_time   = sanitize_text_field($_POST[strtolower($day) . '_slot2_end_time']);
 
-                            if ($insert_teacher === false) {
-                                error_log("Error inserting teacher-course relation: " . $wpdb->last_error);
-                            }
-
-                            // If the course is recurring, insert data into the recurring_class_sessions table for each teacher's group
-                            if ($is_recurring) {
-                                // Sanitize recurring session data
-                                $recurring_days = isset($_POST['recurring_days']) ? array_map('sanitize_text_field', $_POST['recurring_days']) : [];
-                                $recurring_days_json = json_encode($recurring_days); // Convert array to JSON
-                                $recurring_start_time_1 = sanitize_text_field($_POST['recurring_start_time_1']);
-                                $recurring_end_time_1 = sanitize_text_field($_POST['recurring_end_time_1']);
-                                $recurring_start_time_2 = sanitize_text_field($_POST['recurring_start_time_2']);
-                                $recurring_end_time_2 = sanitize_text_field($_POST['recurring_end_time_2']);
-
-                                // Insert recurring session data into the recurring_class_sessions table for this group
-                                $insert_recurring_session = $wpdb->insert(
-                                    $wpdb->prefix . 'recurring_class_sessions',
-                                    [
-                                        'course_id'            => $course_id,
-                                        'group_number'         => $group_number, // Use the same group number as the teacher
-                                        'recurring_start_date' => $start_date,
-                                        'recurring_end_date'   => $end_date,
-                                        'recurring_days'       => $recurring_days_json,
-                                        'recurring_start_time_1' => $recurring_start_time_1,
-                                        'recurring_end_time_1'   => $recurring_end_time_1,
-                                        'recurring_start_time_2' => $recurring_start_time_2,
-                                        'recurring_end_time_2'   => $recurring_end_time_2,
-                                    ],
-                                    [
-                                        '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s'
-                                    ]
-                                );
-
-                                if ($insert_recurring_session === false) {
-                                    error_log("Error inserting recurring session for group $group_number: " . $wpdb->last_error);
-                                }
-                            } else {
-
-                                // Insert non-recurring session data into the class_sessions table for this group
-                                $insert_class_session = $wpdb->insert(
-                                    $wpdb->prefix . 'class_sessions',
-                                    [
-                                        'course_id'    => $course_id,
-                                        'group_number' => $group_number, // Use the same group number as the teacher
-                                        'start_date'   => $start_date,
-                                        'time_slot'    => $time_slot,
-                                    ],
-                                    [
-                                        '%d', '%d', '%s', '%s'
-                                    ]
-                                );
-
-                                if ($insert_class_session === false) {
-                                    error_log("Error inserting class session for group $group_number: " . $wpdb->last_error);
-                                }
-                            }
-
-                            // Insert payment for the teacher
-                            $teacher_table = $wpdb->prefix . 'teachers';
-                            $payments_table = $wpdb->prefix . 'teacher_payments';
-
-                            // Fetch teacher data
-                            $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $teacher_id));
-
-                            // Generate a unique invoice number
-                            do {
-                                $invoice_number = 'JMI-' . uniqid() . '-' . bin2hex(random_bytes(4));
-                                $exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $payments_table WHERE invoice_number = %s", $invoice_number));
-                            } while ($exists > 0);
-
-                            // Set payment details
-                            $currency = 'EUR';
-                            $payment_method = 'Bank';
-                            $status = 'in progress';
-                            $deposit = ($teacher->country === 'France') ? 26 : 13; // Set deposit amount based on teacher's country
-
-                            $due = floatval($teacher->due); // Get past due amount
-
-                            // Insert payment into the database
-                            $inserted_payment = $wpdb->insert(
-                                $payments_table,
-                                [
-                                    'invoice_number'        => $invoice_number,
-                                    'teacher_id'           => $teacher_id,
-                                    'due'                  => $due,
-                                    'deposit'             => $deposit,
-                                    'currency'            => $currency,
-                                    'payment_method'      => $payment_method,
-                                    'status'              => $status,
-                                ],
-                                [
-                                    '%s', '%d', '%f', '%s', '%s', '%s',
-                                ]
-                            );
-
-                            if ($inserted_payment === false) {
-                                error_log("Error inserting payment for teacher $teacher_id: " . $wpdb->last_error);
-                            }
-                        }
-                    }
-                } else {
-                    error_log("Error: Course ID not retrieved after insertion!");
+                    $wpdb->insert(
+                        $wpdb->prefix . 'course_slots',
+                        [
+                            'course_id'        => $course_id,
+                            'session_day'      => $day,
+                            'slot1_start_time' => $slot1_start_time,
+                            'slot1_end_time'   => $slot1_end_time,
+                            'slot2_start_time' => $slot2_start_time,
+                            'slot2_end_time'   => $slot2_end_time,
+                        ],
+                        [
+                            '%d', '%s', '%s', '%s', '%s', '%s'
+                        ]
+                    );
                 }
 
+                // Success message
                 $success_message = 'Le cours a été ajouté avec succès.';
                 wp_redirect(home_url('/admin/course-management/courses/'));
                 exit;
@@ -315,11 +231,6 @@ ob_end_clean();
                 <!-- Add Course -->
                 <section class="section col">
                     <h3 class="section-heading">Ajouter un nouveau cours</h3>
-
-                    <div class="row">
-                        <label for="is_recurring">Récurrent</label>
-                        <input type="checkbox" id="is_recurring" name="is_recurring" value="true">
-                    </div>
 
                     <div class="row">
                         <div class="col">
@@ -483,155 +394,276 @@ ob_end_clean();
                         </div>
                     </div>
 
-                    <div class="row recurring-dates">
+                    <div class="row">
                         <div class="col">
-                            <label for="recurring_start_date">Date de début <span class="required">*</span></label>
-                            <input type="date" id="recurring_start_date" name="recurring_start_date">
+                            <label for="start_date">Date de début <span class="required">*</span></label>
+                            <input type="date" id="start_date" name="start_date">
                         </div>
                         <div class="col">
-                            <label for="recurring_end_date">Date de fin <span class="required">*</span></label>
-                            <input type="date" name="recurring_end_date" id="recurring_end_date">
+                            <label for="end_date">Date de fin <span class="required">*</span></label>
+                            <input type="date" name="end_date" id="end_date">
                         </div>
                     </div>
 
-                    <div class="row recurring-days">
+                    <div class="row">
                         <div class="col">
-                            <label for="recurring_days">Jours</label>
+                            <label for="days">Jours</label>
                             <div class="row checkbox-group">
-                                <label class="row"><input type="checkbox" name="recurring_days[]" value="Monday">
+                                <label class="row"><input type="checkbox" name="days[]" id="recurringMonday"
+                                        value="Monday">
                                     Lundi</label>
-                                <label class="row"><input type="checkbox" name="recurring_days[]" value="Tuesday">
+                                <label class="row"><input type="checkbox" name="days[]" id="recurringTuesday"
+                                        value="Tuesday">
                                     Mardi</label>
-                                <label class="row"><input type="checkbox" name="recurring_days[]" value="Wednesday">
+                                <label class="row"><input type="checkbox" name="days[]" id="recurringWednesday"
+                                        value="Wednesday">
                                     Mercredi</label>
-                                <label class="row"><input type="checkbox" name="recurring_days[]" value="Thursday">
+                                <label class="row"><input type="checkbox" name="days[]" id="recurringThursday"
+                                        value="Thursday">
                                     Jeudi</label>
-                                <label class="row"><input type="checkbox" name="recurring_days[]" value="Friday">
+                                <label class="row"><input type="checkbox" name="days[]" id="recurringFriday"
+                                        value="Friday">
                                     Vendredi</label>
-                                <label class="row"><input type="checkbox" name="recurring_days[]" value="Saturday">
+                                <label class="row"><input type="checkbox" name="days[]" id="recurringSaturday"
+                                        value="Saturday">
                                     Samedi</label>
-                                <label class="row"><input type="checkbox" name="recurring_days[]" value="Sunday">
+                                <label class="row"><input type="checkbox" name="days[]" id="recurringSunday"
+                                        value="Sunday">
                                     Dimanche</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col recurring-time-slots slot-1">
-                        <div class="row">
-                            <div class="col">
-                                <label for="recurring_start_time_1">Heure de début (Emplacement 1) <span
-                                        class="required">*</span></label>
-                                <input type="time" name="recurring_start_time_1" id="recurring_start_time_1">
+                    <!-- Monday -->
+                    <div class="day-time-slot">
+                        <div class="col recurring-time-slots monday slot-1">
+                            <h3>Lundi</h3>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="monday_slot1_start_time">Heure de début (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="monday_slot1_start_time" id="monday_slot1_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="monday_slot1_end_time">Fin des temps (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="monday_slot1_end_time" id="monday_slot1_end_time">
+                                </div>
                             </div>
-                            <div class="col">
-                                <label for="recurring_end_time_1">Fin des temps (Emplacement 1) <span
-                                        class="required">*</span></label>
-                                <input type="time" name="recurring_end_time_1" id="recurring_end_time_1">
+                        </div>
+                        <div class="col recurring-time-slots monday slot-2">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="monday_slot2_start_time">Heure de début (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="monday_slot2_start_time" id="monday_slot2_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="monday_slot2_end_time">Fin des temps (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="monday_slot2_end_time" id="monday_slot2_end_time">
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col recurring-time-slots slot-2">
-                        <div class="row">
-                            <div class="col">
-                                <label for="recurring_start_time_2">Heure de début (Emplacement 2) <span
-                                        class="required">*</span></label>
-                                <input type="time" name="recurring_start_time_2" id="recurring_start_time_2">
+                    <!-- Tuesday -->
+                    <div class="day-time-slot">
+                        <div class="col recurring-time-slots tuesday slot-1">
+                            <h3>Mardi</h3>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="tuesday_slot1_start_time">Heure de début (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="tuesday_slot1_start_time" id="tuesday_slot1_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="tuesday_slot1_end_time">Fin des temps (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="tuesday_slot1_end_time" id="tuesday_slot1_end_time">
+                                </div>
                             </div>
-                            <div class="col">
-                                <label for="recurring_end_time_2">Fin des temps (Emplacement 2) <span
-                                        class="required">*</span></label>
-                                <input type="time" name="recurring_end_time_2" id="recurring_end_time_2">
+                        </div>
+                        <div class="col recurring-time-slots tuesday slot-2">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="tuesday_slot2_start_time">Heure de début (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="tuesday_slot2_start_time" id="tuesday_slot2_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="tuesday_slot2_end_time">Fin des temps (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="tuesday_slot2_end_time" id="tuesday_slot2_end_time">
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row calendar-container">
-                        <div class="calendar col">
-                            <!-- date input -->
-                            <input type="hidden" id="start_date" name="start_date">
-                            <!-- time input -->
-                            <input type="hidden" id="time_slot" name="time_slot">
-
-                            <div class="calendar-header row">
-                                <div class="buttons">
-                                    <div class="custom-select-wrapper">
-                                        <select id="yearSelect">
-                                            <option>2024</option>
-                                            <option selected>2025</option>
-                                            <option>2026</option>
-                                            <option>2027</option>
-                                            <option>2028</option>
-                                            <option>2029</option>
-                                            <option>2030</option>
-                                        </select>
-                                        <i class="fas fa-caret-down custom-arrow"></i>
-                                    </div>
-                                    <div class="custom-select-wrapper">
-                                        <select id="monthSelect">
-                                            <option value="1">Janvier</option>
-                                            <option value="2">Février</option>
-                                            <option value="3">Mars</option>
-                                            <option value="4">Avril</option>
-                                            <option value="5">Mai</option>
-                                            <option value="6">Juin</option>
-                                            <option value="7">Juillet</option>
-                                            <option value="8">Août</option>
-                                            <option value="9">Septembre</option>
-                                            <option value="10">Octobre</option>
-                                            <option value="11">Novembre</option>
-                                            <option value="12" selected>Décembre</option>
-                                        </select>
-                                        <i class="fas fa-caret-down custom-arrow"></i>
-                                    </div>
+                    <!-- Wednesday -->
+                    <div class="day-time-slot">
+                        <div class="col recurring-time-slots wednesday slot-1">
+                            <h3>Mercredi</h3>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="wednesday_slot1_start_time">Heure de début (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="wednesday_slot1_start_time"
+                                        id="wednesday_slot1_start_time">
                                 </div>
-
-                                <div>
-                                    <button class="button reset" id="resetButton"><i class="fas fa-undo"></i>
-                                        Reprogrammer</button>
+                                <div class="col">
+                                    <label for="wednesday_slot1_end_time">Fin des temps (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="wednesday_slot1_end_time" id="wednesday_slot1_end_time">
                                 </div>
-
-                                <div class="special-heading">Date de début</div>
                             </div>
-                            <table class="table calendar-table" id="calendarTable">
-                                <thead>
-                                    <tr>
-                                        <th>dimanche</th>
-                                        <th>lundi</th>
-                                        <th>Mardi</th>
-                                        <th>Mercredi</th>
-                                        <th>Jeudi</th>
-                                        <th>vendredi</th>
-                                        <th>Samedi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Calendar dates will be populated dynamically -->
-                                </tbody>
-                            </table>
+                        </div>
+                        <div class="col recurring-time-slots wednesday slot-2">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="wednesday_slot2_start_time">Heure de début (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="wednesday_slot2_start_time"
+                                        id="wednesday_slot2_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="wednesday_slot2_end_time">Fin des temps (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="wednesday_slot2_end_time" id="wednesday_slot2_end_time">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                            <table class="table time-table" id="timeTable">
-                                <tbody>
-                                    <tr>
-                                        <td>8:00 AM - 10:00 AM</td>
-                                        <td>10:00 AM - 12:00 PM</td>
-                                        <td>12:00 PM - 2:00 PM</td>
-                                        <td>2:00 PM - 4:00 AM</td>
-                                    </tr>
-                                    <tr>
-                                        <td>4:00 PM - 6:00 PM</td>
-                                        <td>6:00 PM - 8:00 PM</td>
-                                        <td>8:00 PM - 10:00 PM</td>
-                                        <td>10:00 PM - 12:00 AM</td>
-                                    </tr>
-                                    <tr>
-                                        <td>12:00 AM - 2:00 AM</td>
-                                        <td>2:00 AM - 4:00 AM</td>
-                                        <td>4:00 AM - 6:00 AM</td>
-                                        <td>6:00 AM - 8:00 AM</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <!-- Thursday -->
+                    <div class="day-time-slot">
+                        <div class="col recurring-time-slots thursday slot-1">
+                            <h3>Jeudi</h3>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="thursday_slot1_start_time">Heure de début (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="thursday_slot1_start_time" id="thursday_slot1_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="thursday_slot1_end_time">Fin des temps (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="thursday_slot1_end_time" id="thursday_slot1_end_time">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col recurring-time-slots thursday slot-2">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="thursday_slot2_start_time">Heure de début (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="thursday_slot2_start_time" id="thursday_slot2_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="thursday_slot2_end_time">Fin des temps (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="thursday_slot2_end_time" id="thursday_slot2_end_time">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Friday -->
+                    <div class="day-time-slot">
+                        <div class="col recurring-time-slots friday slot-1">
+                            <h3>Vendredi</h3>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="friday_slot1_start_time">Heure de début (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="friday_slot1_start_time" id="friday_slot1_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="friday_slot1_end_time">Fin des temps (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="friday_slot1_end_time" id="friday_slot1_end_time">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col recurring-time-slots friday slot-2">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="friday_slot2_start_time">Heure de début (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="friday_slot2_start_time" id="friday_slot2_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="friday_slot2_end_time">Fin des temps (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="friday_slot2_end_time" id="friday_slot2_end_time">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Saturday -->
+                    <div class="day-time-slot">
+                        <div class="col recurring-time-slots saturday slot-1">
+                            <h3>Samedi</h3>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="saturday_slot1_start_time">Heure de début (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="saturday_slot1_start_time" id="saturday_slot1_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="saturday_slot1_end_time">Fin des temps (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="saturday_slot1_end_time" id="saturday_slot1_end_time">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col recurring-time-slots saturday slot-2">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="saturday_slot2_start_time">Heure de début (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="saturday_slot2_start_time" id="saturday_slot2_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="saturday_slot2_end_time">Fin des temps (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="saturday_slot2_end_time" id="saturday_slot2_end_time">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sunday -->
+                    <div class="day-time-slot">
+                        <div class="col recurring-time-slots sunday slot-1">
+                            <h3>Dimanche</h3>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="sunday_slot1_start_time">Heure de début (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="sunday_slot1_start_time" id="sunday_slot1_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="sunday_slot1_end_time">Fin des temps (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="sunday_slot1_end_time" id="sunday_slot1_end_time">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col recurring-time-slots sunday slot-2">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="sunday_slot2_start_time">Heure de début (Emplacement 2) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="sunday_slot2_start_time" id="sunday_slot2_start_time">
+                                </div>
+                                <div class="col">
+                                    <label for="sunday_slot2_end_time">Fin des temps (Emplacement 1) <span
+                                            class="required">*</span></label>
+                                    <input type="time" name="sunday_slot2_end_time" id="sunday_slot2_end_time">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -687,34 +719,28 @@ ob_end_clean();
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const recurringCheckbox = document.getElementById("is_recurring");
-    const calendar = document.querySelector(".calendar-container");
-    const dateInputs = document.querySelector(".recurring-dates");
-    const dayInputs = document.querySelector(".recurring-days");
-    const timeSlot1Inputs = document.querySelector(".recurring-time-slots.slot-1");
-    const timeSlot2Inputs = document.querySelector(".recurring-time-slots.slot-2");
+    // Get all day checkboxes
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-    function toggleVisibility() {
-        if (recurringCheckbox.checked) {
-            calendar.style.display = "none";
-            dateInputs.style.display = "flex";
-            dayInputs.style.display = "flex";
-            timeSlot1Inputs.style.display = "flex";
-            timeSlot2Inputs.style.display = "flex";
-        } else {
-            calendar.style.display = "flex";
-            dateInputs.style.display = "none";
-            dayInputs.style.display = "none";
-            timeSlot1Inputs.style.display = "none";
-            timeSlot2Inputs.style.display = "none";
+    days.forEach(day => {
+        const dayCheck = document.getElementById(`recurring${day}`);
+        const dayTimeSlot = document.querySelector(
+            `.day-time-slot .recurring-time-slots.${day.toLowerCase()}`).parentElement;
+
+        function toggleVisibility() {
+            if (dayCheck.checked) {
+                dayTimeSlot.style.display = "block"; // Show the entire day-time-slot
+            } else {
+                dayTimeSlot.style.display = "none"; // Hide the entire day-time-slot
+            }
         }
-    }
 
-    // Attach event listener to checkbox
-    recurringCheckbox.addEventListener("change", toggleVisibility);
+        // Attach event listener to checkbox
+        dayCheck.addEventListener("change", toggleVisibility);
 
-    // Run the function on page load in case the checkbox is pre-checked
-    toggleVisibility();
+        // Run the function on page load in case the checkbox is pre-checked
+        toggleVisibility();
+    });
 });
 
 jQuery(document).ready(function($) {
