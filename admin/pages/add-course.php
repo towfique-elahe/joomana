@@ -679,8 +679,8 @@ ob_end_clean();
                                     <?php
                                     global $wpdb; // Access the global $wpdb object for database queries
                                     
-                                    // Query the custom 'teachers' table
-                                    $teachers = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teachers");
+                                    // Query the custom 'teachers' table where status is 'Approuvé'
+                                    $teachers = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teachers WHERE status = 'Approuvé'");
                                     
                                     // Define the default image path
                                     $default_image = get_template_directory_uri() . '/assets/image/user.png';
