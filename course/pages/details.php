@@ -37,6 +37,14 @@ if (!isset($_GET['session_id']) || empty($_GET['session_id'])) {
 }
 $session_id = intval($_GET['session_id']);
 
+if (in_array('parent', (array) $user->roles)) {
+    $student_id = intval($_GET['student_id']);
+} elseif (in_array('student', (array) $user->roles)) {
+    $student_id = $user->ID;
+} elseif (in_array('teacher', (array) $user->roles)) {
+    $teacher_id = $user->ID;
+}
+
 global $wpdb;
 $courses_table = $wpdb->prefix . 'courses';
 $sessions_table = $wpdb->prefix . 'course_sessions';
@@ -682,6 +690,12 @@ if (in_array('teacher', (array) $user->roles)) {
                                     <?php } ?>
                                 </div>
 
+                                <?php if($class_link) { ?>
+                                <a href="<?php echo esc_url($class_link); ?>" target="_blank" class="button">
+                                    <i class="fas fa-external-link-square-alt"></i> Rejoindre
+                                </a>
+                                <?php } ?>
+
                             </div>
                             <?php
                                 }
@@ -768,10 +782,23 @@ if (in_array('teacher', (array) $user->roles)) {
                                             alt="" class="student-image">
 
                                         <div class="col student-info">
+                                            <?php
+                                                if (current_user_can('teacher')) {
+                                            ?>
                                             <a href="<?php echo esc_url(home_url('/course/student-management/student-details/?student_id=' . $student->id . '&session_id=' . $session_id)); ?>"
                                                 class="student-name">
                                                 <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
                                             </a>
+                                            <?php
+                                                }
+                                                if (current_user_can('student') || current_user_can('parent')) {
+                                            ?>
+                                            <p class="student-name">
+                                                <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
+                                            </p>
+                                            <?php
+                                                }
+                                            ?>
                                             <p class="student-data">
                                                 <?php echo esc_html($student->grade);?>
                                             </p>

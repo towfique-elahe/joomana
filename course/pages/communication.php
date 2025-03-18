@@ -138,13 +138,13 @@ $messages = $wpdb->get_results( $wpdb->prepare(
 								if ( in_array( 'student', (array) $msg_wp_user->roles ) ) {
 									global $wpdb;
 									$student_table = $wpdb->prefix . 'students';
-									$msg_user = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $msg_wp_user->id));
+									$msg_user = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $msg_wp_user->ID));
 									$msg_user_role = 'student';
 								}
 								if ( in_array( 'teacher', (array) $msg_wp_user->roles ) ) {
 									global $wpdb;
 									$teacher_table = $wpdb->prefix . 'teachers';
-									$msg_user = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $msg_wp_user->id));
+									$msg_user = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $msg_wp_user->ID));
 									$msg_user_role = 'teacher';
 								}
 
@@ -159,7 +159,7 @@ $messages = $wpdb->get_results( $wpdb->prepare(
 								$formatted_time = date( 'M d, Y - h:i A', $message_time );
 
 								// Add 'current-user' class if the message is from the logged-in user
-								$chat_class = ($msg->user_id == $user->id) ? 'current-user' : '';
+								$chat_class = ($msg->user_id == $user->ID) ? 'current-user' : '';
 					?>
                     <div class="row chat <?= esc_attr($msg_user_role); ?> <?= esc_attr($chat_class); ?>">
                         <div class="chat-user">

@@ -654,8 +654,8 @@
 }
 #courseSubmissions .file-delete {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 0.95rem;
+  right: 3.5rem;
   z-index: 1;
   border: none;
   background: transparent;
@@ -670,6 +670,8 @@
 }
 #courseSubmissions .file-bottom {
   width: 100%;
+  height: 10rem;
+  align-items: start;
   background-color: var(--gray-background-color);
   padding: 1rem;
 }
@@ -698,6 +700,10 @@
   color: var(--accent-color);
 }
 #courseSubmissions .download-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;

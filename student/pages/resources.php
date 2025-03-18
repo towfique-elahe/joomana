@@ -19,45 +19,38 @@ global $wpdb;
 $user = wp_get_current_user();
 $student_id = $user->ID;
 
-// Get all course IDs for the student
-$course_ids = $wpdb->get_col(
+$sessions_table = $wpdb->prefix . 'course_sessions';
+
+// Get all session IDs for the student
+$session_ids = $wpdb->get_col(
     $wpdb->prepare(
-        "SELECT course_id FROM {$wpdb->prefix}student_courses WHERE student_id = %d",
-        $student_id
+        "SELECT id FROM $sessions_table WHERE JSON_CONTAINS(enrolled_students, %s)",
+        '"' . $student_id . '"'
     )
 );
 
-$course_id = intval($_GET['course_id']);
+// Check if session_id is set in the URL and is valid
+$session_id = isset($_GET['session_id']) && in_array($_GET['session_id'], $session_ids) ? intval($_GET['session_id']) : null;
 
-$course_ids = $wpdb->get_col(
-    $wpdb->prepare(
-        "SELECT course_id FROM {$wpdb->prefix}student_courses WHERE student_id = %d",
-        $student_id
-    )
-);
-
-$student_group = $wpdb->get_var($wpdb->prepare(
-    "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
-    $student_id,
-    $course_id
-));
-if ($student_group) {
-    $group_number = intval($student_group);
+// If no session_id is set, select the first session
+if (!$session_id && !empty($session_ids)) {
+    $session_id = $session_ids[0];
+    // Redirect to the same page with the first session_id in the URL
+    wp_redirect(add_query_arg('session_id', $session_id));
+    exit;
 }
 
-// Fetch course assignments for the student
-$course_assignments = $wpdb->get_results($wpdb->prepare(
-    "SELECT * FROM {$wpdb->prefix}course_assignments WHERE course_id = %d AND group_number = %d",
-    $course_id,
-    $group_number
-));
+// Fetch session assignments for the student
+$course_assignments = $session_id ? $wpdb->get_results($wpdb->prepare(
+    "SELECT * FROM {$wpdb->prefix}course_assignments WHERE session_id = %d",
+    $session_id
+)) : [];
 
-// Fetch course slides for the student
-$course_slides = $wpdb->get_results($wpdb->prepare(
-    "SELECT * FROM {$wpdb->prefix}course_slides WHERE course_id = %d AND group_number = %d",
-    $course_id,
-    $group_number
-));
+// Fetch session slides for the student
+$course_slides = $session_id ? $wpdb->get_results($wpdb->prepare(
+    "SELECT * FROM {$wpdb->prefix}course_slides WHERE session_id = %d",
+    $session_id
+)) : [];
 
 ?>
 
@@ -77,92 +70,58 @@ $course_slides = $wpdb->get_results($wpdb->prepare(
             </div>
         </div>
 
-        <div class="select-course">
+        <div class="select-session">
             <?php
-            // Only proceed if there are course IDs
-            if (!empty($course_ids)) {
-            // Convert array into a comma-separated string for SQL IN clause
-            $placeholders = implode(',', array_fill(0, count($course_ids), '%d'));
+            // Only proceed if there are session IDs
+            if (!empty($session_ids)) {
+                // Convert array into a comma-separated string for SQL IN clause
+                $placeholders = implode(',', array_fill(0, count($session_ids), '%d'));
 
-            // Prepare the query dynamically
-            $query = $wpdb->prepare(
-            "SELECT id, title FROM {$wpdb->prefix}courses WHERE id IN ($placeholders)",
-            ...$course_ids
-            );
+                // Prepare the query dynamically
+                $query = $wpdb->prepare(
+                    "SELECT id, course_id, session_date FROM $sessions_table WHERE id IN ($placeholders)",
+                    ...$session_ids
+                );
 
-            // Fetch matching courses
-            $courses = $wpdb->get_results($query);
+                // Fetch matching sessions
+                $sessions = $wpdb->get_results($query);
 
-            // Get the first course ID for auto-selection
-            $first_course_id = !empty($courses) ? $courses[0]->id : null;
-
-            if ($courses): ?>
+                if ($sessions) : ?>
             <div class="custom-select-wrapper">
-                <label for="courseSelect">Sélectionnez un cours</label>
-                <select id="courseSelect">
-                    <?php foreach ($courses as $course): ?>
-                    <option value="<?php echo esc_attr($course->id); ?>" <?php echo ($course->id ==
-                        $_GET['course_id']
-                        ??
-                        $first_course_id) ? 'selected' : ''; ?>>
-                        <?php echo esc_html($course->title); ?>
+                <label for="sessionSelect">Sélectionnez une session</label>
+                <select id="sessionSelect">
+                    <?php 
+                        foreach ($sessions as $session) :
+                        $date = date('j M, y', strtotime($session->session_date));
+                        $course_id = $session->course_id;
+                        global $wpdb;
+                        $courses_table = $wpdb->prefix . 'courses';
+                        $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $courses_table WHERE id = %d", $course_id));
+                    ?>
+                    <option value="<?php echo esc_attr($session->id); ?>"
+                        <?php echo ($session->id == $session_id) ? 'selected' : ''; ?>>
+                        <?php echo 'Date: ' . esc_html($date) . ' | ' . esc_html($course->title); ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
                 <i class="fas fa-chevron-down custom-arrow"></i>
             </div>
-
-            <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                var courseSelect = document.getElementById("courseSelect");
-
-                if (courseSelect) {
-                    var selectedCourse = courseSelect.value;
-                    var urlParams = new URLSearchParams(window.location.search);
-
-                    // If no course_id in URL, set it to the first course automatically
-                    if (!urlParams.has("course_id") && selectedCourse) {
-                        window.location.href = window.location.pathname + "?course_id=" + encodeURIComponent(
-                            selectedCourse);
-                    }
-
-                    courseSelect.addEventListener("change", function() {
-                        var selectedCourse = this.value;
-                        if (selectedCourse) {
-                            window.location.href = window.location.pathname + "?course_id=" +
-                                encodeURIComponent(selectedCourse);
-                        }
-                    });
-                }
-            });
-            </script>
             <?php endif;
             }
             ?>
-
         </div>
 
         <div class="row file-container">
-            <?php if ($course_assignments || $course_slides) :?>
+            <?php if ($course_assignments || $course_slides) : ?>
 
-            <!-- Display Course Assignments -->
+            <!-- Display Session Assignments -->
             <?php foreach ($course_assignments as $assignment) : ?>
             <div class="file-card">
                 <div class="file-top">
                     <p class="file-type assignment">Affectation</p>
-                    <?php
-                            if (in_array('teacher', (array) $user->roles)) {
-                        ?>
-                    <form method="post" class="delete-form">
-                        <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($assignment->id); ?>">
-                        <input type="hidden" name="file_type" id="deleteFileType" value="Assignment">
-                        <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </form>
-                    <?php
-                            }
-                        ?>
+                    <a href="<?php echo esc_url($assignment->file); ?>" class="download-button" download>
+                        <i class="fas fa-download"></i>
+                    </a>
                     <div class="file-icon">
                         <i class="fas fa-file-pdf"></i>
                     </div>
@@ -177,33 +136,18 @@ $course_slides = $wpdb->get_results($wpdb->prepare(
                             Téléchargé: <?php echo date('d M, y', strtotime($assignment->created_at)); ?>
                         </p>
                     </div>
-                    <div class="col">
-                        <a href="<?php echo esc_url($assignment->file); ?>" class="download-button" download>
-                            <i class="fas fa-download"></i>
-                        </a>
-                    </div>
                 </div>
             </div>
             <?php endforeach; ?>
 
-            <!-- Display Course Slides -->
+            <!-- Display Session Slides -->
             <?php foreach ($course_slides as $slide) : ?>
             <div class="file-card">
                 <div class="file-top">
                     <p class="file-type slide">Diapositive</p>
-                    <?php
-                            if (in_array('teacher', (array) $user->roles)) {
-                        ?>
-                    <form method="post" class="delete-form">
-                        <input type="hidden" name="delete_item_id" value="<?php echo esc_attr($slide->id); ?>">
-                        <input type="hidden" name="file_type" id="deleteFileType" value="Course Slide">
-                        <button type="button" class="button file-delete open-modal" data-modal="fileDelete">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </form>
-                    <?php
-                            }
-                        ?>
+                    <a href="<?php echo esc_url($slide->file); ?>" class="download-button" download>
+                        <i class="fas fa-download"></i>
+                    </a>
                     <div class="file-icon">
                         <i class="fas fa-file-pdf"></i>
                     </div>
@@ -215,21 +159,36 @@ $course_slides = $wpdb->get_results($wpdb->prepare(
                             Téléchargé: <?php echo date('d M, y', strtotime($slide->created_at)); ?>
                         </p>
                     </div>
-                    <div class="col">
-                        <a href="<?php echo esc_url($slide->file); ?>" class="download-button" download>
-                            <i class="fas fa-download"></i>
-                        </a>
-                    </div>
                 </div>
             </div>
             <?php endforeach; ?>
-            <?php else :?>
-            <p class="no-data">Aucune ressource n'a été ajoutée pour ce cours</p>
-            <?php endif;?>
-
+            <?php endif; ?>
         </div>
-
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var sessionSelect = document.getElementById("sessionSelect");
+
+    if (sessionSelect) {
+        // If no session is selected, select the first one and update the URL
+        if (!window.location.search.includes('session_id')) {
+            var firstSessionId = sessionSelect.options[0].value;
+            window.location.href = window.location.pathname + "?session_id=" + encodeURIComponent(
+                firstSessionId);
+        }
+
+        sessionSelect.addEventListener("change", function() {
+            var selectedCourse = this.value;
+            if (selectedCourse) {
+                window.location.href = window.location.pathname + "?session_id=" +
+                    encodeURIComponent(
+                        selectedCourse);
+            }
+        });
+    }
+});
+</script>
 
 <?php require_once(get_template_directory() . '/student/templates/footer.php'); ?>

@@ -58,17 +58,17 @@
 }
 
 /* resources page */
-#studentResources .select-course {
+#studentResources .select-session {
   width: 100%;
 }
-#studentResources .select-course label {
+#studentResources .select-session label {
   font-family: var(--accent-font-family) !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   margin-bottom: -5px;
   text-transform: capitalize;
 }
-#studentResources .select-course select {
+#studentResources .select-session select {
   margin-top: 0.5rem;
   width: 100%;
   height: fit-content;
@@ -85,17 +85,17 @@
   width: 100%; /* Make select take full width of the wrapper */
   cursor: pointer;
 }
-#studentResources .select-course select::-ms-expand {
+#studentResources .select-session select::-ms-expand {
   display: none;
 }
-#studentResources .select-course select:focus {
+#studentResources .select-session select:focus {
   border-color: var(--accent-color) !important;
 }
-#studentResources .select-course .custom-select-wrapper {
+#studentResources .select-session .custom-select-wrapper {
   position: relative;
   display: block; /* Allow positioning the arrow next to the select */
 }
-#studentResources .select-course .custom-arrow {
+#studentResources .select-session .custom-arrow {
   position: absolute;
   top: 65%;
   right: 10px; /* Adjust the right padding to position the arrow */
@@ -156,6 +156,8 @@
 }
 #studentResources .file-bottom {
   width: 100%;
+  height: 10rem;
+  align-items: start;
   background-color: var(--gray-background-color);
   padding: 1rem;
 }
@@ -184,6 +186,10 @@
   color: var(--accent-color);
 }
 #studentResources .download-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -197,17 +203,17 @@
 }
 
 /* progress page */
-#studentProgress .select-course {
+#studentProgress .select-session {
   width: 100%;
 }
-#studentProgress .select-course label {
+#studentProgress .select-session label {
   font-family: var(--accent-font-family) !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   margin-bottom: -5px;
   text-transform: capitalize;
 }
-#studentProgress .select-course select {
+#studentProgress .select-session select {
   margin-top: 0.5rem;
   width: 100%;
   height: fit-content;
@@ -224,17 +230,17 @@
   width: 100%; /* Make select take full width of the wrapper */
   cursor: pointer;
 }
-#studentProgress .select-course select::-ms-expand {
+#studentProgress .select-session select::-ms-expand {
   display: none;
 }
-#studentProgress .select-course select:focus {
+#studentProgress .select-session select:focus {
   border-color: var(--accent-color) !important;
 }
-#studentProgress .select-course .custom-select-wrapper {
+#studentProgress .select-session .custom-select-wrapper {
   position: relative;
   display: block; /* Allow positioning the arrow next to the select */
 }
-#studentProgress .select-course .custom-arrow {
+#studentProgress .select-session .custom-arrow {
   position: absolute;
   top: 65%;
   right: 10px; /* Adjust the right padding to position the arrow */
@@ -242,6 +248,25 @@
   font-size: 14px; /* Adjust the size of the arrow */
   color: #333; /* Change the color of the arrow */
   pointer-events: none; /* Prevent interaction with the icon */
+}
+#studentProgress .chart-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+#studentProgress .chart-card {
+  flex: 1 1 30%;
+  background: var(--gray-background-color);
+  padding: 2rem;
+  border-radius: 0.5rem;
+}
+#studentProgress .chart-card .chart-heading {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  color: var(--dark-text-color);
+  margin-bottom: 1rem;
+  text-align: center;
 }
 #studentProgress .file-container {
   align-items: flex-start;
@@ -295,6 +320,8 @@
 }
 #studentProgress .file-bottom {
   width: 100%;
+  height: 10rem;
+  align-items: start;
   background-color: var(--gray-background-color);
   padding: 1rem;
 }
@@ -323,6 +350,10 @@
   color: var(--accent-color);
 }
 #studentProgress .download-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;

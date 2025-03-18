@@ -159,13 +159,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ob_end_clean();
 
-
 ?>
 
                 <!-- profile update form -->
                 <form class="parent-profile-update-form" method="post" action="">
-
-                    <input type="hidden" name="csrf_token" value="<?php echo esc_attr($csrf_token); ?>">
 
                     <!-- Display error message -->
                     <?php if ($error_message): ?>

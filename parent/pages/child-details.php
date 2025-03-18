@@ -34,52 +34,106 @@ if (!$student) {
     wp_die("L'étudiant demandé n'a pas pu être trouvé.");
 }
 
-// function to get student's active courses
-function get_student_active_courses($student_id) {
-    global $wpdb;
-
-    // Query to get the courses assigned to the student with status 'En cours'
-    $courses = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT c.* 
-             FROM {$wpdb->prefix}student_courses sc
-             INNER JOIN {$wpdb->prefix}courses c ON sc.course_id = c.id
-             WHERE sc.student_id = %d AND sc.status = %s",
-            $student_id,
-            'En cours'
-        )
-    );
-
-    return $courses;
-}
-
 // get current student
 $student_id = $student->id;
 
-// function to get student's completed courses
-function get_student_completed_courses($student_id) {
-    global $wpdb;
+$sessions_table = $wpdb->prefix . 'course_sessions';
 
-    // Query to get the courses assigned to the student with status 'En cours'
-    $courses = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT c.* 
-             FROM {$wpdb->prefix}student_courses sc
-             INNER JOIN {$wpdb->prefix}courses c ON sc.course_id = c.id
-             WHERE sc.student_id = %d AND sc.status = %s",
-            $student_id,
-            'Complété'
-        )
-    );
+$upcomming_sessions = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT * FROM $sessions_table 
+        WHERE JSON_CONTAINS(enrolled_students, %s) 
+        AND status IN ('upcoming')",
+        '"' . $student_id . '"'
+    )
+);
 
-    return $courses;
+$ongoing_sessions = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT * FROM $sessions_table 
+        WHERE JSON_CONTAINS(enrolled_students, %s) 
+        AND status IN ('ongoing')",
+        '"' . $student_id . '"'
+    )
+);
+
+$completed_sessions = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT * FROM $sessions_table 
+        WHERE JSON_CONTAINS(enrolled_students, %s) 
+        AND status IN ('completed')",
+        '"' . $student_id . '"'
+    )
+);
+
+$cancelled_sessions = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT * FROM $sessions_table 
+        WHERE JSON_CONTAINS(enrolled_students, %s) 
+        AND status IN ('cancelled')",
+        '"' . $student_id . '"'
+    )
+);
+
+// Fetch Attendance Rate for all sessions
+$attendance_data = $wpdb->get_results($wpdb->prepare(
+    "SELECT attendance FROM {$wpdb->prefix}student_attendance WHERE student_id = %d",
+    $student_id
+));
+
+$present_count = 0;
+$absent_count = 0;
+foreach ($attendance_data as $attendance) {
+    if ($attendance->attendance === 'present') {
+        $present_count++;
+    } else {
+        $absent_count++;
+    }
 }
 
-// Get the student's active courses
-$active_courses = get_student_active_courses($student_id);
+// Fetch Assignment Submission Progress for all sessions
+// Get total assignments for the student
+$assignments_data = $wpdb->get_results($wpdb->prepare(
+    "SELECT id FROM {$wpdb->prefix}course_assignments WHERE session_id IN (
+        SELECT session_id FROM {$wpdb->prefix}student_attendance WHERE student_id = %d
+    )",
+    $student_id
+));
 
-// Get the student's completed courses
-$completed_courses = get_student_completed_courses($student_id);
+$total_assignments = count($assignments_data);
+
+// Get submitted assignments for the student
+$submission_data = $wpdb->get_results($wpdb->prepare(
+    "SELECT file FROM {$wpdb->prefix}student_submissions WHERE student_id = %d",
+    $student_id
+));
+
+$submitted_count = 0;
+foreach ($submission_data as $submission) {
+    if (!empty($submission->file)) {
+        $submitted_count++;
+    }
+}
+
+$not_submitted_count = $total_assignments - $submitted_count;
+
+// Fetch Performance Feedback from Teachers for all sessions
+$feedback_data = $wpdb->get_results($wpdb->prepare(
+    "SELECT comment FROM {$wpdb->prefix}student_reports WHERE student_id = %d",
+    $student_id
+));
+
+$feedback_counts = [
+    'Excellent' => 0,
+    'Bon' => 0,
+    'Moyen' => 0,
+    'Faible' => 0,
+];
+foreach ($feedback_data as $feedback) {
+    if (isset($feedback_counts[$feedback->comment])) {
+        $feedback_counts[$feedback->comment]++;
+    }
+}
 
 ?>
 
@@ -128,7 +182,7 @@ $completed_courses = get_student_completed_courses($student_id);
                         <div class="row detail-row">
                             <span class="col detail-label">Date de naissance:</span>
                             <span class="col detail-value">
-                                <?php echo esc_html($student->date_of_birth); ?>
+                                <?php echo esc_html(date('M d, Y', strtotime($student->date_of_birth))); ?>
                             </span>
                         </div>
                         <div class="row detail-row">
@@ -157,44 +211,121 @@ $completed_courses = get_student_completed_courses($student_id);
                     <h3 class="section-heading">Cours Enregistrés</h3>
 
                     <ul class="nav nav-tabs" id="courseTabs">
-                        <a class="nav-link active" data-toggle="tab" href="#active">Cours en cours</a>
+                        <a class="nav-link active" data-toggle="tab" href="#upcoming">Cours à venir</a>
+                        <a class="nav-link" data-toggle="tab" href="#ongoing">Cours en cours</a>
                         <a class="nav-link" data-toggle="tab" href="#completed">Cours terminés</a>
+                        <a class="nav-link" data-toggle="tab" href="#cancelled">Cours annulés</a>
                     </ul>
 
                     <div class="tab-content">
-                        <div class="tab-pane fade show active" id="active">
+                        <div class="tab-pane fade show active" id="upcoming">
                             <div class="row">
                                 <div class="col">
                                     <div class="courses">
                                         <?php 
                                     $default_image = get_template_directory_uri() . '/assets/image/image-placeholder.png';
-                                    if (!empty($active_courses)): 
-                                        foreach ($active_courses as $course): 
+                                    if (!empty($upcomming_sessions)): 
+                                        foreach ($upcomming_sessions as $session): 
+                                            $course_id = $session->course_id;
+                                            $group_number = $session->group_number;
+                                            $session_date = $session->session_date;
+                                            $session_date = date('M d, Y', strtotime($session->session_date));
+                                            $status = $session->status;
+                                            $slot_1 = date('h:i A', strtotime($session->slot1_start_time)) . ' - ' . date('h:i A', strtotime($session->slot1_end_time));
+                                            $slot_2 = date('h:i A', strtotime($session->slot2_start_time)) . ' - ' . date('h:i A', strtotime($session->slot2_end_time));
+
+                                            $table_name = $wpdb->prefix . 'courses';
+                                            $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
                                 ?>
                                         <div class="course-card">
                                             <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                                 alt="Course Image" class="course-image">
-                                            <span class="course-tag in-progress">En cours</span>
+                                            <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
                                             <h3 class="course-title">
                                                 <?php echo esc_html($course->title); ?>
                                             </h3>
                                             <div class="course-info">
                                                 <p class="date">
-                                                    <?php echo esc_html(date('M d, Y', strtotime($course->start_date))); ?>
+                                                    Groupe:
+                                                    <?php echo esc_html($group_number);?>
                                                 </p>
-                                                <p class="time">
-                                                    <?php echo esc_html($course->time_slot); ?>
+                                                <p class="date">
+                                                    Date:
+                                                    <?php echo esc_html($session_date);?>
+                                                </p>
+                                                <p class="date">
+                                                    Temps 1:
+                                                    <?php echo esc_html($slot_1);?>
+                                                </p>
+                                                <p class="date">
+                                                    Temps 2:
+                                                    <?php echo esc_html($slot_2);?>
                                                 </p>
                                             </div>
                                             <div class="course-footer">
-                                                <a href="<?php echo site_url('/course/details/?course_id=' . $course->id . '&student_id=' . $student->id); ?>"
-                                                    class="course-btn">
-                                                    Voir les détails
-                                                </a>
+                                                <a href="<?php echo esc_url(site_url('/course/details/?session_id=' . $session->id . '&student_id=' . $student_id)); ?>"
+                                                    class="course-btn">Voir les détails</a>
                                             </div>
                                         </div>
                                         <?php endforeach; else: ?>
-                                        <p class="no-data">Aucun cours en cours.</p>
+                                        <p class="no-data">Aucun cours à venir.</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="ongoing">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="courses">
+                                        <?php 
+                                    $default_image = get_template_directory_uri() . '/assets/image/image-placeholder.png';
+                                    if (!empty($ongoing_sessions)): 
+                                        foreach ($ongoing_sessions as $session): 
+                                            $course_id = $session->course_id;
+                                            $group_number = $session->group_number;
+                                            $session_date = $session->session_date;
+                                            $session_date = date('M d, Y', strtotime($session->session_date));
+                                            $status = $session->status;
+                                            $slot_1 = date('h:i A', strtotime($session->slot1_start_time)) . ' - ' . date('h:i A', strtotime($session->slot1_end_time));
+                                            $slot_2 = date('h:i A', strtotime($session->slot2_start_time)) . ' - ' . date('h:i A', strtotime($session->slot2_end_time));
+
+                                            $table_name = $wpdb->prefix . 'courses';
+                                            $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+                                ?>
+                                        <div class="course-card">
+                                            <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
+                                                alt="Course Image" class="course-image">
+                                            <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                            <h3 class="course-title">
+                                                <?php echo esc_html($course->title); ?>
+                                            </h3>
+                                            <div class="course-info">
+                                                <p class="date">
+                                                    Groupe:
+                                                    <?php echo esc_html($group_number);?>
+                                                </p>
+                                                <p class="date">
+                                                    Date:
+                                                    <?php echo esc_html($session_date);?>
+                                                </p>
+                                                <p class="date">
+                                                    Temps 1:
+                                                    <?php echo esc_html($slot_1);?>
+                                                </p>
+                                                <p class="date">
+                                                    Temps 2:
+                                                    <?php echo esc_html($slot_2);?>
+                                                </p>
+                                            </div>
+                                            <div class="course-footer">
+                                                <a href="<?php echo esc_url(site_url('/course/details/?session_id=' . $session->id . '&student_id=' . $student_id)); ?>"
+                                                    class="course-btn">Voir les détails</a>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; else: ?>
+                                        <p class="no-data">Pas de cours en cours.</p>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -205,28 +336,49 @@ $completed_courses = get_student_completed_courses($student_id);
                             <div class="row">
                                 <div class="col">
                                     <div class="courses">
-                                        <?php if (!empty($completed_courses)): 
-                                foreach ($completed_courses as $course): ?>
+                                        <?php 
+                                    $default_image = get_template_directory_uri() . '/assets/image/image-placeholder.png';
+                                    if (!empty($completed_sessions)): 
+                                        foreach ($completed_sessions as $session): 
+                                            $course_id = $session->course_id;
+                                            $group_number = $session->group_number;
+                                            $session_date = $session->session_date;
+                                            $session_date = date('M d, Y', strtotime($session->session_date));
+                                            $status = $session->status;
+                                            $slot_1 = date('h:i A', strtotime($session->slot1_start_time)) . ' - ' . date('h:i A', strtotime($session->slot1_end_time));
+                                            $slot_2 = date('h:i A', strtotime($session->slot2_start_time)) . ' - ' . date('h:i A', strtotime($session->slot2_end_time));
+
+                                            $table_name = $wpdb->prefix . 'courses';
+                                            $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+                                ?>
                                         <div class="course-card">
                                             <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                                 alt="Course Image" class="course-image">
-                                            <span class="course-tag completed">Complété</span>
+                                            <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
                                             <h3 class="course-title">
                                                 <?php echo esc_html($course->title); ?>
                                             </h3>
                                             <div class="course-info">
                                                 <p class="date">
-                                                    <?php echo esc_html(date('M d, Y', strtotime($course->start_date))); ?>
+                                                    Groupe:
+                                                    <?php echo esc_html($group_number);?>
                                                 </p>
-                                                <p class="time">
-                                                    <?php echo esc_html($course->time_slot); ?>
+                                                <p class="date">
+                                                    Date:
+                                                    <?php echo esc_html($session_date);?>
+                                                </p>
+                                                <p class="date">
+                                                    Temps 1:
+                                                    <?php echo esc_html($slot_1);?>
+                                                </p>
+                                                <p class="date">
+                                                    Temps 2:
+                                                    <?php echo esc_html($slot_2);?>
                                                 </p>
                                             </div>
                                             <div class="course-footer">
-                                                <a href="<?php echo site_url('/course/details/?course_id=' . $course->id . '&student_id=' . $student->id); ?>"
-                                                    class="course-btn">
-                                                    Voir les détails
-                                                </a>
+                                                <a href="<?php echo esc_url(site_url('/course/details/?session_id=' . $session->id . '&student_id=' . $student_id)); ?>"
+                                                    class="course-btn">Voir les détails</a>
                                             </div>
                                         </div>
                                         <?php endforeach; else: ?>
@@ -236,13 +388,164 @@ $completed_courses = get_student_completed_courses($student_id);
                                 </div>
                             </div>
                         </div>
+
+                        <div class="tab-pane fade" id="cancelled">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="courses">
+                                        <?php 
+                                    $default_image = get_template_directory_uri() . '/assets/image/image-placeholder.png';
+                                    if (!empty($cancelled_sessions)): 
+                                        foreach ($cancelled_sessions as $session): 
+                                            $course_id = $session->course_id;
+                                            $group_number = $session->group_number;
+                                            $session_date = $session->session_date;
+                                            $session_date = date('M d, Y', strtotime($session->session_date));
+                                            $status = $session->status;
+                                            $slot_1 = date('h:i A', strtotime($session->slot1_start_time)) . ' - ' . date('h:i A', strtotime($session->slot1_end_time));
+                                            $slot_2 = date('h:i A', strtotime($session->slot2_start_time)) . ' - ' . date('h:i A', strtotime($session->slot2_end_time));
+
+                                            $table_name = $wpdb->prefix . 'courses';
+                                            $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+                                ?>
+                                        <div class="course-card">
+                                            <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
+                                                alt="Course Image" class="course-image">
+                                            <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                            <h3 class="course-title">
+                                                <?php echo esc_html($course->title); ?>
+                                            </h3>
+                                            <div class="course-info">
+                                                <p class="date">
+                                                    Groupe:
+                                                    <?php echo esc_html($group_number);?>
+                                                </p>
+                                                <p class="date">
+                                                    Date:
+                                                    <?php echo esc_html($session_date);?>
+                                                </p>
+                                                <p class="date">
+                                                    Temps 1:
+                                                    <?php echo esc_html($slot_1);?>
+                                                </p>
+                                                <p class="date">
+                                                    Temps 2:
+                                                    <?php echo esc_html($slot_2);?>
+                                                </p>
+                                            </div>
+                                            <div class="course-footer">
+                                                <a href="<?php echo esc_url(site_url('/course/details/?session_id=' . $session->id . '&student_id=' . $student_id)); ?>"
+                                                    class="course-btn">Voir les détails</a>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; else: ?>
+                                        <p class="no-data">Aucun cours annulé.</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
             </div>
 
         </div>
+
+        <div class="row chart-container">
+            <!-- Attendance Rate Chart -->
+            <div class="chart-card">
+                <h3 class="chart-heading">Taux de présence</h3>
+                <canvas id="attendanceChart"></canvas>
+            </div>
+
+            <!-- Assignment Submission Progress Chart -->
+            <div class="chart-card">
+                <h3 class="chart-heading">Progrès des devoirs</h3>
+                <canvas id="submissionChart"></canvas>
+            </div>
+
+            <!-- Performance Feedback Chart -->
+            <div class="chart-card">
+                <h3 class="chart-heading">Retour des enseignants</h3>
+                <canvas id="feedbackChart"></canvas>
+            </div>
+        </div>
+
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Attendance Rate Chart
+const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+const attendanceChart = new Chart(attendanceCtx, {
+    type: 'pie',
+    data: {
+        labels: ['Présent', 'Absent'],
+        datasets: [{
+            data: [<?php echo $present_count; ?>, <?php echo $absent_count; ?>],
+            backgroundColor: ['#36a2eb', '#ff6384'],
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+        }
+    }
+});
+
+// Assignment Submission Progress Chart
+const submissionCtx = document.getElementById('submissionChart').getContext('2d');
+const submissionChart = new Chart(submissionCtx, {
+    type: 'pie',
+    data: {
+        labels: ['Soumis', 'Non soumis'],
+        datasets: [{
+            data: [<?php echo $submitted_count; ?>, <?php echo $not_submitted_count; ?>],
+            backgroundColor: ['#4bc0c0', '#ff9f40'],
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+        }
+    }
+});
+
+// Performance Feedback Chart
+const feedbackCtx = document.getElementById('feedbackChart').getContext('2d');
+const feedbackChart = new Chart(feedbackCtx, {
+    type: 'pie',
+    data: {
+        labels: ['Excellent', 'Bon', 'Moyen', 'Faible'],
+        datasets: [{
+            data: [
+                <?php echo $feedback_counts['Excellent']; ?>,
+                <?php echo $feedback_counts['Bon']; ?>,
+                <?php echo $feedback_counts['Moyen']; ?>,
+                <?php echo $feedback_counts['Faible']; ?>
+            ],
+            backgroundColor: ['#9966ff', '#ffcd56', '#c9cbcf', '#ff6384'],
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+        }
+    }
+});
+</script>
 
 <?php require_once(get_template_directory() . '/parent/templates/footer.php'); ?>

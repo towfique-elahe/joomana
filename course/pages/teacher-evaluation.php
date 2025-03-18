@@ -30,6 +30,9 @@ if (!isset($_GET['session_id']) || empty($_GET['session_id'])) {
     }
 }
 $session_id = intval($_GET['session_id']);
+$sessions_table = $wpdb->prefix . 'course_sessions';
+$session = $wpdb->get_row($wpdb->prepare("SELECT * FROM $sessions_table WHERE id = %d", $session_id));
+$teacher_id = $session->teacher_id;
 
 global $wpdb;
 
@@ -92,7 +95,7 @@ if (in_array('teacher', (array) $user->roles)) {
         $session_id,
         $teacher_id
     ));
-} elseif {
+} else {
     $evaluations = $wpdb->get_results($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}teacher_evaluations WHERE session_id = %d AND student_id = %d ORDER BY created_at DESC",
         $session_id,

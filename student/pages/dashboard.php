@@ -16,73 +16,36 @@ if (!defined('ABSPATH')) {
 // Get the current user
 $user = wp_get_current_user();
 $student_id = $user->ID;
-// Get the student details by the current user
-$student_table = $wpdb->prefix . 'students';
-$student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $student_id));
 
 global $wpdb;
 
-// Function to get the count of a student's active courses
-function get_student_active_courses_count($student_id) {
-    global $wpdb;
+$session_table = $wpdb->prefix . 'course_sessions';
 
-    // Query to get the count of active courses assigned to the student
-    $course_count = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT COUNT(*) 
-             FROM {$wpdb->prefix}student_courses sc
-             INNER JOIN {$wpdb->prefix}courses c ON sc.course_id = c.id
-             WHERE sc.student_id = %d AND sc.status = %s",
-            $student_id,
-            'En cours'
-        )
-    );
+$total_course_count = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT COUNT(*) FROM $session_table 
+         WHERE JSON_CONTAINS(enrolled_students, %s)",
+        json_encode((string) $student_id)
+    )
+);
 
-    return $course_count;
-}
+$total_active_course_count = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT COUNT(*) FROM $session_table 
+         WHERE JSON_CONTAINS(enrolled_students, %s) 
+         AND status IN (%s, %s)",
+        json_encode((string) $student_id), 'upcoming', 'ongoing'
+    )
+);
 
-// Function to get the count of a student's completed courses
-function get_student_completed_courses_count($student_id) {
-    global $wpdb;
-
-    // Query to get the count of completed courses assigned to the student
-    $course_count = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT COUNT(*) 
-             FROM {$wpdb->prefix}student_courses sc
-             INNER JOIN {$wpdb->prefix}courses c ON sc.course_id = c.id
-             WHERE sc.student_id = %d AND sc.status = %s",
-            $student_id,
-            'Complété'
-        )
-    );
-
-    return $course_count;
-}
-
-// Query to count total courses
-$course_count = $wpdb->get_var($wpdb->prepare(
-    "SELECT COUNT(*) FROM {$wpdb->prefix}student_courses WHERE student_id = %d",
-    $student_id
-));
-
-// Query to count total active courses
-$active_course_count = get_student_active_courses_count($student_id);
-
-// Query to count total completed courses
-$completed_course_count = get_student_completed_courses_count($student_id);
-
-// Query to get total payments
-$total_payments = (int) $wpdb->get_var($wpdb->prepare(
-    "SELECT SUM(amount) FROM {$wpdb->prefix}payments WHERE user_id = %d",
-    $student_id
-));
-
-// Query to get total credit purchased
-$total_credit = (int) $wpdb->get_var($wpdb->prepare(
-    "SELECT SUM(credit) FROM {$wpdb->prefix}payments WHERE user_id = %d",
-    $student_id
-));
+$total_completed_course_count = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT COUNT(*) FROM $session_table 
+         WHERE JSON_CONTAINS(enrolled_students, %s) 
+         AND status IN (%s)",
+        json_encode((string) $student_id), 'completed'
+    )
+);
 
 ?>
 
@@ -112,7 +75,7 @@ $total_credit = (int) $wpdb->get_var($wpdb->prepare(
                         <i class="fas fa-book"></i> Total de cours
                     </h4>
                     <p class="statistic-value">
-                        <?php echo esc_html($course_count); ?>
+                        <?php echo esc_html($total_course_count); ?>
                     </p>
                 </a>
 
@@ -122,7 +85,7 @@ $total_credit = (int) $wpdb->get_var($wpdb->prepare(
                         <i class="fas fa-hourglass-end"></i> Total des cours en cours
                     </h4>
                     <p class="statistic-value">
-                        <?php echo esc_html($active_course_count); ?>
+                        <?php echo esc_html($total_active_course_count); ?>
                     </p>
                 </a>
 
@@ -132,37 +95,7 @@ $total_credit = (int) $wpdb->get_var($wpdb->prepare(
                         <i class="fas fa-check-circle"></i> Total de cours suivis
                     </h4>
                     <p class="statistic-value">
-                        <?php echo esc_html($completed_course_count); ?>
-                    </p>
-                </a>
-
-                <a href="<?php echo home_url('/student/payments/'); ?>" class="statistic-box total-payments">
-                    <h4 class="statistic-title">
-                        <i class="fas fa-exchange-alt"></i> Paiements totaux
-                    </h4>
-                    <p class="statistic-value">
-                        <?php echo esc_html($total_payments); ?>
-                        <span class="currecy"><i class="fas fa-euro-sign"></i></span>
-                    </p>
-                </a>
-
-                <a href="<?php echo home_url('/student/credit-management/'); ?>"
-                    class="statistic-box total-purchased-credit">
-                    <h4 class="statistic-title">
-                        <i class="fas fa-shopping-bag"></i> Crédit d'achat total
-                    </h4>
-                    <p class="statistic-value">
-                        <?php echo esc_html($total_credit); ?>
-                    </p>
-                </a>
-
-                <a href="<?php echo home_url('/student/credit-management/'); ?>"
-                    class="statistic-box total-available-credit">
-                    <h4 class="statistic-title">
-                        <i class="fas fa-coins"></i> Crédit total disponible
-                    </h4>
-                    <p class="statistic-value">
-                        <?php echo esc_html($student->credit); ?>
+                        <?php echo esc_html($total_completed_course_count); ?>
                     </p>
                 </a>
 
