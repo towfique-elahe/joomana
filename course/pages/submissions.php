@@ -16,8 +16,8 @@ if (!defined('ABSPATH')) {
 // Get the current user
 $user = wp_get_current_user();
 
-// Get course_id from session
-if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
+// Get session_id from session
+if (!isset($_GET['session_id']) || empty($_GET['session_id'])) {
     // Check the user's role and redirect accordingly
     if (in_array('parent', (array) $user->roles)) {
         wp_redirect(home_url('/parent/course-management/'));
@@ -34,40 +34,14 @@ if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
         exit;
     }
 }
-$course_id = intval($_GET['course_id']);
-
-$group_number = 0;
+$session_id = intval($_GET['session_id']);
 
 if (in_array('parent', (array) $user->roles)) {
     $student_id = intval($_GET['student_id']);
-    $student_group = $wpdb->get_var($wpdb->prepare(
-        "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
-        $student_id,
-        $course_id
-    ));
-    if ($student_group) {
-        $group_number = intval($student_group);
-    }
 } elseif (in_array('student', (array) $user->roles)) {
     $student_id = $user->ID;
-    $student_group = $wpdb->get_var($wpdb->prepare(
-        "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
-        $student_id,
-        $course_id
-    ));
-    if ($student_group) {
-        $group_number = intval($student_group);
-    }
 } elseif (in_array('teacher', (array) $user->roles)) {
     $teacher_id = $user->ID;
-    $teacher_group = $wpdb->get_var($wpdb->prepare(
-        "SELECT group_number FROM {$wpdb->prefix}teacher_courses WHERE teacher_id = %d AND course_id = %d LIMIT 1",
-        $teacher_id,
-        $course_id
-    ));
-    if ($teacher_group) {
-        $group_number = intval($teacher_group);
-    }
 }
 
 // Handle assignment upload for students
@@ -86,8 +60,7 @@ if (in_array('student', (array) $user->roles)) {
 
         if ($uploaded_file_url) {
             $wpdb->insert($table_name, [
-                'course_id' => $course_id,
-                'group_number' => $group_number,
+                'session_id' => $session_id,
                 'student_id' => $student_id,
                 'file' => $uploaded_file_url,
                 'created_at' => current_time('mysql'),
@@ -140,17 +113,15 @@ $submissions = [];
 if (in_array('teacher', (array) $user->roles)) {
     // Fetch submissions for the teacher
     $submissions = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}student_submissions WHERE course_id = %d AND group_number = %d",
-        $course_id,
-        $group_number
+        "SELECT * FROM {$wpdb->prefix}student_submissions WHERE session_id = %d",
+        $session_id
     ));
 
 } elseif (current_user_can('student') || current_user_can('parent')) {
     // Fetch submissions for the student
     $submissions = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}student_submissions WHERE course_id = %d AND group_number = %d AND student_id = %d",
-        $course_id,
-        $group_number,
+        "SELECT * FROM {$wpdb->prefix}student_submissions WHERE session_id = %d AND student_id = %d",
+        $session_id,
         $student_id
     ));
 
@@ -284,6 +255,9 @@ if (in_array('student', (array) $user->roles)) {
                         <?php
                             }
                         ?>
+                        <a href="<?php echo esc_url($submission->file); ?>" class="download-button" download>
+                            <i class="fas fa-download"></i>
+                        </a>
                         <div class="file-icon">
                             <i class="fas fa-file-pdf"></i>
                         </div>
@@ -300,7 +274,7 @@ if (in_array('student', (array) $user->roles)) {
                             ?>
                             <p class="file-info">
                                 Étudiant:
-                                <a href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id . '&course_id=' . $course_id)); ?>"
+                                <a href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id . '&session_id=' . $session_id)); ?>"
                                     class="accent"><?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?></a>
                             </p>
                             <?php
@@ -309,11 +283,6 @@ if (in_array('student', (array) $user->roles)) {
                             <p class="file-info">
                                 Téléchargé: <?php echo date('d M, y', strtotime($submission->created_at)); ?>
                             </p>
-                        </div>
-                        <div class="col">
-                            <a href="<?php echo esc_url($submission->file); ?>" class="download-button" download>
-                                <i class="fas fa-download"></i>
-                            </a>
                         </div>
                     </div>
                 </div>

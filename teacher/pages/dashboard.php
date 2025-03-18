@@ -18,74 +18,49 @@ $user = wp_get_current_user();
 $teacher_id = $user->ID;
 
 global $wpdb;
+$courses_table = $wpdb->prefix . 'courses';
+$sessions_table = $wpdb->prefix . 'course_sessions';
 
-// Function to get the count of a teacher's active courses
-function get_teacher_active_courses_count($teacher_id) {
-    global $wpdb;
+// Ensure teacher_id is defined and treated as a string
+$teacher_id_str = json_encode((string) $teacher_id);
 
-    // Query to get the count of active courses assigned to the teacher
-    $course_count = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT COUNT(*) 
-             FROM {$wpdb->prefix}teacher_courses tc
-             INNER JOIN {$wpdb->prefix}courses c ON tc.course_id = c.id
-             WHERE tc.teacher_id = %d AND tc.status = %s",
-            $teacher_id,
-            'En cours'
-        )
-    );
+// Assigned courses count
+$assigned_course_count = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT COUNT(*) FROM $courses_table WHERE JSON_CONTAINS(assigned_teachers, %s)", 
+        $teacher_id_str
+    )
+);
 
-    return $course_count;
-}
+// Active courses count (status = 'Upcoming' OR 'Ongoing')
+$active_course_count = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT COUNT(*) FROM $courses_table 
+         WHERE JSON_CONTAINS(assigned_teachers, %s) 
+         AND (status = %s OR status = %s)",
+        $teacher_id_str, "Upcoming", "Ongoing"
+    )
+);
 
-// Function to get the count of a teacher's completed courses
-function get_teacher_completed_courses_count($teacher_id) {
-    global $wpdb;
+// Completed courses count (status = 'Completed')
+$completed_course_count = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT COUNT(*) FROM $courses_table 
+         WHERE JSON_CONTAINS(assigned_teachers, %s) 
+         AND (status = %s)",
+        $teacher_id_str, "Completed"
+    )
+);
 
-    // Query to get the count of completed courses assigned to the teacher
-    $course_count = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT COUNT(*) 
-             FROM {$wpdb->prefix}teacher_courses tc
-             INNER JOIN {$wpdb->prefix}courses c ON tc.course_id = c.id
-             WHERE tc.teacher_id = %d AND tc.status = %s",
-            $teacher_id,
-            'Complété'
-        )
-    );
-
-    return $course_count;
-}
-
-// Query to count total students
-$student_count = $wpdb->get_var($wpdb->prepare(
-    "SELECT COUNT(*) FROM {$wpdb->prefix}student_courses WHERE teacher_id = %d",
-    $teacher_id
-));
-
-// Query to count total courses
-$course_count = $wpdb->get_var($wpdb->prepare(
-    "SELECT COUNT(*) FROM {$wpdb->prefix}teacher_courses WHERE teacher_id = %d",
-    $teacher_id
-));
-
-// Query to count total active courses
-$active_course_count = get_teacher_active_courses_count($teacher_id);
-
-// Query to count total completed courses
-$completed_course_count = get_teacher_completed_courses_count($teacher_id);
-
-// Query to get total due
-$total_due = (int) $wpdb->get_var($wpdb->prepare(
-    "SELECT due FROM {$wpdb->prefix}teachers WHERE id = %d",
-    $teacher_id
-));
-
-// Query to get total revenue for the teacher
-$total_revenue = (int) $wpdb->get_var($wpdb->prepare(
-    "SELECT SUM(deposit) FROM {$wpdb->prefix}teacher_payments WHERE user_id = %d",
-    $teacher_id
-));
+// Count total students from enrolled_students where teacher_id matches
+$total_students = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT SUM(JSON_LENGTH(enrolled_students)) 
+         FROM $sessions_table 
+         WHERE teacher_id = %d",
+        $teacher_id
+    )
+);
 
 ?>
 
@@ -113,7 +88,7 @@ $total_revenue = (int) $wpdb->get_var($wpdb->prepare(
                         <i class="fas fa-book"></i> Total de cours
                     </h4>
                     <p class="statistic-value">
-                        <?php echo esc_html($course_count); ?>
+                        <?php echo esc_html($assigned_course_count); ?>
                     </p>
                 </a>
 
@@ -142,27 +117,7 @@ $total_revenue = (int) $wpdb->get_var($wpdb->prepare(
                         <i class="fas fa-user-graduate"></i> Total d'étudiants
                     </h4>
                     <p class="statistic-value">
-                        <?php echo esc_html($student_count); ?>
-                    </p>
-                </a>
-
-                <a href="<?php echo home_url('/teacher/revenues/'); ?>" class="statistic-box total-due">
-                    <h4 class="statistic-title">
-                        <i class="fas fa-coins"></i> Total dû
-                    </h4>
-                    <p class="statistic-value">
-                        <?php echo esc_html($total_due); ?>
-                        <span class="currecy"><i class="fas fa-euro-sign"></i></span>
-                    </p>
-                </a>
-
-                <a href="<?php echo home_url('/teacher/revenues/'); ?>" class="statistic-box total-deposit">
-                    <h4 class="statistic-title">
-                        <i class="fas fa-wallet"></i> Chiffre d'affaires total
-                    </h4>
-                    <p class="statistic-value">
-                        <?php echo esc_html($total_revenue); ?>
-                        <span class="currecy"><i class="fas fa-euro-sign"></i></span>
+                        <?php echo esc_html($total_students); ?>
                     </p>
                 </a>
 

@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 $user = wp_get_current_user();
 
 // Get student_id from session
-if (!isset($_GET['id']) || empty($_GET['id'])) {
+if (!isset($_GET['student_id']) || empty($_GET['student_id'])) {
 
     // Check the user's role and redirect accordingly
     if (in_array('teacher', (array) $user->roles)) {
@@ -29,16 +29,13 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
         exit;
     }
 }
-$student_id = intval($_GET['id']);
+$student_id = intval($_GET['student_id']);
 
 // Get course_id from session
-if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
+if (!isset($_GET['session_id']) || empty($_GET['session_id'])) {
 
     // Check the user's role and redirect accordingly
-    if (in_array('student', (array) $user->roles)) {
-        wp_redirect(home_url('/student/course-management/'));
-        exit;
-    } elseif (in_array('teacher', (array) $user->roles)) {
+    if (in_array('teacher', (array) $user->roles)) {
         wp_redirect(home_url('/teacher/course-management/'));
         exit;
     } else {
@@ -47,7 +44,7 @@ if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
         exit;
     }
 }
-$course_id = intval($_GET['course_id']);
+$session_id = intval($_GET['session_id']);
 
 global $wpdb;
 

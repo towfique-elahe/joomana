@@ -32,6 +32,7 @@ $course_id = $session->course_id;
 $group_number = $session->group_number;
 $teacher_id = $session->teacher_id;
 $session_date = $session->session_date;
+$status = $session->status;
 $class_link = $session->class_link;
 $slot_1 = date('h:i A', strtotime($session->slot1_start_time)) . ' - ' . date('h:i A', strtotime($session->slot1_end_time));
 $slot_2 = date('h:i A', strtotime($session->slot2_start_time)) . ' - ' . date('h:i A', strtotime($session->slot2_end_time));
@@ -183,6 +184,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                         Temps 2:
                                         <span class="value">
                                             <?php echo esc_html($slot_2);?>
+                                        </span>
+                                    </li>
+                                    <li>
+                                        Statut:
+                                        <span class="value">
+                                            <?php echo esc_html($status);?>
                                         </span>
                                     </li>
                                 </ul>
@@ -455,21 +462,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                 <h4 class="settings-title">Paramètres</h4>
                                 <div class="buttons">
 
+                                    <!-- update class link -->
                                     <button type="button" class="button add-link open-modal" data-modal="addLinkModal">
                                         <i class="fas fa-link"></i> ajouter/mettre à jour le lien de classe
                                     </button>
 
+                                    <!-- reprogram session -->
                                     <button type="button" class="button reprogram open-modal"
                                         data-modal="sessionReprogramModal">
                                         <i class="fas fa-sync-alt"></i> Reprogrammer
                                     </button>
 
+                                    <!-- cancel class -->
                                     <!-- <form method="post" class="delete-form">
                                         <input type="hidden" name="cancel_course_id" value="<?php echo $course_id; ?>">
                                         <button type="button" class="button cancel open-modal" data-modal="cancelModal">
                                             <i class="fas fa-times"></i> Annuler
                                         </button>
                                     </form> -->
+
                                 </div>
                             </div>
 

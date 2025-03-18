@@ -28,7 +28,7 @@ if ($id > 0) {
 
 // Fetch the details of the teacher using the ID
 $teacher_table = $wpdb->prefix . 'teachers';
-$teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $payment->user_id));
+$teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $payment->teacher_id));
 
 ?>
 

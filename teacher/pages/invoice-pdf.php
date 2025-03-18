@@ -25,7 +25,7 @@ if (!$payment) {
     die('Payment not found');
 }
 
-$teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $payment->user_id));
+$teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $payment->teacher_id));
 if (!$teacher) {
     die('Teacher not found');
 }

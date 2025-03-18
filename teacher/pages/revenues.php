@@ -14,11 +14,11 @@ if (!defined('ABSPATH')) {
 }
 
 // current user ID
-$user_id = get_current_user_id();
+$teacher_id = get_current_user_id();
 
 global $wpdb;
 
-$payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments WHERE user_id = $user_id");
+$payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments WHERE teacher_id = $teacher_id");
 
 ?>
 
@@ -68,7 +68,7 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments WH
                     <?php if (!empty($payments)) : ?>
                     <?php 
                         foreach ($payments as $payment) : 
-                            $user = get_user_by('id', $payment->user_id);
+                            $user = get_user_by('id', $payment->teacher_id);
                             $user_roles = $user->roles;
                     ?>
                     <tr>

@@ -11,27 +11,27 @@
 <div class="sidebar">
     <ul class="sidebar-items">
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/details/?course_id=' . $course_id); ?>">
+            <a href="<?php echo home_url('/course/details/?session_id=' . $session_id); ?>">
                 <i class="fas fa-book"></i> Détails du cours
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/student-management/?course_id=' . $course_id); ?>">
+            <a href="<?php echo home_url('/course/student-management/?session_id=' . $session_id); ?>">
                 <i class="fas fa-graduation-cap"></i> Gestion étudiants
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/resources/?course_id=' . $course_id); ?>">
+            <a href="<?php echo home_url('/course/resources/?session_id=' . $session_id); ?>">
                 <i class="fas fa-folder-open"></i> Resources
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/submissions/?course_id=' . $course_id); ?>">
+            <a href="<?php echo home_url('/course/submissions/?session_id=' . $session_id); ?>">
                 <i class="fas fa-tasks"></i> Soumission
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/communication/?course_id=' . $course_id); ?>">
+            <a href="<?php echo home_url('/course/communication/?session_id=' . $session_id); ?>">
                 <i class="fas fa-comment-alt"></i> Communication
             </a>
         </li>
@@ -61,27 +61,27 @@
 <div class="sidebar">
     <ul class="sidebar-items">
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/details/?course_id=' . $course_id); ?>">
+            <a href="<?php echo home_url('/course/details/?session_id=' . $session_id); ?>">
                 <i class="fas fa-book"></i> Détails du cours
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/resources/?course_id=' . $course_id); ?>">
+            <a href="<?php echo home_url('/course/resources/?session_id=' . $session_id); ?>">
                 <i class="fas fa-folder-open"></i> Resources
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/submissions/?course_id=' . $course_id); ?>">
+            <a href="<?php echo home_url('/course/submissions/?session_id=' . $session_id); ?>">
                 <i class="fas fa-tasks"></i> Soumission
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/communication/?course_id=' . $course_id); ?>">
+            <a href="<?php echo home_url('/course/communication/?session_id=' . $session_id); ?>">
                 <i class="fas fa-comment-alt"></i> Communication
             </a>
         </li>
         <li class="sidebar-item">
-            <a href="<?php echo home_url('/course/teacher-evaluation/?course_id=' . $course_id); ?>">
+            <a href="<?php echo home_url('/course/teacher-evaluation/?session_id=' . $session_id); ?>">
                 <i class="fas fa-star-half-alt"></i> Évaluation
             </a>
         </li>
@@ -112,31 +112,31 @@
     <ul class="sidebar-items">
         <li class="sidebar-item">
             <a
-                href="<?php echo home_url('/course/details/?course_id=' . $course_id . '&student_id=' . $student_id); ?>">
+                href="<?php echo home_url('/course/details/?session_id=' . $session_id . '&student_id=' . $student_id); ?>">
                 <i class="fas fa-book"></i> Détails du cours
             </a>
         </li>
         <li class="sidebar-item">
             <a
-                href="<?php echo home_url('/course/resources/?course_id=' . $course_id . '&student_id=' . $student_id); ?>">
+                href="<?php echo home_url('/course/resources/?session_id=' . $session_id . '&student_id=' . $student_id); ?>">
                 <i class="fas fa-folder-open"></i> Resources
             </a>
         </li>
         <li class="sidebar-item">
             <a
-                href="<?php echo home_url('/course/submissions/?course_id=' . $course_id . '&student_id=' . $student_id); ?>">
+                href="<?php echo home_url('/course/submissions/?session_id=' . $session_id . '&student_id=' . $student_id); ?>">
                 <i class="fas fa-tasks"></i> Soumission
             </a>
         </li>
         <li class="sidebar-item">
             <a
-                href="<?php echo home_url('/course/communication/?course_id=' . $course_id . '&student_id=' . $student_id); ?>">
+                href="<?php echo home_url('/course/communication/?session_id=' . $session_id . '&student_id=' . $student_id); ?>">
                 <i class="fas fa-comment-alt"></i> Communication
             </a>
         </li>
         <li class="sidebar-item">
             <a
-                href="<?php echo home_url('/course/teacher-evaluation/?course_id=' . $course_id . '&student_id=' . $student_id); ?>">
+                href="<?php echo home_url('/course/teacher-evaluation/?session_id=' . $session_id . '&student_id=' . $student_id); ?>">
                 <i class="fas fa-star-half-alt"></i> Évaluation
             </a>
         </li>

@@ -16,14 +16,11 @@ if (!defined('ABSPATH')) {
 // Get the current user
 $user = wp_get_current_user();
 
-// Get course_id from session
-if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
+// Get session_id from session
+if (!isset($_GET['session_id']) || empty($_GET['session_id'])) {
 
     // Check the user's role and redirect accordingly
-    if (in_array('student', (array) $user->roles)) {
-        wp_redirect(home_url('/student/course-management/'));
-        exit;
-    } elseif (in_array('teacher', (array) $user->roles)) {
+    if (in_array('teacher', (array) $user->roles)) {
         wp_redirect(home_url('/teacher/course-management/'));
         exit;
     } else {
@@ -32,41 +29,41 @@ if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
         exit;
     }
 }
-$course_id = intval($_GET['course_id']);
+
+$session_id = intval($_GET['session_id']);
 
 global $wpdb;
 
 // for teacher users only
 if (in_array('teacher', (array) $user->roles)) {
+
     // Query the custom table to get the student's teacher_id
-    $student_courses_table  = $wpdb->prefix . 'student_courses'; // Ensure the table name is correct
-    $teacher_id = $user->id;
+    $sessions_table = $wpdb->prefix . 'course_sessions';
+    $students_table = $wpdb->prefix . 'students';
 
-    // Fetch the teacher's details using the teacher_id for the student
-    $teacher_table = $wpdb->prefix. 'teachers';
-    $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $teacher_id));
+    // Fetch the enrolled_students array where the session ID matches
+    $enrolled_students = $wpdb->get_var($wpdb->prepare(
+        "SELECT enrolled_students FROM $sessions_table WHERE id = %d",
+        $session_id
+    ));
 
-    // Fetch all student IDs enrolled in the course for the given teacher group
-    $enrolled_student_ids = $wpdb->get_col(
-        $wpdb->prepare(
-            "SELECT student_id FROM $student_courses_table WHERE course_id = %d AND teacher_id = %d",
-            $course_id,
-            $teacher_id
-        )
-    );
+    // Decode the JSON array if it's stored as a JSON string
+    $enrolled_students_array = json_decode($enrolled_students, true);
 
-    // Check if any student IDs were found
-    if (!empty($enrolled_student_ids)) {
-        // Fetch student details from the students table
-        $students_table = $wpdb->prefix . 'students';
-        $student_ids_placeholder = implode(',', array_map('intval', $enrolled_student_ids)); // Sanitize IDs
-
-        $enrolled_students = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM $students_table WHERE id IN ($student_ids_placeholder)"
-            )
-        );
+    // If it's not an array or empty, return an empty array
+    if (!is_array($enrolled_students_array) || empty($enrolled_students_array)) {
+        return [];
     }
+
+    // Convert student IDs to a comma-separated string for SQL query
+    $placeholders = implode(',', array_fill(0, count($enrolled_students_array), '%d'));
+    
+    // Fetch student details
+    $query = "SELECT * FROM $students_table WHERE id IN ($placeholders)";
+    $prepared_query = $wpdb->prepare($query, ...$enrolled_students_array);
+
+    $students = $wpdb->get_results($prepared_query);
+
 }
 
 ?>
@@ -99,16 +96,13 @@ if (in_array('teacher', (array) $user->roles)) {
                 </thead>
                 <tbody id="list">
                     <?php
-                        // Check if any student IDs were found
-                        if (!empty($enrolled_student_ids)) {
-                            // Output or process the enrolled students
-                            if (!empty($enrolled_students)) {
-                                foreach ($enrolled_students as $student) {
+                            if (!empty($students)) {
+                                foreach ($students as $student) {
                     ?>
                     <tr>
                         <td class="name">
                             <a
-                                href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id)); ?>">
+                                href="<?php echo esc_url(home_url('/course/student-management/student-details/?student_id=' . $student->id . '&session_id=' . $session_id)); ?>">
                                 <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
                             </a>
                         </td>
@@ -121,7 +115,7 @@ if (in_array('teacher', (array) $user->roles)) {
                         <td>
                             <div class="action-buttons">
                                 <a
-                                    href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id . '&course_id=' . $course_id)); ?>">
+                                    href="<?php echo esc_url(home_url('/course/student-management/student-details/?student_id=' . $student->id . '&session_id=' . $session_id)); ?>">
                                     <i class="fas fa-info-circle"></i>
                                 </a>
                             </div>
@@ -132,17 +126,10 @@ if (in_array('teacher', (array) $user->roles)) {
                             } else {
                     ?>
                     <tr>
-                        <td colspan="4">Aucun détail étudiant n'a été trouvé pour les étudiants inscrits.</td>
+                        <td colspan="4">Aucun étudiant trouvé.</td>
                     </tr>
                     <?php
                                 }
-                            } else {
-                    ?>
-                    <tr>
-                        <td colspan="4">Pourtant, aucun étudiant n'est inscrit à ce cours pour vous.</td>
-                    </tr>
-                    <?php
-                        }
                     ?>
                 </tbody>
             </table>

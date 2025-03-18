@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 $user = wp_get_current_user();
 
 // Get course_id from session
-if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
+if (!isset($_GET['session_id']) || empty($_GET['session_id'])) {
     // Check the user's role and redirect accordingly
     if (in_array('parent', (array) $user->roles)) {
         wp_redirect(home_url('/parent/course-management/'));
@@ -34,64 +34,43 @@ if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
         exit;
     }
 }
-$course_id = intval($_GET['course_id']);
+$session_id = intval($_GET['session_id']);
 
-$group_number = 0;
-
-if (in_array('parent', (array) $user->roles)) {
-    $student_id = intval($_GET['student_id']);
-    $student_group = $wpdb->get_var($wpdb->prepare(
-        "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
-        $student_id,
-        $course_id
+// Role base queries
+if (in_array('teacher', (array) $user->roles)) {
+    
+    $sessions_table = $wpdb->prefix . 'course_sessions';
+    $students_table = $wpdb->prefix . 'students';
+    
+    $teacher_id = $user->ID;
+    
+    // Fetch the enrolled_students array where the session ID matches
+    $enrolled_students = $wpdb->get_var($wpdb->prepare(
+        "SELECT enrolled_students FROM $sessions_table WHERE id = %d",
+        $session_id
     ));
-    if ($student_group) {
-        $group_number = intval($student_group);
+
+    // Decode the JSON array if it's stored as a JSON string
+    $enrolled_students_array = json_decode($enrolled_students, true);
+
+    // If it's not an array or empty, return an empty array
+    if (!is_array($enrolled_students_array) || empty($enrolled_students_array)) {
+        return [];
     }
+
+    // Convert student IDs to a comma-separated string for SQL query
+    $placeholders = implode(',', array_fill(0, count($enrolled_students_array), '%d'));
+    
+    // Fetch student details
+    $query = "SELECT * FROM $students_table WHERE id IN ($placeholders)";
+    $prepared_query = $wpdb->prepare($query, ...$enrolled_students_array);
+
+    $students = $wpdb->get_results($prepared_query);
+    
 } elseif (in_array('student', (array) $user->roles)) {
     $student_id = $user->ID;
-    $student_group = $wpdb->get_var($wpdb->prepare(
-        "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
-        $student_id,
-        $course_id
-    ));
-    if ($student_group) {
-        $group_number = intval($student_group);
-    }
-} elseif (in_array('teacher', (array) $user->roles)) {
-    $teacher_id = $user->ID;
-    $teacher_group = $wpdb->get_var($wpdb->prepare(
-        "SELECT group_number FROM {$wpdb->prefix}teacher_courses WHERE teacher_id = %d AND course_id = %d LIMIT 1",
-        $teacher_id,
-        $course_id
-    ));
-    if ($teacher_group) {
-        $group_number = intval($teacher_group);
-    }
-
-    $student_courses_table  = $wpdb->prefix . 'student_courses';
-    
-    // Fetch all student IDs enrolled in the course for the given teacher group
-    $enrolled_student_ids = $wpdb->get_col(
-        $wpdb->prepare(
-            "SELECT student_id FROM $student_courses_table WHERE course_id = %d AND teacher_id = %d",
-            $course_id,
-            $teacher_id
-        )
-    );
-
-    // Check if any student IDs were found
-    if (!empty($enrolled_student_ids)) {
-        // Fetch student details from the students table
-        $students_table = $wpdb->prefix . 'students';
-        $student_ids_placeholder = implode(',', array_map('intval', $enrolled_student_ids)); // Sanitize IDs
-
-        $enrolled_students = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM $students_table WHERE id IN ($student_ids_placeholder)"
-            )
-        );
-    }
+} elseif (in_array('parent', (array) $user->roles)) {
+    $student_id = intval($_GET['student_id']);
 }
 
 // Handle resource file upload for teachers
@@ -143,8 +122,7 @@ if (in_array('teacher', (array) $user->roles)) {
 
             if ($uploaded_file_url) {
                 $wpdb->insert($table_name, [
-                    'course_id' => $course_id,
-                    'group_number' => $group_number,
+                    'session_id' => $session_id,
                     'teacher_id' => $teacher_id,
                     'deadline' => sanitize_text_field($_POST['submission_deadline']),
                     'file' => $uploaded_file_url,
@@ -161,8 +139,7 @@ if (in_array('teacher', (array) $user->roles)) {
             
             if ($uploaded_file_url) {
                 $wpdb->insert($table_name, [
-                    'course_id' => $course_id,
-                    'group_number' => $group_number,
+                    'session_id' => $session_id,
                     'teacher_id' => $teacher_id,
                     'student_id' => intval($_POST['student_id']),
                     'comment' => $comment,
@@ -177,8 +154,7 @@ if (in_array('teacher', (array) $user->roles)) {
 
             if ($uploaded_file_url) {
                 $wpdb->insert($table_name, [
-                    'course_id' => $course_id,
-                    'group_number' => $group_number,
+                    'session_id' => $session_id,
                     'teacher_id' => $teacher_id,
                     'file' => $uploaded_file_url,
                     'created_at' => current_time('mysql'),
@@ -200,47 +176,38 @@ $student_reports = [];
 if (in_array('teacher', (array) $user->roles)) {
     // Fetch course assignments for the teacher
     $course_assignments = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}course_assignments WHERE course_id = %d AND group_number = %d AND teacher_id = %d",
-        $course_id,
-        $group_number,
-        $teacher_id
+        "SELECT * FROM {$wpdb->prefix}course_assignments WHERE session_id = %d",
+        $session_id
     ));
 
     // Fetch course slides for the teacher
     $course_slides = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}course_slides WHERE course_id = %d AND group_number = %d AND teacher_id = %d",
-        $course_id,
-        $group_number,
-        $teacher_id
+        "SELECT * FROM {$wpdb->prefix}course_slides WHERE session_id = %d",
+        $session_id
     ));
 
     // Fetch student reports for the teacher
     $student_reports = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}student_reports WHERE course_id = %d AND group_number = %d AND teacher_id = %d",
-        $course_id,
-        $group_number,
-        $teacher_id
+        "SELECT * FROM {$wpdb->prefix}student_reports WHERE session_id = %d",
+        $session_id
     ));
 } elseif (current_user_can('student') || current_user_can('parent')) {
     // Fetch course assignments for the student
     $course_assignments = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}course_assignments WHERE course_id = %d AND group_number = %d",
-        $course_id,
-        $group_number
+        "SELECT * FROM {$wpdb->prefix}course_assignments WHERE session_id = %d",
+        $session_id
     ));
 
     // Fetch course slides for the student
     $course_slides = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}course_slides WHERE course_id = %d AND group_number = %d",
-        $course_id,
-        $group_number
+        "SELECT * FROM {$wpdb->prefix}course_slides WHERE session_id = %d",
+        $session_id
     ));
 
     // Fetch student reports for the student
     $student_reports = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}student_reports WHERE course_id = %d AND group_number = %d AND student_id = %d",
-        $course_id,
-        $group_number,
+        "SELECT * FROM {$wpdb->prefix}student_reports WHERE session_id = %d AND student_id = %d",
+        $session_id,
         $student_id
     ));
 }
@@ -378,6 +345,9 @@ if (in_array('teacher', (array) $user->roles)) {
                         <?php
                             }
                         ?>
+                        <a href="<?php echo esc_url($assignment->file); ?>" class="download-button" download>
+                            <i class="fas fa-download"></i>
+                        </a>
                         <div class="file-icon">
                             <i class="fas fa-file-pdf"></i>
                         </div>
@@ -391,11 +361,6 @@ if (in_array('teacher', (array) $user->roles)) {
                             <p class="file-info">
                                 Téléchargé: <?php echo date('d M, y', strtotime($assignment->created_at)); ?>
                             </p>
-                        </div>
-                        <div class="col">
-                            <a href="<?php echo esc_url($assignment->file); ?>" class="download-button" download>
-                                <i class="fas fa-download"></i>
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -419,6 +384,9 @@ if (in_array('teacher', (array) $user->roles)) {
                         <?php
                             }
                         ?>
+                        <a href="<?php echo esc_url($slide->file); ?>" class="download-button" download>
+                            <i class="fas fa-download"></i>
+                        </a>
                         <div class="file-icon">
                             <i class="fas fa-file-pdf"></i>
                         </div>
@@ -429,11 +397,6 @@ if (in_array('teacher', (array) $user->roles)) {
                             <p class="file-info">
                                 Téléchargé: <?php echo date('d M, y', strtotime($slide->created_at)); ?>
                             </p>
-                        </div>
-                        <div class="col">
-                            <a href="<?php echo esc_url($slide->file); ?>" class="download-button" download>
-                                <i class="fas fa-download"></i>
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -457,6 +420,9 @@ if (in_array('teacher', (array) $user->roles)) {
                         <?php
                             }
                         ?>
+                        <a href="<?php echo esc_url($report->file); ?>" class="download-button" download>
+                            <i class="fas fa-download"></i>
+                        </a>
                         <div class="file-icon">
                             <i class="fas fa-file-pdf"></i>
                         </div>
@@ -473,7 +439,7 @@ if (in_array('teacher', (array) $user->roles)) {
                             ?>
                             <p class="file-info">
                                 Étudiant:
-                                <a href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id . '&course_id=' . $course_id)); ?>"
+                                <a href="<?php echo esc_url(home_url('/course/student-management/student-details/?student_id=' . $student->id . '&session_id=' . $session_id)); ?>"
                                     class="accent"><?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?></a>
                             </p>
                             <?php
@@ -483,13 +449,8 @@ if (in_array('teacher', (array) $user->roles)) {
                                 Commentaire: <?php echo esc_html($report->comment); ?>
                             </p>
                             <p class="file-info">
-                                Téléchargé: <?php echo date('d M, y', strtotime($slide->created_at)); ?>
+                                Téléchargé: <?php echo date('d M, y', strtotime($report->created_at)); ?>
                             </p>
-                        </div>
-                        <div class="col">
-                            <a href="<?php echo esc_url($report->file); ?>" class="download-button" download>
-                                <i class="fas fa-download"></i>
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -560,11 +521,8 @@ if (in_array('teacher', (array) $user->roles)) {
                         <label for="student_id">Étudiant</label>
                         <select name="student_id" id="student_id">
                             <?php
-                                // Check if any student IDs were found
-                                if (!empty($enrolled_student_ids)) {
-                                    // Output or process the enrolled students
-                                    if (!empty($enrolled_students)) {
-                                        foreach ($enrolled_students as $student) {
+                                    if (!empty($students)) {
+                                        foreach ($students as $student) {
                             ?>
                             <option value="<?= $student->id ?>">
                                 <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>
@@ -573,14 +531,9 @@ if (in_array('teacher', (array) $user->roles)) {
                                         }
                                     } else {
                             ?>
-                            <option value="">Aucun détail sur l'étudiant n'a été trouvé</option>
+                            <option value="">Aucun étudiant trouvé</option>
                             <?php
                                         }
-                                    } else {
-                            ?>
-                            <option value="">Aucun étudiant n'est inscrit</option>
-                            <?php
-                                }
                             ?>
                         </select>
                     </div>
@@ -589,7 +542,7 @@ if (in_array('teacher', (array) $user->roles)) {
                     <div class="col">
                         <label for="comment">Commentaire</label>
                         <div class="custom-select-wrapper">
-                            <select name="comment" id="comment" required>
+                            <select name="comment" id="comment">
                                 <option value="">-- Choisissez une option --</option>
                                 <option value="Excellent">Excellent</option>
                                 <option value="Bon">Bon</option>

@@ -185,17 +185,17 @@
 }
 
 /* resources page */
-#teacherResources .select-course {
+#teacherResources .select-session {
   width: 100%;
 }
-#teacherResources .select-course label {
+#teacherResources .select-session label {
   font-family: var(--accent-font-family) !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   margin-bottom: -5px;
   text-transform: capitalize;
 }
-#teacherResources .select-course select {
+#teacherResources .select-session select {
   margin-top: 0.5rem;
   width: 100%;
   height: fit-content;
@@ -212,17 +212,17 @@
   width: 100%; /* Make select take full width of the wrapper */
   cursor: pointer;
 }
-#teacherResources .select-course select::-ms-expand {
+#teacherResources .select-session select::-ms-expand {
   display: none;
 }
-#teacherResources .select-course select:focus {
+#teacherResources .select-session select:focus {
   border-color: var(--accent-color) !important;
 }
-#teacherResources .select-course .custom-select-wrapper {
+#teacherResources .select-session .custom-select-wrapper {
   position: relative;
   display: block; /* Allow positioning the arrow next to the select */
 }
-#teacherResources .select-course .custom-arrow {
+#teacherResources .select-session .custom-arrow {
   position: absolute;
   top: 65%;
   right: 10px; /* Adjust the right padding to position the arrow */
@@ -283,6 +283,8 @@
 }
 #teacherResources .file-bottom {
   width: 100%;
+  height: 10rem;
+  align-items: start;
   background-color: var(--gray-background-color);
   padding: 1rem;
 }
@@ -311,6 +313,10 @@
   color: var(--accent-color);
 }
 #teacherResources .download-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// current user ID
+// Current user ID
 $teacher_id = get_current_user_id();
 
 global $wpdb;
@@ -30,13 +30,26 @@ $teacher = $wpdb->get_row(
 
 $teacher_bankinfo_table = $wpdb->prefix . 'teacher_bank_details';
 
-// Fetch teacher data
+// Fetch teacher bank details or initialize an empty object
 $bankinfo = $teacher_id ? $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_bankinfo_table WHERE teacher_id = %d", $teacher_id)) : null;
+
+// Ensure $bankinfo is always an object
+if (!$bankinfo) {
+    $bankinfo = (object) [
+        'bank_name' => '',
+        'account_number' => '',
+        'account_holder' => '',
+        'account_type' => '',
+        'swift_code' => '',
+        'bank_address' => ''
+    ];
+}
 
 ob_start();
 
-$error_message = ''; // Initialize error message variable
-$success_message = ''; // Initialize success message variable
+// Initialize variables
+$error_message = '';
+$success_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_bank_details'])) {
 
@@ -144,7 +157,7 @@ ob_end_clean();
                         <tr>
                             <th>Nom de la banque</th>
                             <td>
-                                <?= !empty($bankinfo->bank_name) ? $bankinfo->bank_name : '---' ?>
+                                <?= !empty($bankinfo->bank_name) ? esc_html($bankinfo->bank_name) : '---' ?>
                             </td>
                         </tr>
                         <tr>
@@ -160,31 +173,31 @@ ob_end_clean();
                                 }
                             ?>
                             <td>
-                                <?= !empty($bankinfo->account_number) ? $bankinfo->account_number : '---' ?>
+                                <?= !empty($bankinfo->account_number) ? esc_html($bankinfo->account_number) : '---' ?>
                             </td>
                         </tr>
                         <tr>
                             <th>Titulaire du compte</th>
                             <td>
-                                <?= !empty($bankinfo->account_holder) ? $bankinfo->account_holder : '---' ?>
+                                <?= !empty($bankinfo->account_holder) ? esc_html($bankinfo->account_holder) : '---' ?>
                             </td>
                         </tr>
                         <tr>
                             <th>Type de compte</th>
                             <td>
-                                <?= !empty($bankinfo->account_type) ? $bankinfo->account_type : '---' ?>
+                                <?= !empty($bankinfo->account_type) ? esc_html($bankinfo->account_type) : '---' ?>
                             </td>
                         </tr>
                         <tr>
                             <th>Code BIC/SWIFT</th>
                             <td>
-                                <?= !empty($bankinfo->swift_code) ? $bankinfo->swift_code : '---' ?>
+                                <?= !empty($bankinfo->swift_code) ? esc_html($bankinfo->swift_code) : '---' ?>
                             </td>
                         </tr>
                         <tr>
                             <th>Adresse de la banque</th>
                             <td>
-                                <?= !empty($bankinfo->bank_address) ? $bankinfo->bank_address : '---' ?>
+                                <?= !empty($bankinfo->bank_address) ? esc_html($bankinfo->bank_address) : '---' ?>
                             </td>
                         </tr>
                     </table>

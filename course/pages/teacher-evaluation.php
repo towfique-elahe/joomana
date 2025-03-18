@@ -13,8 +13,8 @@ if (!defined('ABSPATH')) {
 $user = wp_get_current_user();
 $default_user_image = esc_url(get_stylesheet_directory_uri() . '/assets/image/user.png');
 
-// Redirect if course_id is not provided
-if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
+// Redirect if session_id is not provided
+if (!isset($_GET['session_id']) || empty($_GET['session_id'])) {
     if (in_array('parent', (array) $user->roles)) {
         wp_redirect(home_url('/parent/course-management/'));
         exit;
@@ -29,40 +29,17 @@ if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
         exit;
     }
 }
-$course_id = intval($_GET['course_id']);
+$session_id = intval($_GET['session_id']);
 
 global $wpdb;
-$group_number = 0;
 
-// Get student group number
-if (in_array('student', (array) $user->roles)) {
-    $student_id = $user->ID;
-    $student_group = $wpdb->get_var($wpdb->prepare(
-        "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
-        $student_id,
-        $course_id
-    ));
-    if ($student_group) {
-        $group_number = intval($student_group);
-    }
-} elseif (in_array('parent', (array) $user->roles)) {
+if (in_array('parent', (array) $user->roles)) {
     $student_id = intval($_GET['student_id']);
-    $student_group = $wpdb->get_var($wpdb->prepare(
-        "SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
-        $student_id,
-        $course_id
-    ));
-    if ($student_group) {
-        $group_number = intval($student_group);
-    }
+} elseif (in_array('student', (array) $user->roles)) {
+    $student_id = $user->ID;
+} elseif (in_array('teacher', (array) $user->roles)) {
+    $teacher_id = $user->ID;
 }
-
-// Get teacher ID for the group
-$teacher_id = $wpdb->get_var($wpdb->prepare(
-    "SELECT teacher_id FROM {$wpdb->prefix}teacher_courses WHERE course_id = %d AND group_number = %d LIMIT 1",
-    $course_id,
-    $group_number
-));
 
 // Handle evaluation submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_evaluation'])) {
@@ -73,17 +50,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_evaluation']))
         if ($rating >= 1 && $rating <= 5) {
             $existing = $wpdb->get_var($wpdb->prepare(
                 "SELECT id FROM {$wpdb->prefix}teacher_evaluations 
-                WHERE student_id = %d AND course_id = %d 
-                AND group_number = %d AND teacher_id = %d",
-                $student_id, $course_id, $group_number, $teacher_id
+                WHERE student_id = %d AND session_id = %d 
+                AND teacher_id = %d",
+                $student_id, $session_id, $teacher_id
             ));
 
             if (!$existing) {
                 $wpdb->insert(
                     "{$wpdb->prefix}teacher_evaluations",
                     array(
-                        'course_id' => $course_id,
-                        'group_number' => $group_number,
+                        'session_id' => $session_id,
                         'teacher_id' => $teacher_id,
                         'student_id' => $student_id,
                         'rating' => $rating,
@@ -103,19 +79,26 @@ $has_evaluated = false;
 if (in_array('student', (array)$user->roles)) {
     $has_evaluated = $wpdb->get_var($wpdb->prepare(
         "SELECT id FROM {$wpdb->prefix}teacher_evaluations 
-        WHERE student_id = %d AND course_id = %d 
-        AND group_number = %d AND teacher_id = %d",
-        $student_id, $course_id, $group_number, $teacher_id
+        WHERE student_id = %d AND session_id = %d 
+        AND teacher_id = %d",
+        $student_id, $session_id, $teacher_id
     ));
 }
 
 // Get existing evaluations
-$evaluations = $wpdb->get_results($wpdb->prepare(
-    "SELECT * FROM {$wpdb->prefix}teacher_evaluations WHERE course_id = %d AND group_number = %d AND teacher_id = %d ORDER BY created_at DESC",
-    $course_id,
-    $group_number,
-    $teacher_id
-));
+if (in_array('teacher', (array) $user->roles)) {
+    $evaluations = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}teacher_evaluations WHERE session_id = %d AND teacher_id = %d ORDER BY created_at DESC",
+        $session_id,
+        $teacher_id
+    ));
+} elseif {
+    $evaluations = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}teacher_evaluations WHERE session_id = %d AND student_id = %d ORDER BY created_at DESC",
+        $session_id,
+        $student_id
+    ));
+}
 
 ?>
 

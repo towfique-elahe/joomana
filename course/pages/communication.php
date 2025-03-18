@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 $user = wp_get_current_user();
 $default_user_image = esc_url( get_stylesheet_directory_uri() . '/assets/image/user.png' );
 
-// Get course_id from session
-if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
+// Get session_id from session
+if (!isset($_GET['session_id']) || empty($_GET['session_id'])) {
     // Check the user's role and redirect accordingly
     if (in_array('parent', (array) $user->roles)) {
         wp_redirect(home_url('/parent/course-management/'));
@@ -36,43 +36,16 @@ if (!isset($_GET['course_id']) || empty($_GET['course_id'])) {
         exit;
     }
 }
-$course_id = intval($_GET['course_id']);
+$session_id = intval($_GET['session_id']);
 
 global $wpdb;
-$group_number = 0;
 
-/**
- * Determine the user's group number for this course.
- * (Assumes a student has an entry in wp_student_courses and a teacher in wp_teacher_courses.)
- */
-if ( in_array( 'parent', (array) $user->roles ) ) {
-	$student_id = intval($_GET['student_id']);
-	$student_group = $wpdb->get_var( $wpdb->prepare(
-		"SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
-		$student_id,
-		$course_id
-	) );
-	if ( $student_group ) {
-		$group_number = intval( $student_group );
-	}
-} elseif ( in_array( 'student', (array) $user->roles ) ) {
-	$student_group = $wpdb->get_var( $wpdb->prepare(
-		"SELECT group_number FROM {$wpdb->prefix}student_courses WHERE student_id = %d AND course_id = %d LIMIT 1",
-		$user->ID,
-		$course_id
-	) );
-	if ( $student_group ) {
-		$group_number = intval( $student_group );
-	}
-} elseif ( in_array( 'teacher', (array) $user->roles ) ) {
-	$teacher_group = $wpdb->get_var( $wpdb->prepare(
-		"SELECT group_number FROM {$wpdb->prefix}teacher_courses WHERE teacher_id = %d AND course_id = %d LIMIT 1",
-		$user->ID,
-		$course_id
-	) );
-	if ( $teacher_group ) {
-		$group_number = intval( $teacher_group );
-	}
+if (in_array('parent', (array) $user->roles)) {
+    $student_id = intval($_GET['student_id']);
+} elseif (in_array('student', (array) $user->roles)) {
+    $student_id = $user->ID;
+} elseif (in_array('teacher', (array) $user->roles)) {
+    $teacher_id = $user->ID;
 }
 
 /**
@@ -84,9 +57,8 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['chat_message'] ) ) 
 		$wpdb->insert(
 			$wpdb->prefix . 'communications',
 			[
-				'course_id'    => $course_id,
+				'session_id'    => $session_id,
 				'user_id'      => $user->ID,
-				'group_number' => $group_number,
 				'message'      => $message
 			]
 		);
@@ -101,10 +73,9 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['chat_message'] ) ) 
  * Messages are ordered by timestamp (oldest first).
  */
 $messages = $wpdb->get_results( $wpdb->prepare(
-	"SELECT * FROM {$wpdb->prefix}communications WHERE course_id = %d AND group_number = %d ORDER BY timestamp DESC",
-	$course_id,
-	$group_number
-) );
+	"SELECT * FROM {$wpdb->prefix}communications WHERE session_id = %d ORDER BY timestamp DESC",
+	$session_id
+));
 
 ?>
 

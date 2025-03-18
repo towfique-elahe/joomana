@@ -528,13 +528,15 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
                     'slot2_start_time' => $course_slot->slot2_start_time,
                     'slot2_end_time'   => $course_slot->slot2_end_time,
                     'class_link'       => null,
-                    'status'           => 'active',
+                    'status'           => 'upcoming',
                     'cancelled_reason' => null
                 ],
                 [
                     '%d', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s'
                 ]
             );
+
+            $session_id = $wpdb->insert_id; // Get the ID of the newly inserted session
 
             // Insert payment for the teacher
             $teacher_table = $wpdb->prefix . 'teachers';
@@ -569,6 +571,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
                 [
                     'invoice_number'        => $invoice_number,
                     'teacher_id'           => $available_teacher,
+                    'session_id'           => $session_id,
                     'due'                  => $due,
                     'deposit'             => $deposit,
                     'currency'            => $currency,
@@ -576,7 +579,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
                     'status'              => $status,
                 ],
                 [
-                    '%s', '%d', '%f', '%f', '%s', '%s', '%s'
+                    '%s', '%d', '%d', '%f', '%f', '%s', '%s', '%s'
                 ]
             );
 
