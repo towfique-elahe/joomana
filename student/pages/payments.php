@@ -14,14 +14,20 @@ if (!defined('ABSPATH')) {
 }
 
 // Get current user ID
-$current_user = get_current_user_id();
+$student_id = get_current_user_id();
 
 // Get the 'payment' table name
 global $wpdb;
 $payments_table = $wpdb->prefix . 'payments';
 
 // Get the payments made by the current user
-$payments = $wpdb->get_results("SELECT * FROM $payments_table WHERE user_id = $current_user ORDER BY created_at DESC");
+$payments = $wpdb->get_results("SELECT * FROM $payments_table WHERE user_id = $student_id ORDER BY created_at DESC");
+
+// Query to get total payments
+$total_payments = (int) $wpdb->get_var($wpdb->prepare(
+    "SELECT SUM(amount) FROM {$wpdb->prefix}payments WHERE user_id = %d",
+    $student_id
+));
 
 ?>
 
@@ -39,6 +45,23 @@ $payments = $wpdb->get_results("SELECT * FROM $payments_table WHERE user_id = $c
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
                 <span class="active">Paiements</span>
+            </div>
+        </div>
+
+        <div class="content-section statistics">
+            <div class="section-body">
+
+                <!-- Total payments -->
+                <a href="javascript:void()" class="statistic-box total-payments">
+                    <h4 class="statistic-title">
+                        <i class="fas fa-exchange-alt"></i> Paiements totaux
+                    </h4>
+                    <p class="statistic-value">
+                        <?php echo esc_html($total_payments); ?>
+                        <span class="currecy"><i class="fas fa-euro-sign"></i></span>
+                    </p>
+                </a>
+
             </div>
         </div>
 

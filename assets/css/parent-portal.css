@@ -8,6 +8,31 @@
 #parentDashboard .statistic-box.total-child .statistic-value {
   color: rgb(0, 96, 206);
 }
+#parentDashboard .statistic-box.upcoming-session {
+  background-color: rgb(255, 238, 248);
+  gap: 0.5rem;
+}
+#parentDashboard .statistic-box.upcoming-session:hover {
+  background-color: rgb(255, 230, 245);
+}
+#parentDashboard .statistic-box.upcoming-session .countdown-timer {
+  color: rgb(223, 0, 130);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: 1.6rem;
+}
+#parentDashboard .statistic-box.upcoming-session .child-info {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--text-font-size);
+}
+#parentDashboard .statistic-box.upcoming-session .session-info {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+}
 
 /* child management page */
 #parentChildManagement .list th:nth-child(1),
@@ -274,6 +299,11 @@
   margin-bottom: 1rem;
   text-align: center;
 }
+#parentChildDetails .chart-card canvas {
+  width: 200px !important;
+  height: 200px !important;
+  margin: 0 auto;
+}
 
 /* add child page */
 #parentAddChild form .section {
@@ -334,6 +364,18 @@
 }
 
 /* payments page */
+#parentPayments .statistic-box.total-payments .currecy {
+  font-size: 2rem;
+}
+#parentPayments .statistic-box.total-payments {
+  background-color: rgb(255, 238, 248);
+}
+#parentPayments .statistic-box.total-payments:hover {
+  background-color: rgb(255, 221, 241);
+}
+#parentPayments .statistic-box.total-payments .statistic-value {
+  color: rgb(223, 0, 130);
+}
 #parentPayments .filter-container {
   flex-direction: row-reverse;
 }

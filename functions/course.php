@@ -28,7 +28,9 @@ function course_categories_section() {
             <img src="<?php echo esc_html($category->image ? $category->image : $default_image); ?>"
                 alt="<?php echo esc_attr($category->category); ?>">
             <h4><?php echo esc_html($category->category); ?></h4>
-            <p class="course-count"><?php echo esc_html($course_count); ?> Cours</p>
+            <p class="course-count <?php echo $course_count == 0 ? 'no-courses' : 'has-courses'; ?>">
+                <?php echo esc_html($course_count); ?> Cours
+            </p>
             <a class="course-button"
                 href="<?php echo site_url('/topics/?category=' . urlencode($category->category)); ?>">Voir
                 les cours</a>
@@ -157,7 +159,9 @@ function course_filter_page_shortcode() {
             <img src="<?php echo esc_html($topic->image ? $topic->image : $default_image); ?>"
                 alt="<?php echo esc_attr($topic->topic); ?>">
             <h4><?php echo esc_html($topic->topic); ?></h4>
-            <p class="course-count"><?php echo esc_html($course_count); ?> Cours</p>
+            <p class="course-count <?php echo $course_count == 0 ? 'no-courses' : 'has-courses'; ?>">
+                <?php echo esc_html($course_count); ?> Cours
+            </p>
             <a class="course-button"
                 href="<?php echo site_url('/available-courses/?topic=' . urldecode($topic->topic)); ?>">Voir
                 les

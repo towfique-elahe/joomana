@@ -191,26 +191,6 @@ function render_course_details_section() {
                     ?>
                 </tbody>
             </table>
-
-            <!-- Time Slot Table -->
-            <div class="time-table-section">
-                <table class="table time-table">
-                    <tbody>
-                        <?php
-                // Loop through the time slots and display them in 3 rows with 4 columns
-                $slot_chunks = array_chunk($time_slots, 4);
-                foreach ($slot_chunks as $slots_row) {
-                    echo '<tr>';
-                    foreach ($slots_row as $slot) {
-                        $selected_class = ($slot == $time_slot) ? 'class="selected-time"' : '';
-                        echo "<td {$selected_class}>{$slot}</td>";
-                    }
-                    echo '</tr>';
-                }
-                ?>
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 
@@ -234,6 +214,22 @@ function render_course_details_section() {
                     </span>
                     <span class="item-value">
                         <?php echo esc_html($course->required_credit); ?> credit
+                    </span>
+                </li>
+                <li class="list-item">
+                    <span class="item-name">
+                        <i class="fas fa-calendar-day"></i> Date de début:
+                    </span>
+                    <span class="item-value">
+                        <?php echo date("M j, Y", strtotime($course->start_date)); ?>
+                    </span>
+                </li>
+                <li class="list-item">
+                    <span class="item-name">
+                        <i class="fas fa-calendar-check"></i> Date de fin:
+                    </span>
+                    <span class="item-value">
+                        <?php echo date("M j, Y", strtotime($course->end_date)); ?>
                     </span>
                 </li>
                 <li class="list-item">
@@ -278,7 +274,7 @@ function render_course_details_section() {
                             </option>
                             <?php endforeach; ?>
                         </select>
-                        <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
+                        <i class="fas fa-chevron-down custom-arrow"></i>
                     </div>
                     <?php else : ?>
                     <label for="student_id">Choisissez un enfant:</label>
@@ -286,11 +282,11 @@ function render_course_details_section() {
                         <select name="student_id" id="student_id">
                             <option value="" selected disabled>Aucun enfant trouvé</option>
                         </select>
-                        <ion-icon name="chevron-down-outline" class="custom-arrow"></ion-icon>
+                        <i class="fas fa-chevron-down custom-arrow"></i>
                     </div>
                     <?php endif; ?>
-                    <button type="submit" class="button buy-now">
-                        <ion-icon name="bag-handle-outline"></ion-icon> Inscrire un enfant
+                    <button type=" submit" class="button buy-now">
+                        <i class="fas fa-shopping-bag"></i> Inscrire un enfant
                     </button>
                 </form>
             </div>
@@ -302,7 +298,7 @@ function render_course_details_section() {
                 <form method="post" action="">
                     <input type="hidden" name="enroll_student" value="1">
                     <button type="submit" class="button buy-now">
-                        <ion-icon name="bag-handle-outline"></ion-icon> Inscrire
+                        <i class="fas fa-shopping-bag"></i> Inscrire
                     </button>
                 </form>
             </div>
@@ -315,18 +311,18 @@ function render_course_details_section() {
                     <!-- Facebook Share -->
                     <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode(get_permalink()); ?>"
                         target="_blank" class="social-link" title="Share on Facebook">
-                        <ion-icon name="logo-facebook"></ion-icon>
+                        <i class="fab fa-facebook"></i>
                     </a>
 
                     <!-- Instagram Share -->
                     <a href="https://www.instagram.com/" target="_blank" class="social-link" title="Share on Instagram">
-                        <ion-icon name="logo-instagram"></ion-icon>
+                        <i class="fab fa-instagram"></i>
                     </a>
 
                     <!-- LinkedIn Share -->
                     <a href="https://www.linkedin.com/shareArticle?mini=true&url=<?php echo urlencode(get_permalink()); ?>&title=<?php echo urlencode(get_the_title()); ?>&summary=<?php echo urlencode(get_the_excerpt()); ?>"
                         target="_blank" class="social-link" title="Share on LinkedIn">
-                        <ion-icon name="logo-linkedin"></ion-icon>
+                        <i class="fab fa-linkedin-in"></i>
                     </a>
                 </div>
             </div>

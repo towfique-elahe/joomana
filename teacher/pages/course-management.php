@@ -105,10 +105,6 @@ $cancelled_sessions = $wpdb->get_results(
                                     </h3>
                                     <div class="course-info">
                                         <p class="date">
-                                            Groupe:
-                                            <?php echo esc_html($group_number);?>
-                                        </p>
-                                        <p class="date">
                                             Date:
                                             <?php echo esc_html($session_date);?>
                                         </p>
@@ -161,10 +157,6 @@ $cancelled_sessions = $wpdb->get_results(
                                         <?php echo esc_html($course->title); ?>
                                     </h3>
                                     <div class="course-info">
-                                        <p class="date">
-                                            Groupe:
-                                            <?php echo esc_html($group_number);?>
-                                        </p>
                                         <p class="date">
                                             Date:
                                             <?php echo esc_html($session_date);?>
@@ -219,10 +211,6 @@ $cancelled_sessions = $wpdb->get_results(
                                     </h3>
                                     <div class="course-info">
                                         <p class="date">
-                                            Groupe:
-                                            <?php echo esc_html($group_number);?>
-                                        </p>
-                                        <p class="date">
                                             Date:
                                             <?php echo esc_html($session_date);?>
                                         </p>
@@ -275,10 +263,6 @@ $cancelled_sessions = $wpdb->get_results(
                                         <?php echo esc_html($course->title); ?>
                                     </h3>
                                     <div class="course-info">
-                                        <p class="date">
-                                            Groupe:
-                                            <?php echo esc_html($group_number);?>
-                                        </p>
                                         <p class="date">
                                             Date:
                                             <?php echo esc_html($session_date);?>

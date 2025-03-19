@@ -56,6 +56,25 @@
 #studentDashboard .statistic-box.total-payments .currecy {
   font-size: 2rem;
 }
+#studentDashboard .statistic-box.upcoming-session {
+  background-color: rgb(255, 238, 248);
+  gap: 0.5rem;
+}
+#studentDashboard .statistic-box.upcoming-session:hover {
+  background-color: rgb(255, 230, 245);
+}
+#studentDashboard .statistic-box.upcoming-session .countdown-timer {
+  color: rgb(223, 0, 130);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: 1.6rem;
+}
+#studentDashboard .statistic-box.upcoming-session .session-info {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+}
 
 /* resources page */
 #studentResources .select-session {
@@ -268,6 +287,11 @@
   margin-bottom: 1rem;
   text-align: center;
 }
+#studentProgress .chart-card canvas {
+  width: 200px !important;
+  height: 200px !important;
+  margin: 0 auto;
+}
 #studentProgress .file-container {
   align-items: flex-start;
   flex-wrap: wrap;
@@ -398,6 +422,18 @@
 }
 
 /* payments page */
+#studentPayments .statistic-box.total-payments .currecy {
+  font-size: 2rem;
+}
+#studentPayments .statistic-box.total-payments {
+  background-color: rgb(255, 238, 248);
+}
+#studentPayments .statistic-box.total-payments:hover {
+  background-color: rgb(255, 221, 241);
+}
+#studentPayments .statistic-box.total-payments .statistic-value {
+  color: rgb(223, 0, 130);
+}
 #studentPayments .filter-container {
   flex-direction: row-reverse;
 }

@@ -7,7 +7,7 @@ form .interested-modules label {
 }
 
 form .weekly-availability .time-slots {
-  flex: 2 !important;
+  flex: 2;
 }
 form .weekly-availability .checkbox-group label,
 form .weekly-availability .radio-group label {
@@ -69,7 +69,6 @@ form .submit-button {
   font-size: var(--text-font-size) !important;
   font-weight: var(--text-font-weight) !important;
 }
-
 .teacher-registration-form .upload-button-group {
   display: flex;
   flex-direction: column;
@@ -89,7 +88,6 @@ form .submit-button {
   font-size: 30px;
   font-weight: var(--accent-font-weight) !important;
 }
-
 .teacher-registration-form .upload-video-container {
   text-align: center;
 }
@@ -122,7 +120,6 @@ form .submit-button {
 .teacher-registration-form .upload-video-input {
   display: none;
 }
-
 .teacher-registration-form .declaration-heading {
   font-family: var(--secondary-font-family) !important;
   font-size: var(--secondary-font-size) !important;
@@ -140,10 +137,131 @@ form .submit-button {
   border: none !important;
   border-bottom: var(--border) !important;
 }
+@media only screen and (max-width: 960px) {
+  .teacher-registration-form .days .checkbox-group .row {
+    gap: 20px !important;
+    padding-bottom: 30px;
+    margin-bottom: 15px;
+    border-bottom: var(--border);
+  }
+  .teacher-registration-form .days .checkbox-group .row:first-of-type {
+    padding-top: 30px !important;
+  }
+  .teacher-registration-form .days .checkbox-group .row:last-of-type {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+  .teacher-registration-form .days .checkbox-group .row:nth-child(1) {
+    padding-bottom: 59px;
+  }
+  .teacher-registration-form .days .checkbox-group .row:nth-child(2) {
+    padding-bottom: 45px;
+  }
+  .teacher-registration-form .days .checkbox-group .row:nth-child(3) {
+    padding-bottom: 44px;
+  }
+  .teacher-registration-form .days .checkbox-group .row:nth-child(4) {
+    padding-bottom: 45px;
+  }
+  .teacher-registration-form .days .checkbox-group .row:nth-child(5) {
+    padding-bottom: 44px;
+  }
+  .teacher-registration-form .days .checkbox-group .row:nth-child(6) {
+    padding-bottom: 114px;
+  }
+  .teacher-registration-form .time-slots {
+    flex: 1 !important;
+  }
+  .teacher-registration-form .time-slots .checkbox-group {
+    flex-direction: column;
+    gap: 20px !important;
+    padding-bottom: 30px;
+    margin-bottom: 15px;
+    border-bottom: var(--border);
+  }
+  .teacher-registration-form .time-slots .checkbox-group:first-of-type {
+    padding-top: 30px !important;
+  }
+  .teacher-registration-form .time-slots .checkbox-group:last-child {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+}
+@media only screen and (max-width: 550px) {
+  .teacher-registration-form .personal-information .row {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* Student Registration From */
+@media only screen and (max-width: 550px) {
+  .student-registration-form .personal-information .row,
+  .student-registration-form .academic-details .row,
+  .student-registration-form .account-details .row {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+@media only screen and (max-width: 1045px) {
+  .student-registration-form .days .checkbox-group .row {
+    gap: 20px !important;
+    padding-bottom: 30px;
+    margin-bottom: 15px;
+    border-bottom: var(--border);
+  }
+  .student-registration-form .days .checkbox-group .row:first-of-type {
+    padding-top: 30px !important;
+  }
+  .student-registration-form .days .checkbox-group .row:last-of-type {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+  .student-registration-form .days .checkbox-group .row:nth-child(1) {
+    padding-bottom: 163px;
+  }
+  .student-registration-form .days .checkbox-group .row:nth-child(2),
+  .student-registration-form .days .checkbox-group .row:nth-child(3),
+  .student-registration-form .days .checkbox-group .row:nth-child(4),
+  .student-registration-form .days .checkbox-group .row:nth-child(5),
+  .student-registration-form .days .checkbox-group .row:nth-child(6) {
+    padding-bottom: 148px;
+  }
+  .student-registration-form .time-slots {
+    flex: 1 !important;
+  }
+  .student-registration-form .time-slots .checkbox-group {
+    flex-direction: column;
+    gap: 20px !important;
+    padding-bottom: 30px;
+    margin-bottom: 15px;
+    border-bottom: var(--border);
+  }
+  .student-registration-form .time-slots .checkbox-group:first-of-type {
+    padding-top: 30px !important;
+  }
+  .student-registration-form .time-slots .checkbox-group:last-child {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+/* Parent Registration From */
+@media only screen and (max-width: 550px) {
+  .parent-registration-form .row {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
 
 /* Course Categories with Filtering */
 .course-category-filtering,
 .course-categories {
+  width: 100%;
   gap: 20px;
 }
 .course-category-filtering .sidebar {
@@ -251,7 +369,16 @@ form .submit-button {
   color: #fff !important;
   font-family: var(--text-font-family) !important;
   font-size: 12px !important;
-  font-weight: var(--text-font-weight) !important;
+  font-weight: var(--accent-font-weight) !important;
+}
+.course-categories .course-card .course-count.no-courses,
+.course-category-filtering .course-card .course-count.no-courses {
+  background-color: rgb(236, 56, 92);
+}
+.course-categories .course-card .course-count.has-courses,
+.course-category-filtering .course-card .course-count.has-courses {
+  background-color: rgb(173, 230, 87);
+  color: var(--dark-text-color) !important;
 }
 .course-categories .course-card .course-button,
 .course-category-filtering .course-card .course-button {
@@ -272,6 +399,60 @@ form .submit-button {
 .course-categories .course-card .course-button:hover,
 .course-category-filtering .course-card .course-button:hover {
   background-color: var(--accent-color);
+}
+/* course category filter section */
+@media only screen and (max-width: 1180px) {
+  .course-category-filtering .course-card {
+    width: calc(33% - 11px);
+  }
+}
+@media only screen and (max-width: 975px) {
+  .course-category-filtering .course-card {
+    width: calc(33% - 12px);
+  }
+}
+@media only screen and (max-width: 860px) {
+  .course-category-filtering .sidebar {
+    width: 35%;
+  }
+  .course-category-filtering .course-cards {
+    width: 65%;
+  }
+  .course-category-filtering .course-card {
+    width: calc(50% - 10px);
+  }
+}
+@media only screen and (max-width: 625px) {
+  .course-category-filtering .sidebar {
+    width: 45%;
+  }
+  .course-category-filtering .course-cards {
+    width: 55%;
+  }
+  .course-category-filtering .course-card {
+    width: 100%;
+  }
+}
+/* course category section */
+@media only screen and (max-width: 870px) {
+  .course-categories .course-card {
+    width: calc(33% - 11px);
+  }
+}
+@media only screen and (max-width: 712px) {
+  .course-categories .course-card {
+    width: calc(33% - 12px);
+  }
+}
+@media only screen and (max-width: 650px) {
+  .course-categories .course-card {
+    width: calc(50% - 10px);
+  }
+}
+@media only screen and (max-width: 400px) {
+  .course-categories .course-card {
+    width: 100%;
+  }
 }
 
 /* Category Wise Available Courses */
@@ -400,6 +581,9 @@ form .submit-button {
   border-radius: 10px;
   padding: 15px;
   box-shadow: var(--box-shadow-light);
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 #courseDetails .title {
   color: var(--dark-text-color);
@@ -583,6 +767,23 @@ form .submit-button {
 }
 #courseDetails .course-info .social-link ion-icon {
   font-size: 18px;
+}
+@media only screen and (max-width: 840px) {
+  #courseDetails .calendar {
+    display: none;
+  }
+  #courseDetails .right-column {
+    flex: 1.5;
+  }
+}
+@media only screen and (max-width: 700px) {
+  #courseDetails {
+    flex-direction: column;
+  }
+  #courseDetails .right-column {
+    max-width: 400px;
+    margin: 0 auto;
+  }
 }
 
 /* Login Form */

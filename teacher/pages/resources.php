@@ -98,7 +98,7 @@ $student_reports = $session_id ? $wpdb->get_results($wpdb->prepare(
                 <select id="sessionSelect">
                     <?php 
                         foreach ($sessions as $session) :
-                        $date = date('j M, y', strtotime($session->session_date));
+                        $date = date('M j, Y', strtotime($session->session_date));
                         $course_id = $session->course_id;
                         global $wpdb;
                         $courses_table = $wpdb->prefix . 'courses';

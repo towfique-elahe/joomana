@@ -42,6 +42,18 @@
     html {
         font-size: 14px;
     }
+
+    @media only screen and (max-width: 786px) {
+        html {
+            font-size: 13px;
+        }
+    }
+
+    @media only screen and (max-width: 500px) {
+        html {
+            font-size: 12px;
+        }
+    }
     </style>
 </head>
 

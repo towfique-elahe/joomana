@@ -35,27 +35,24 @@
 #teacherDashboard .statistic-box.total-student .statistic-value {
   color: rgb(212, 212, 0);
 }
-#teacherDashboard .statistic-box.total-due {
+#teacherDashboard .statistic-box.upcoming-session {
   background-color: rgb(255, 238, 248);
+  gap: 0.5rem;
 }
-#teacherDashboard .statistic-box.total-due:hover {
-  background-color: rgb(255, 221, 241);
+#teacherDashboard .statistic-box.upcoming-session:hover {
+  background-color: rgb(255, 230, 245);
 }
-#teacherDashboard .statistic-box.total-due .statistic-value {
+#teacherDashboard .statistic-box.upcoming-session .countdown-timer {
   color: rgb(223, 0, 130);
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: 1.6rem;
 }
-#teacherDashboard .statistic-box.total-deposit {
-  background-color: rgb(247, 242, 255);
-}
-#teacherDashboard .statistic-box.total-deposit:hover {
-  background-color: rgb(237, 227, 253);
-}
-#teacherDashboard .statistic-box.total-deposit .statistic-value {
-  color: rgb(106, 0, 255);
-}
-#teacherDashboard .statistic-box.total-due .currecy,
-#teacherDashboard .statistic-box.total-deposit .currecy {
-  font-size: 2rem;
+#teacherDashboard .statistic-box.upcoming-session .session-info {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
 }
 
 /* course management page */
@@ -330,6 +327,38 @@
 }
 
 /* revenues page */
+#teacherRevenue .statistic-box.total-in-progress .currecy,
+#teacherRevenue .statistic-box.total-due .currecy,
+#teacherRevenue .statistic-box.total-deposit .currecy {
+  font-size: 2rem;
+}
+#teacherRevenue .statistic-box.total-in-progress {
+  background-color: rgb(242, 248, 255);
+}
+#teacherRevenue .statistic-box.total-in-progress:hover {
+  background-color: rgb(221, 237, 255);
+}
+#teacherRevenue .statistic-box.total-in-progress .statistic-value {
+  color: rgb(0, 96, 206);
+}
+#teacherRevenue .statistic-box.total-due {
+  background-color: rgb(255, 238, 248);
+}
+#teacherRevenue .statistic-box.total-due:hover {
+  background-color: rgb(255, 221, 241);
+}
+#teacherRevenue .statistic-box.total-due .statistic-value {
+  color: rgb(223, 0, 130);
+}
+#teacherRevenue .statistic-box.total-deposit {
+  background-color: rgb(247, 242, 255);
+}
+#teacherRevenue .statistic-box.total-deposit:hover {
+  background-color: rgb(237, 227, 253);
+}
+#teacherRevenue .statistic-box.total-deposit .statistic-value {
+  color: rgb(106, 0, 255);
+}
 #teacherRevenue .table th,
 #teacherRevenue .table td {
   padding: 1rem;

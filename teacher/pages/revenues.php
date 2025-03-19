@@ -20,6 +20,26 @@ global $wpdb;
 
 $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments WHERE teacher_id = $teacher_id");
 
+// Query to get total in progress
+$total_in_progress = (int) $wpdb->get_var($wpdb->prepare( 
+    "SELECT SUM(due) FROM {$wpdb->prefix}teacher_payments 
+     WHERE teacher_id = %d AND status = %s",
+    $teacher_id, 'in progress'
+));
+
+// Query to get total dues
+$total_dues = (int) $wpdb->get_var($wpdb->prepare( 
+    "SELECT SUM(due) FROM {$wpdb->prefix}teacher_payments 
+     WHERE teacher_id = %d AND status = %s",
+    $teacher_id, 'due'
+));
+
+// Query to get total deposits
+$total_deposits = (int) $wpdb->get_var($wpdb->prepare(
+    "SELECT SUM(deposit) FROM {$wpdb->prefix}teacher_payments WHERE teacher_id = %d",
+    $teacher_id
+));
+
 ?>
 
 <div class="content-area">
@@ -35,6 +55,45 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments WH
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
                 <span class="active">Revenus</span>
+            </div>
+        </div>
+
+        <div class="content-section statistics">
+            <div class="section-body">
+
+                <!-- Total in progress -->
+                <a href="javascript:void()" class="statistic-box total-in-progress">
+                    <h4 class="statistic-title">
+                        <i class="fas fa-exchange-alt"></i> Total en cours
+                    </h4>
+                    <p class="statistic-value">
+                        <?php echo esc_html($total_in_progress); ?>
+                        <span class="currecy"><i class="fas fa-euro-sign"></i></span>
+                    </p>
+                </a>
+
+                <!-- Total due -->
+                <a href="javascript:void()" class="statistic-box total-due">
+                    <h4 class="statistic-title">
+                        <i class="fas fa-exchange-alt"></i> Total dû
+                    </h4>
+                    <p class="statistic-value">
+                        <?php echo esc_html($total_dues); ?>
+                        <span class="currecy"><i class="fas fa-euro-sign"></i></span>
+                    </p>
+                </a>
+
+                <!-- Total deposits -->
+                <a href="javascript:void()" class="statistic-box total-deposit">
+                    <h4 class="statistic-title">
+                        <i class="fas fa-exchange-alt"></i> Dépôt total
+                    </h4>
+                    <p class="statistic-value">
+                        <?php echo esc_html($total_deposits); ?>
+                        <span class="currecy"><i class="fas fa-euro-sign"></i></span>
+                    </p>
+                </a>
+
             </div>
         </div>
 
@@ -57,8 +116,8 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments WH
                 <thead>
                     <tr>
                         <th>Numéro de facture</th>
-                        <th>Montant</th>
                         <th>Exigible</th>
+                        <th>Dépôt</th>
                         <th>Méthode</th>
                         <th>Date</th>
                         <th>Invoice</th>
@@ -77,11 +136,11 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments WH
                         </td>
                         <td class="payment">
                             <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                            <?php echo esc_html($payment->deposit); ?>
+                            <?php echo esc_html($payment->due); ?>
                         </td>
                         <td class="payment">
                             <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                            <?php echo esc_html($payment->due); ?>
+                            <?php echo esc_html($payment->deposit); ?>
                         </td>
                         <td>
                             <?php echo esc_html($payment->payment_method); ?>
