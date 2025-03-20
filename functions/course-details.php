@@ -23,6 +23,43 @@ function render_course_details_section() {
         )
     );
 
+    // Decode session days from JSON
+    $session_dates = json_decode($course->session_days, true);
+
+    // Get the current date
+    $current_day = new DateTime();
+    $current_day_str = $current_day->format('Y-m-d');
+
+    // Find the next available session date
+    $next_available_date = null;
+    foreach ($session_dates as $session_date) {
+        if ($session_date > $current_day_str) {
+            $next_available_date = $session_date;
+            break; // Get only the immediate next session
+        }
+    }
+
+    // Check if a next session is found
+    if (!$next_available_date) {
+        $error_message = "Aucune session à venir disponible";
+        echo '<div class="course-error-message">' . esc_html($error_message) . '</div>';
+    }
+
+    // Get the day name
+    $next_date_obj = new DateTime($next_available_date);
+    $day_name = $next_date_obj->format('l');
+
+    // Fetch session time slots from course_sessions table using WPDB
+    $session_times = $wpdb->get_row(
+        $wpdb->prepare("
+            SELECT slot1_start_time, slot1_end_time, slot2_start_time, slot2_end_time 
+            FROM {$wpdb->prefix}course_sessions 
+            WHERE course_id = %d AND session_date = %s",
+            $course_id, $next_available_date
+        ),
+        ARRAY_A
+    );
+
     // Check if the course exists
     if ($course) {
         // Extract the start date and time slot
@@ -99,35 +136,6 @@ function render_course_details_section() {
 
         ob_start();
 
-        // Get total teacher assigned count
-        function get_total_assigned_teachers($course_id) {
-            global $wpdb;
-            $table_name = $wpdb->prefix . 'courses';
-        
-            // Get the count of teachers by checking the length of the assigned_teachers JSON array
-            $total_teachers = $wpdb->get_var($wpdb->prepare(
-                "SELECT JSON_LENGTH(assigned_teachers) FROM $table_name WHERE id = %d",
-                $course_id
-            ));
-        
-            return (int) $total_teachers; // Return as an integer
-        }
-        $total_teachers = get_total_assigned_teachers($course_id);
-
-        // Get total student enrolled count
-        function get_total_enrolled_students($course_id) {
-            global $wpdb;
-            $table_name = $wpdb->prefix . 'courses';
-        
-            // Get the count of teachers by checking the length of the assigned_teachers JSON array
-            $total_students = $wpdb->get_var($wpdb->prepare(
-                "SELECT JSON_LENGTH(enrolled_students) FROM $table_name WHERE id = %d",
-                $course_id
-            ));
-        
-            return (int) $total_students; // Return as an integer
-        }
-        $total_students = get_total_enrolled_students($course_id);
 ?>
 
 <div id="courseDetails" class="container row">
@@ -216,46 +224,50 @@ function render_course_details_section() {
                         <?php echo esc_html($course->required_credit); ?> credit
                     </span>
                 </li>
+                <?php
+                    if ($next_available_date) {
+                ?>
                 <li class="list-item">
                     <span class="item-name">
                         <i class="fas fa-calendar-day"></i> Date de début:
                     </span>
                     <span class="item-value">
-                        <?php echo date("M j, Y", strtotime($course->start_date)); ?>
+                        <?php echo date("M j, Y", strtotime($next_available_date)); ?>
                     </span>
                 </li>
                 <li class="list-item">
                     <span class="item-name">
-                        <i class="fas fa-calendar-check"></i> Date de fin:
+                        <i class="fas fa-calendar-day"></i> Jour:
                     </span>
                     <span class="item-value">
-                        <?php echo date("M j, Y", strtotime($course->end_date)); ?>
+                        <?php echo $day_name; ?>
                     </span>
                 </li>
                 <li class="list-item">
                     <span class="item-name">
-                        <i class="fas fa-hourglass-half"></i> Durée:
+                        <i class="fas fa-calendar-day"></i> Temps 1:
                     </span>
                     <span class="item-value">
-                        <?php echo esc_html($course->duration); ?> heures
+                        <?php  
+        echo esc_html(date("g:i A", strtotime($session_times['slot1_start_time']))) . " - " . 
+             esc_html(date("g:i A", strtotime($session_times['slot1_end_time'])));
+        ?>
                     </span>
                 </li>
                 <li class="list-item">
                     <span class="item-name">
-                        <i class="fas fa-user-tie"></i> Prof:
+                        <i class="fas fa-calendar-day"></i> Temps 2:
                     </span>
                     <span class="item-value">
-                        <?php echo esc_html($total_teachers); ?>
+                        <?php 
+        echo esc_html(date("g:i A", strtotime($session_times['slot2_start_time']))) . " - " . 
+             esc_html(date("g:i A", strtotime($session_times['slot2_end_time'])));
+        ?>
                     </span>
                 </li>
-                <li class="list-item">
-                    <span class="item-name">
-                        <i class="fas fa-user-graduate"></i> Eléves:
-                    </span>
-                    <span class="item-value">
-                        <?php echo esc_html($total_students); ?>
-                    </span>
-                </li>
+                <?php
+                    }
+                ?>
             </ul>
             <?php
                 if (in_array('parent', (array) $user->roles)) {

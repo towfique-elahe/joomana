@@ -423,11 +423,18 @@ form .submit-button {
   }
 }
 @media only screen and (max-width: 625px) {
+  .course-category-filtering {
+    flex-direction: column;
+  }
   .course-category-filtering .sidebar {
-    width: 45%;
+    width: 100%;
+    max-width: 25rem;
+    margin: 0 auto;
   }
   .course-category-filtering .course-cards {
-    width: 55%;
+    width: 100%;
+    max-width: 25rem;
+    margin: 0 auto;
   }
   .course-category-filtering .course-card {
     width: 100%;
