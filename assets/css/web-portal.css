@@ -26,6 +26,11 @@ form .signature {
 form .submit-button {
   max-width: 30rem;
 }
+.student-registration-form .section-heading,
+.teacher-registration-form .section-heading,
+.parent-registration-form .section-heading {
+  text-transform: unset;
+}
 
 /* Teacher Registration From */
 .teacher-registration-form .upload-cv-button {
@@ -125,17 +130,8 @@ form .submit-button {
   font-size: var(--secondary-font-size) !important;
   font-weight: var(--secondary-font-weight) !important;
 }
-.teacher-registration-form .declaration-text {
-  color: var(--text-color) !important;
-  font-family: var(--text-font-family) !important;
-  font-size: var(--text-font-size) !important;
-  font-weight: var(--text-font-weight) !important;
-}
-.teacher-registration-form .declaration input {
-  width: 100%;
-  max-width: 30rem;
-  border: none !important;
-  border-bottom: var(--border) !important;
+.teacher-registration-form .declaration label {
+  align-items: flex-start;
 }
 @media only screen and (max-width: 960px) {
   .teacher-registration-form .days .checkbox-group .row {

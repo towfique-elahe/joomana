@@ -36,7 +36,7 @@ function custom_student_registration_form() {
 
     <!-- Personal Information -->
     <section class="section col personal-information">
-        <h3 class="section-heading">Informations Générales</h3>
+        <h3 class="section-heading">Informations générales</h3>
 
         <div class="row">
             <div class="col">
@@ -73,7 +73,7 @@ function custom_student_registration_form() {
 
     <!-- Academic Details -->
     <section class="section col academic-details">
-        <h3 class="section-heading">Parle-nous de tes études</h3>
+        <h3 class="section-heading">Parles-nous de ta scolarité </h3>
 
         <div class="row">
             <div class="col">
@@ -311,7 +311,7 @@ function custom_student_registration_form() {
 
     <!-- Account Details -->
     <section class="section col account-details">
-        <h3 class="section-heading">Crée ton compte</h3>
+        <h3 class="section-heading">Crée ton propre compte</h3>
 
         <div class="row">
             <div class="col">
@@ -342,9 +342,13 @@ function custom_student_registration_form() {
 
     <!-- Parent/Guardian Consent -->
     <div class="col guardian-consent">
-        <h3 class="section-heading">Consentement des Parents/Tuteurs</h3>
-        <input type="text" name="parent_consent" id="parent_consent" class="declaration-input signature"
-            placeholder="Parce qu’on veut que tes parents soient d’accord avec tout ça !" required>
+        <h3 class="section-heading">Consentement des parents/tuteurs</h3>
+        <div class="col checkbox-group">
+            <label class="row"><input type="checkbox" id="parent_consent" name="parent_consent" value="Consent"
+                    required>
+                X Je certifie être le parent ou le représentant légal de l'enfant inscrit et donne mon consentement
+                explicite à son inscription et à sa participation aux cours de maths proposés par Joomaths </label>
+        </div>
     </div>
 
     <!-- Submit Button -->

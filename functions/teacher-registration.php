@@ -95,14 +95,6 @@ function custom_teacher_registration_form() {
 
         <div class="row">
             <div class="col">
-                <label for="company_name">Nom de l'entreprise</label>
-                <input type="text" id="company_name" name="company_name" placeholder="Votre dernier nom d'entreprise"
-                    required>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col">
                 <label for="how_found">Comment as-tu connu Joomaths ?</label>
                 <div class="custom-select-wrapper">
                     <select id="how_found" name="how_found">
@@ -362,7 +354,7 @@ function custom_teacher_registration_form() {
 
         <div class="row">
             <div class="col">
-                <label for="address">Adresse de la rue <span class="required">*</span></label>
+                <label for="address">Adresse <span class="required">*</span></label>
                 <input type="text" id="address" name="address" placeholder="Votre adresse postale" required>
             </div>
         </div>
@@ -532,14 +524,14 @@ function custom_teacher_registration_form() {
 
                 <!-- Sunday Time Slots -->
                 <div class="row checkbox-group">
+                    <label class="row"><input type="checkbox" name="sunday_timeslot[]" value="9am-10:30am">
+                        9am-10:30am</label>
+                    <label class="row"><input type="checkbox" name="sunday_timeslot[]" value="11am-12:30pm">
+                        11am-12:30pm</label>
                     <label class="row"><input type="checkbox" name="sunday_timeslot[]" value="2pm-3:30pm">
                         2pm-3:30pm</label>
                     <label class="row"><input type="checkbox" name="sunday_timeslot[]" value="4pm-5:30pm">
                         4pm-5:30pm</label>
-                    <label class="row"><input type="checkbox" name="sunday_timeslot[]" value="5:18pm-6:30pm">
-                        5:18pm-6:30pm</label>
-                    <label class="row"><input type="checkbox" name="sunday_timeslot[]" value="7pm-8:30pm">
-                        7pm-8:30pm</label>
                 </div>
             </div>
 
@@ -619,15 +611,12 @@ function custom_teacher_registration_form() {
 
     <div class="col declaration">
         <h3 class="declaration-heading">Déclaration</h3>
-        <p class="declaration-text">
-            Je certifie que les informations fournies dans ce formulaire sont exactes et complètes. Je comprends que
-            toute information fausse
-            ou trompeuse peut entraîner le rejet ou la résiliation de ma candidature si elle est découverte après mon
-            embauche.
-        </p>
-        <input type="text" name="signature" id="signature" class="declaration-input signature" placeholder="Signature"
-            required>
-        <input type="date" name="signature_date" id="signature_date" class="declaration-input signature-date" required>
+        <div class="col checkbox-group">
+            <label class="row"><input type="checkbox" id="signature" name="signature" value="I declare this" required>
+                X I certify that the information provided in this form is accurate and complete. I understand that any
+                false or misleading information may result in the rejection or termination of my application if
+                discovered after my employment. </label>
+        </div>
     </div>
 
     <button type="submit" class="submit-button" name="submit_teacher_registration">Valider</button>
@@ -659,7 +648,6 @@ function custom_teacher_registration_form() {
             $email = sanitize_email($_POST['email']);
             $password = $_POST['password'];
             $confirm_password = $_POST['confirm_password'];
-            $company_name = sanitize_text_field($_POST['company_name']);
             $how_found = sanitize_text_field($_POST['how_found']);
             $country = sanitize_text_field($_POST['country']);
             $address = sanitize_text_field($_POST['address']);
@@ -818,7 +806,6 @@ function custom_teacher_registration_form() {
                     'last_name' => $last_name,
                     'date_of_birth' => $date_of_birth,
                     'email' => $email,
-                    'company_name' => $company_name,
                     'how_found' => $how_found,
                     'country' => $country,
                     'address' => $address,

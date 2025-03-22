@@ -221,7 +221,7 @@ function render_course_details_section() {
                         <i class="far fa-credit-card"></i> Crédit:
                     </span>
                     <span class="item-value">
-                        <?php echo esc_html($course->required_credit); ?> credit
+                        <?php echo esc_html($course->required_credit); ?> Crédit
                     </span>
                 </li>
                 <?php
@@ -229,23 +229,41 @@ function render_course_details_section() {
                 ?>
                 <li class="list-item">
                     <span class="item-name">
-                        <i class="fas fa-calendar-day"></i> Date de début:
+                        <i class="fas fa-calendar-day"></i> Date du cours:
                     </span>
                     <span class="item-value">
-                        <?php echo date("M j, Y", strtotime($next_available_date)); ?>
+                        <?php
+                            $formatter = new IntlDateFormatter(
+                                'fr_FR', // French locale
+                                IntlDateFormatter::LONG,
+                                IntlDateFormatter::NONE
+                            );
+                            echo $formatter->format(strtotime($next_available_date));
+                        ?>
                     </span>
                 </li>
                 <li class="list-item">
                     <span class="item-name">
-                        <i class="fas fa-calendar-day"></i> Jour:
+                        <i class="fas fa-calendar-week"></i> Jour:
                     </span>
                     <span class="item-value">
-                        <?php echo $day_name; ?>
+                        <?php
+                            $date = new DateTime($next_available_date);
+                            $formatter = new IntlDateFormatter(
+                                'fr_FR', // French locale
+                                IntlDateFormatter::FULL,
+                                IntlDateFormatter::NONE,
+                                null,
+                                null,
+                                'EEEE' // Day name
+                            );
+                            echo ucfirst($formatter->format($date)); // ucfirst to capitalize first letter
+                        ?>
                     </span>
                 </li>
                 <li class="list-item">
                     <span class="item-name">
-                        <i class="fas fa-calendar-day"></i> Temps 1:
+                        <i class="fas fa-hourglass-start"></i> Temps 1:
                     </span>
                     <span class="item-value">
                         <?php  
@@ -256,7 +274,7 @@ function render_course_details_section() {
                 </li>
                 <li class="list-item">
                     <span class="item-name">
-                        <i class="fas fa-calendar-day"></i> Temps 2:
+                        <i class="fas fa-hourglass-end"></i> Temps 2:
                     </span>
                     <span class="item-value">
                         <?php 
