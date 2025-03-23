@@ -59,7 +59,7 @@ $credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits
                 </a>
 
                 <a href="<?php echo home_url('/#buyCredit'); ?>" class="button buy-credit">
-                    <i class="fas fa-shopping-bag"></i> Buy Credit
+                    <i class="fas fa-shopping-bag"></i> Acheter du crédit
                 </a>
 
             </div>
@@ -75,8 +75,8 @@ $credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits
                             <thead>
                                 <tr>
                                     <th>Crédit</th>
-                                    <th>Transaction Type</th>
-                                    <th>Transaction Reason</th>
+                                    <th>Type de transaction</th>
+                                    <th>Motif de la transaction</th>
                                     <th>Date</th>
                                 </tr>
                             </thead>

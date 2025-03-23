@@ -129,7 +129,7 @@ $childs = get_childs($parent_id);
                             <tr>
                                 <th>Name</th>
                                 <th>Gender</th>
-                                <th>Grade</th>
+                                <th>Classe</th>
                                 <th>Action</th>
                             </tr>
                         </thead>

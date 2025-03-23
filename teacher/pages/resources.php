@@ -193,7 +193,7 @@ $student_reports = $session_id ? $wpdb->get_results($wpdb->prepare(
                                     if ($student) {
                                 ?>
                         <p class="file-info">
-                            Étudiant:
+                            Elèves:
                             <a href="<?php echo esc_url(home_url('/session/student-management/student-details/?id=' . $student->id . '&session_id=' . $session_id)); ?>"
                                 class="accent">
                                 <?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?>

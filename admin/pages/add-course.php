@@ -298,10 +298,10 @@ ob_end_clean();
 
                     <div class="row">
                         <div class="col">
-                            <label for="grade">Grade <span class="required">*</span></label>
+                            <label for="grade">Classe <span class="required">*</span></label>
                             <div class="custom-select-wrapper">
                                 <select id="grade" name="grade" required>
-                                    <option value="" disabled selected>Sélectionnez le Grade</option>
+                                    <option value="" disabled selected>Sélectionnez le classe</option>
 
                                     <?php
                                                         global $wpdb; // Access the global $wpdb object for database queries
@@ -315,7 +315,7 @@ ob_end_clean();
                                                                 echo '<option value="' . esc_attr($grade->grade) . '">' . esc_html($grade->grade) . '</option>';
                                                             }
                                                         } else {
-                                                            echo '<option disabled>No grade found</option>';
+                                                            echo '<option disabled>No Classe found</option>';
                                                         }
                                                     ?>
 
@@ -354,14 +354,14 @@ ob_end_clean();
 
                     <div class="row">
                         <div class="col">
-                            <label for="max_students_per_group">Nombre maximal d'étudiants/groupe <span
+                            <label for="max_students_per_group">Nombre maximal d'elèvess/groupe <span
                                     class="required">*</span></label>
                             <input type="number" id="max_students_per_group" name="max_students_per_group" min="1"
                                 placeholder="6" required>
                         </div>
 
                         <div class="col">
-                            <label for="max_student_groups">Nombre maximal de groupes d'étudiants <span
+                            <label for="max_student_groups">Nombre maximal de groupes d'elèvess <span
                                     class="required">*</span></label>
                             <input type="number" id="max_student_groups" name="max_student_groups" min="1"
                                 placeholder="25" required>

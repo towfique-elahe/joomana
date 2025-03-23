@@ -372,12 +372,12 @@ if (in_array('teacher', (array) $user->roles)) {
                     if (current_user_can('student')) {
                 ?>
                 <a href="<?php echo home_url('/student/course-management'); ?>" class="breadcrumb-link">Gestion des
-                    enfants</a>
+                    cours</a>
                 <?php 
                     } elseif (current_user_can('parent')) {
                 ?>
-                <a href="<?php echo home_url('/parent/child-management'); ?>" class="breadcrumb-link">Gestion de
-                    cours</a>
+                <a href="<?php echo home_url('/parent/child-management'); ?>" class="breadcrumb-link">Gestion des
+                    enfants</a>
                 <?php 
                     } elseif (current_user_can('teacher')) {
                 ?>
@@ -768,7 +768,7 @@ if (in_array('teacher', (array) $user->roles)) {
                         <div class="col">
                             <!-- student list -->
                             <div class="col course-sidebar">
-                                <h4 class="sidebar-title">Liste des étudiants</h4>
+                                <h4 class="sidebar-title">Liste des elèves</h4>
 
                                 <ul class="list">
 
@@ -848,7 +848,7 @@ if (in_array('teacher', (array) $user->roles)) {
                                     <?php
                                             }
                                         } else {
-                                            echo '<p class="no-date">Aucun étudiant trouvé.</p>';
+                                            echo '<p class="no-date">Aucun elèves trouvé.</p>';
                                         }
                                     ?>
 

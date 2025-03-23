@@ -113,7 +113,7 @@ require_once(get_template_directory() . '/admin/templates/header.php');
                 ?>
                 <a href="<?php echo home_url('/admin/student-management'); ?>" class="statistic-box total-student">
                     <h4 class="statistic-title">
-                        <i class="fas fa-user-graduate"></i> étudiants totaux
+                        <i class="fas fa-user-graduate"></i> Elèves totaux
                     </h4>
                     <p class="statistic-value">
                         <?php echo esc_html($student_count); ?>

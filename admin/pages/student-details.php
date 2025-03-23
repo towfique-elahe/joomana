@@ -4,7 +4,7 @@
 
 // page title
 global $pageTitle;
-$pageTitle = "Détails Sur L'étudiant";
+$pageTitle = "Détails Sur L'elèves";
 
 require_once(get_template_directory() . '/admin/templates/header.php');
 
@@ -39,7 +39,7 @@ $studentTotalPayment = $wpdb->get_var(
 
 if (!$student) {
     // Handle case when the student does not exist
-    wp_die("L'étudiant demandé n'a pas pu être trouvé.");
+    wp_die("L'elèves demandé n'a pas pu être trouvé.");
 }
 
 $student_id = $student->id;
@@ -86,7 +86,7 @@ $completed_courses = get_student_assigned_completed_courses($student_id);
     </div>
     <div id="adminStudentDetails" class="main-content">
         <div class="content-header">
-            <h2 class="content-title">Détails Sur L'étudiant</h2>
+            <h2 class="content-title">Détails Sur L'elèves</h2>
             <div class="content-breadcrumb">
                 <a href="<?php echo home_url('/admin/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
                 <span class="separator">
@@ -97,7 +97,7 @@ $completed_courses = get_student_assigned_completed_courses($student_id);
                 <span class="separator">
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
-                <span class="active">Détails Sur L'étudiant</span>
+                <span class="active">Détails Sur L'elèves</span>
             </div>
         </div>
 
@@ -135,7 +135,7 @@ $completed_courses = get_student_assigned_completed_courses($student_id);
                             </span>
                         </div>
                         <div class="row detail-row">
-                            <span class="col detail-label">Grade:</span>
+                            <span class="col detail-label">Classe:</span>
                             <span class="col detail-value">
                                 <?php echo esc_html($student->grade); ?>
                             </span>

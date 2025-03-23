@@ -4,7 +4,7 @@
 
 // Page title
 global $pageTitle;
-$pageTitle = 'Niveaux Étudiant';
+$pageTitle = 'Niveaux Elèves';
 
 require_once(get_template_directory() . '/admin/templates/header.php');
 
@@ -86,13 +86,13 @@ if ($edit_item_id > 0) {
     </div>
     <div id="adminCourseLevel" class="main-content">
         <div class="content-header">
-            <h2 class="content-title">Niveaux étudiant</h2>
+            <h2 class="content-title">Niveaux Elèves</h2>
             <div class="content-breadcrumb">
                 <a href="<?php echo home_url('/admin/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
                 <span class="separator">
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
-                <span class="active">Niveaux étudiant</span>
+                <span class="active">Niveaux Elèves</span>
             </div>
         </div>
 

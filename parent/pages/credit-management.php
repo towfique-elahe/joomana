@@ -75,8 +75,8 @@ $credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits
                             <thead>
                                 <tr>
                                     <th>Crédit</th>
-                                    <th>Transaction Type</th>
-                                    <th>Transaction Reason</th>
+                                    <th>Type de transaction</th>
+                                    <th>Motif de la transaction</th>
                                     <th>Date</th>
                                 </tr>
                             </thead>

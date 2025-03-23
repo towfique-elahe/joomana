@@ -42,7 +42,7 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}payments");
                 <div class="filter-bar">
                     <div class="search-bar">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" placeholder="Recherche De Paiement" onkeyup="filterUser()">
+                        <input type="text" placeholder="Recherche de paiement" onkeyup="filterUser()">
                     </div>
                 </div>
             </div>

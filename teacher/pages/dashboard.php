@@ -130,7 +130,7 @@ $upcoming_sessions = $wpdb->get_results(
 
                 <a href="<?php echo home_url('/teacher/course-management/'); ?>" class="statistic-box total-student">
                     <h4 class="statistic-title">
-                        <i class="fas fa-user-graduate"></i> Total d'étudiants
+                        <i class="fas fa-user-graduate"></i> Total d'elèves
                     </h4>
                     <p class="statistic-value">
                         <?php echo esc_html($total_students); ?>

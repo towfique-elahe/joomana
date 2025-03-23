@@ -4,7 +4,7 @@
 
 // page title
 global $pageTitle;
-$pageTitle = "Détails Sur L'étudiant";
+$pageTitle = "Détails Sur L'elèves";
 
 require_once(get_template_directory() . '/course/templates/header.php');
 
@@ -57,7 +57,7 @@ if (in_array('teacher', (array) $user->roles)) {
 
     if (!$student) {
         // Handle case when the student does not exist
-        wp_die("L'étudiant demandé n'a pas pu être trouvé.");
+        wp_die("L'elèves demandé n'a pas pu être trouvé.");
     }
 }
 
@@ -69,18 +69,18 @@ if (in_array('teacher', (array) $user->roles)) {
     </div>
     <div id="courseStudentDetails" class="main-content">
         <div class="content-header">
-            <h2 class="content-title">Détails Sur L'étudiant</h2>
+            <h2 class="content-title">Détails Sur L'elèves</h2>
             <div class="content-breadcrumb">
                 <a href="<?php echo home_url('/course/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
                 <span class="separator">
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
                 <a href="<?php echo home_url('/course/student-management'); ?>" class="breadcrumb-link">Gestion
-                    étudiants</a>
+                    elèves</a>
                 <span class="separator">
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
-                <span class="active">Détails Sur L'étudiant</span>
+                <span class="active">Détails Sur L'elèves</span>
             </div>
         </div>
 
@@ -109,7 +109,7 @@ if (in_array('teacher', (array) $user->roles)) {
                             </span>
                         </div>
                         <div class="row detail-row">
-                            <span class="col detail-label">Grade:</span>
+                            <span class="col detail-label">Classe:</span>
                             <span class="col detail-value">
                                 <?php echo esc_html($student->grade); ?>
                             </span>

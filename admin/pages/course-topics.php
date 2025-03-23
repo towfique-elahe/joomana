@@ -313,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <tr>
                         <th>Sujet</th>
                         <th>catégorie</th>
-                        <th>Grade</th>
+                        <th>Classe</th>
                         <th>Niveaus</th>
                         <th>Cours</th>
                         <th>Actions</th>

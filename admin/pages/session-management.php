@@ -15,7 +15,10 @@ if (!defined('ABSPATH')) {
 
 global $wpdb;
 
-$course_sessions = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_sessions");
+$course_sessions = $wpdb->get_results("
+    SELECT * FROM {$wpdb->prefix}course_sessions 
+    ORDER BY created_at DESC
+");
 
 // Function to get course title
 function get_course_title($course_id) {
@@ -84,7 +87,7 @@ function get_enrolled_students_count($session_id) {
                         <th>Date</th>
                         <th>Cours</th>
                         <th>Groupe</th>
-                        <th>Étudiants</th>
+                        <th>Elèves</th>
                         <th>Temp 1</th>
                         <th>Temp 2</th>
                         <th>Actions</th>

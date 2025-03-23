@@ -31,7 +31,7 @@ $student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id 
 
 if (!$student) {
     // Handle case when the student does not exist
-    wp_die("L'étudiant demandé n'a pas pu être trouvé.");
+    wp_die("L'elèves demandé n'a pas pu être trouvé.");
 }
 
 // get current student
@@ -192,7 +192,7 @@ foreach ($feedback_data as $feedback) {
                             </span>
                         </div>
                         <div class="row detail-row">
-                            <span class="col detail-label">Grade:</span>
+                            <span class="col detail-label">Classe:</span>
                             <span class="col detail-value">
                                 <?php echo esc_html($student->grade); ?>
                             </span>

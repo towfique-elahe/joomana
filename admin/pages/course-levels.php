@@ -4,7 +4,7 @@
 
 // page title
 global $pageTitle;
-$pageTitle = 'Niveaux Étudiant';
+$pageTitle = 'Niveaux Elèves';
 
 require_once(get_template_directory() . '/admin/templates/header.php');
 
@@ -104,13 +104,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
     </div>
     <div id="adminCourseLevel" class="main-content">
         <div class="content-header">
-            <h2 class="content-title">Niveaus étudiant</h2>
+            <h2 class="content-title">Niveaus Elèves</h2>
             <div class="content-breadcrumb">
                 <a href="<?php echo home_url('/admin/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
                 <span class="separator">
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
-                <span class="active">Niveaus étudiant</span>
+                <span class="active">Niveaus Elèves</span>
             </div>
         </div>
 

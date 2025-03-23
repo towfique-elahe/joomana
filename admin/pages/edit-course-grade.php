@@ -4,7 +4,7 @@
 
 // Page title
 global $pageTitle;
-$pageTitle = 'Notes étudiant';
+$pageTitle = 'Notes Elèves';
 
 require_once(get_template_directory() . '/admin/templates/header.php');
 
@@ -86,13 +86,13 @@ if ($edit_item_id > 0) {
     </div>
     <div id="adminCourseGrade" class="main-content">
         <div class="content-header">
-            <h2 class="content-title">Notes étudiant</h2>
+            <h2 class="content-title">Notes Elèves</h2>
             <div class="content-breadcrumb">
                 <a href="<?php echo home_url('/admin/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
                 <span class="separator">
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
-                <span class="active">Notes étudiant</span>
+                <span class="active">Notes Elèves</span>
             </div>
         </div>
 
@@ -115,7 +115,7 @@ if ($edit_item_id > 0) {
                     <h3 class="section-heading">Mettre à jour la note</h3>
                     <div class="row">
                         <div class="col">
-                            <label for="grade">Nom de Grade <span class="required">*</span></label>
+                            <label for="grade">Nom de Classe <span class="required">*</span></label>
                             <input type="text" id="grade" name="grade" placeholder="Nom de Grade"
                                 value="<?php echo esc_attr($grade->grade); ?>" required>
                         </div>

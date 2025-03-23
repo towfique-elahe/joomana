@@ -13,7 +13,7 @@
         </li>
         <li class="sidebar-item">
             <a href="<?php echo home_url('/admin/student-management/'); ?>">
-                <i class="fas fa-user-graduate"></i> Gestion étudiants
+                <i class="fas fa-user-graduate"></i> Gestion Elèves
             </a>
         </li>
         <li class="sidebar-item">
@@ -49,12 +49,12 @@
                 </li>
                 <li class="sidebar-sub-item child">
                     <a href="<?php echo home_url('/admin/course-management/grades/'); ?>">
-                        <i class="fas fa-signal"></i> Grades
+                        <i class="fas fa-signal"></i> Classe
                     </a>
                 </li>
                 <li class="sidebar-sub-item child">
                     <a href="<?php echo home_url('/admin/course-management/levels/'); ?>">
-                        <i class="fas fa-level-up-alt"></i> Niveaus étudiant
+                        <i class="fas fa-level-up-alt"></i> Niveaus elèves
                     </a>
                 </li>
             </ul>

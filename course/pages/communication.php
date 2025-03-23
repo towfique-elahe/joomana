@@ -107,12 +107,12 @@ $messages = $wpdb->get_results( $wpdb->prepare(
                     if (current_user_can('student')) {
                 ?>
                 <a href="<?php echo home_url('/student/course-management'); ?>" class="breadcrumb-link">Gestion des
-                    enfants</a>
+                    cours</a>
                 <?php 
                     } elseif (current_user_can('parent')) {
                 ?>
-                <a href="<?php echo home_url('/parent/child-management'); ?>" class="breadcrumb-link">Gestion de
-                    cours</a>
+                <a href="<?php echo home_url('/parent/child-management'); ?>" class="breadcrumb-link">Gestion des
+                    enfants</a>
                 <?php 
                     } elseif (current_user_can('teacher')) {
                 ?>

@@ -452,7 +452,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                     </a>
                                     <a href="<?php echo esc_url(home_url('/admin/session-management/courses/groups/group-submissions/?group_number=' . $group_number . '&course_id=' . $course_id)); ?>"
                                         class="button">
-                                        <i class="fas fa-tasks"></i> Soumissions des étudiants
+                                        <i class="fas fa-tasks"></i> Soumissions des elèves
                                     </a>
                                 </div>
                             </div>
@@ -489,7 +489,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                         <div class="col">
                             <!-- student list -->
                             <div class="col course-sidebar">
-                                <h4 class="sidebar-title">Liste des étudiants</h4>
+                                <h4 class="sidebar-title">Liste des elèves</h4>
 
                                 <ul class="list">
 
@@ -515,7 +515,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                     <?php
                                             }
                                         } else {
-                                            echo '<p class="no-date">Aucun étudiant trouvé.</p>';
+                                            echo '<p class="no-date">Aucun elèves trouvé.</p>';
                                         }
                                     ?>
 

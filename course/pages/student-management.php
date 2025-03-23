@@ -4,7 +4,7 @@
 
 // page title
 global $pageTitle;
-$pageTitle = 'Gestion Étudiants';
+$pageTitle = 'Gestion Elèves';
 
 require_once(get_template_directory() . '/course/templates/header.php');
 
@@ -74,13 +74,13 @@ if (in_array('teacher', (array) $user->roles)) {
     </div>
     <div id="courseStudentManagement" class="main-content">
         <div class="content-header">
-            <h2 class="content-title">Gestion étudiants</h2>
+            <h2 class="content-title">Gestion Elèves</h2>
             <div class="content-breadcrumb">
                 <a href="<?php echo home_url('/course/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
                 <span class="separator">
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
-                <span class="active">Gestion étudiants</span>
+                <span class="active">Gestion Elèves</span>
             </div>
         </div>
 
@@ -88,8 +88,8 @@ if (in_array('teacher', (array) $user->roles)) {
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Nom d'étudiant</th>
-                        <th>Grade</th>
+                        <th>Nom d'elèves</th>
+                        <th>Classe</th>
                         <th>Niveau</th>
                         <th>Détails</th>
                     </tr>
@@ -126,7 +126,7 @@ if (in_array('teacher', (array) $user->roles)) {
                             } else {
                     ?>
                     <tr>
-                        <td colspan="4">Aucun étudiant trouvé.</td>
+                        <td colspan="4">Aucun elèves trouvé.</td>
                     </tr>
                     <?php
                                 }

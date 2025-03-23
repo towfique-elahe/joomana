@@ -189,12 +189,12 @@ if (in_array('student', (array) $user->roles)) {
                     if (current_user_can('student')) {
                 ?>
                 <a href="<?php echo home_url('/student/course-management'); ?>" class="breadcrumb-link">Gestion des
-                    enfants</a>
+                    cours</a>
                 <?php 
                     } elseif (current_user_can('parent')) {
                 ?>
-                <a href="<?php echo home_url('/parent/child-management'); ?>" class="breadcrumb-link">Gestion de
-                    cours</a>
+                <a href="<?php echo home_url('/parent/child-management'); ?>" class="breadcrumb-link">Gestion des
+                    enfants</a>
                 <?php 
                     } elseif (current_user_can('teacher')) {
                 ?>
@@ -273,7 +273,7 @@ if (in_array('student', (array) $user->roles)) {
                                     $student = $wpdb->get_row($wpdb->prepare("SELECT * FROM $student_table WHERE id = %d", $student_id));
                             ?>
                             <p class="file-info">
-                                Étudiant:
+                                Elèves:
                                 <a href="<?php echo esc_url(home_url('/course/student-management/student-details/?id=' . $student->id . '&session_id=' . $session_id)); ?>"
                                     class="accent"><?php echo esc_html($student->first_name) . ' ' . esc_html($student->last_name); ?></a>
                             </p>

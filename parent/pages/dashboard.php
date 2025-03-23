@@ -97,7 +97,7 @@ $childs = $wpdb->get_results(
                         🕒 Loading countdown...
                     </p>
                     <p class="child-info">
-                        Child: <?php echo esc_html($child->first_name) . ' ' . esc_html($child->last_name); ?>
+                        Enfant: <?php echo esc_html($child->first_name) . ' ' . esc_html($child->last_name); ?>
                     </p>
                     <p class="session-info">
                         📅 <?php echo date("M j, Y", strtotime($session->session_date)); ?> | 🕒

@@ -4,7 +4,7 @@
 
 // page title
 global $pageTitle;
-$pageTitle = 'Gestion Étudiants';
+$pageTitle = 'Gestion Elèves';
 
 require_once(get_template_directory() . '/admin/templates/header.php');
 
@@ -76,13 +76,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
     </div>
     <div id="adminStudentManagement" class="main-content">
         <div class="content-header">
-            <h2 class="content-title">Gestion étudiants</h2>
+            <h2 class="content-title">Gestion Elèves</h2>
             <div class="content-breadcrumb">
                 <a href="<?php echo home_url('/admin/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
                 <span class="separator">
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
-                <span class="active">Gestion étudiants</span>
+                <span class="active">Gestion Elèves</span>
             </div>
         </div>
 
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <!-- Grade Filter -->
                     <div class="custom-select-wrapper">
                         <select id="grade-filter" onchange="filterBySelect()">
-                            <option value="all">Tous les grades</option>
+                            <option value="all">Tous les classe</option>
                             <?php
                                 global $wpdb;
                                 $grades = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_grades");
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                                         echo '<option value="' . esc_attr($grade->grade) . '">' . esc_html($grade->grade) . '</option>';
                                     }
                                 } else {
-                                    echo '<option disabled>No grade found</option>';
+                                    echo '<option disabled>No Classe found</option>';
                                 }
                             ?>
                         </select>
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                 <div class="filter-bar">
                     <div class="search-bar">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" placeholder="Rechercher Un Étudiant" onkeyup="filterUser()">
+                        <input type="text" placeholder="Rechercher Un Elèves" onkeyup="filterUser()">
                     </div>
                 </div>
             </div>
@@ -139,8 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Nom d'étudiant</th>
-                        <th>Grade</th>
+                        <th>Nom d'elèves</th>
+                        <th>Classe</th>
                         <th>Niveau</th>
                         <th>Inscrit</th>
                         <th>Paiement total</th>

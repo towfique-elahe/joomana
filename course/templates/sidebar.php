@@ -17,7 +17,7 @@
         </li>
         <li class="sidebar-item">
             <a href="<?php echo home_url('/course/student-management/?session_id=' . $session_id); ?>">
-                <i class="fas fa-graduation-cap"></i> Gestion étudiants
+                <i class="fas fa-graduation-cap"></i> Gestion Elèves
             </a>
         </li>
         <li class="sidebar-item">
