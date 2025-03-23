@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.5.1';
+    $custom_tables_version = '1.5.2';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -88,7 +88,7 @@ function create_custom_tables() {
         max_student_groups INT(11) NOT NULL DEFAULT 25,
         max_students_per_group INT(11) NOT NULL DEFAULT 6,
         max_teachers INT(11) NOT NULL DEFAULT 25,
-        duration INT(11) NOT NULL DEFAULT 2,
+        duration VARCHAR(50) NOT NULL,
         status ENUM('ongoing', 'upcoming', 'completed') NOT NULL DEFAULT 'upcoming',
         image VARCHAR(255) DEFAULT NULL,
         required_credit DECIMAL(10) NOT NULL,

@@ -188,7 +188,7 @@ unset($_SESSION['registration_error'], $_SESSION['registration_success']);
 
                 <!-- Personal Information -->
                 <section class="section col personal-information">
-                    <h3 class="section-heading">Informations Générales</h3>
+                    <h3 class="section-heading">Informations générales</h3>
 
                     <div class="row">
                         <div class="col">
@@ -225,7 +225,7 @@ unset($_SESSION['registration_error'], $_SESSION['registration_success']);
 
                 <!-- Academic Details -->
                 <section class="section col academic-details">
-                    <h3 class="section-heading">Parle-nous de tes études</h3>
+                    <h3 class="section-heading">Parles-nous de ta scolarité</h3>
 
                     <div class="row">
                         <div class="col">
@@ -265,7 +265,7 @@ unset($_SESSION['registration_error'], $_SESSION['registration_success']);
                         </div>
 
                         <div class="col">
-                            <label for="level">Niveau <span class="required">*</span></label>
+                            <label for="level">Ta moyenne en maths <span class="required">*</span></label>
                             <div class="custom-select-wrapper">
                                 <!-- Hidden select element to store the actual level (Fort/Débutant) -->
                                 <select id="level" name="level" required style="display: none;">
@@ -471,7 +471,7 @@ unset($_SESSION['registration_error'], $_SESSION['registration_success']);
 
                 <!-- Account Details -->
                 <section class="section col account-details">
-                    <h3 class="section-heading">Crée ton compte</h3>
+                    <h3 class="section-heading">Crée ton propre compte</h3>
 
                     <div class="row">
                         <div class="col">
@@ -502,14 +502,21 @@ unset($_SESSION['registration_error'], $_SESSION['registration_success']);
                 </section>
 
                 <!-- Parent/Guardian Consent -->
-                <div class="section col guardian-consent">
-                    <h3 class="section-heading">Consentement des Parents/Tuteurs</h3>
-                    <input type="text" name="parent_consent" id="parent_consent" class="declaration-input signature"
-                        placeholder="Parce qu’on veut que tes parents soient d’accord avec tout ça !" required>
+                <div class="col guardian-consent">
+                    <h3 class="section-heading">Consentement des parents/tuteurs</h3>
+                    <div class="col checkbox-group">
+                        <label class="row"><input type="checkbox" id="parent_consent" name="parent_consent"
+                                value="Consent" required>
+                            X Je certifie être le parent ou le représentant légal de l'enfant inscrit et donne mon
+                            consentement explicite à son inscription et à sa participation aux cours de maths proposés
+                            par Joomaths
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="submit-button" name="submit_child_registration">Registre</button>
+                <button type="submit" class="submit-button" name="submit_child_registration">Inscrivez votre
+                    enfant</button>
             </form>
 
         </div>

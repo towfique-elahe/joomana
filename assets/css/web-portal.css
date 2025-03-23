@@ -551,6 +551,29 @@ form .submit-button {
 #availableCourses .course-btn:hover {
   background-color: var(--accent-color);
 }
+@media only screen and (max-width: 900px) {
+  #availableCourses .container {
+    gap: 10px;
+  }
+  #availableCourses .course-card {
+    width: calc(33% - 10.5px);
+  }
+}
+@media only screen and (max-width: 768px) {
+  #availableCourses .course-card {
+    width: calc(50% - 5px);
+  }
+}
+@media only screen and (max-width: 500px) {
+  #availableCourses .container {
+    justify-content: center;
+    gap: 20px;
+  }
+  #availableCourses .course-card {
+    width: 100%;
+    max-width: 350px;
+  }
+}
 
 /* Course Details */
 .course-error-message {

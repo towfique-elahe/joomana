@@ -309,6 +309,10 @@
 #parentAddChild form .section {
   border-radius: 0.5rem;
 }
+#parentAddChild form .section-heading,
+#parentAddChild form label {
+  text-transform: unset !important;
+}
 #parentAddChild form .interested-subjects label,
 #parentAddChild form .interested-modules label {
   font-family: var(--text-font-family) !important;

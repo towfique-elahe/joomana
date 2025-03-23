@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_course'])) {
         $max_student_groups   = intval($_POST['max_student_groups']);
         $max_students_per_group = intval($_POST['max_students_per_group']);
         $max_teachers         = intval($_POST['max_teachers']);
-        $duration             = intval($_POST['duration']);
+        $duration             = sanitize_text_field($_POST['duration']);
         $required_credit      = floatval($_POST['required_credit']);
         $course_material      = esc_url_raw($_POST['course_material']);
         $start_date           = sanitize_text_field($_POST['start_date']);
@@ -156,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_course'])) {
                 ],
                 ['id' => $course_id],
                 [
-                    '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%f', '%s', '%s', '%s', '%s', '%d', '%s', '%s'
+                    '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%d', '%s', '%s'
                 ]
             );
 
@@ -363,8 +363,8 @@ ob_end_clean();
 
                         <div class="col">
                             <label for="duration">Durée (en heure) <span class="required">*</span></label>
-                            <input type="number" id="duration" name="duration" min="1"
-                                value="<?php echo esc_attr($course->duration); ?>" placeholder="2" required>
+                            <input type="text" id="duration" name="duration"
+                                value="<?php echo esc_attr($course->duration); ?>" placeholder="1h 30m" required>
                         </div>
                     </div>
 

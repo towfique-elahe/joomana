@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 ?>
 
 <p class="woocommerce-notice woocommerce-notice--success woocommerce-thankyou-order-received">
-	<?php
+    <?php
 	/**
 	 * Filter the message shown after a checkout is complete.
 	 *
@@ -32,7 +32,7 @@ defined( 'ABSPATH' ) || exit;
 	 */
 	$message = apply_filters(
 		'woocommerce_thankyou_order_received_text',
-		esc_html( __( 'Thank you. Your order has been received.', 'woocommerce' ) ),
+		esc_html( __( 'Merci. Votre commande a bien été reçue.', 'woocommerce' ) ),
 		$order
 	);
 
