@@ -135,6 +135,9 @@ foreach ($feedback_data as $feedback) {
     }
 }
 
+// Fetch childs payment history
+$payments = $wpdb->get_results($wpdb->prepare("SELECT * FROM $payment_table WHERE user_id = %d", $student_id));
+
 ?>
 
 <div class="content-area">
@@ -227,7 +230,6 @@ foreach ($feedback_data as $feedback) {
                                     if (!empty($upcomming_sessions)): 
                                         foreach ($upcomming_sessions as $session): 
                                             $course_id = $session->course_id;
-                                            $group_number = $session->group_number;
                                             $session_date = $session->session_date;
                                             $session_date = date('M d, Y', strtotime($session->session_date));
                                             $status = $session->status;
@@ -236,19 +238,31 @@ foreach ($feedback_data as $feedback) {
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                         <div class="course-card">
                                             <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                                 alt="Course Image" class="course-image">
-                                            <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                            <span
+                                                class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                             <h3 class="course-title">
                                                 <?php echo esc_html($course->title); ?>
                                             </h3>
                                             <div class="course-info">
-                                                <p class="date">
-                                                    Groupe:
-                                                    <?php echo esc_html($group_number);?>
-                                                </p>
                                                 <p class="date">
                                                     Date:
                                                     <?php echo esc_html($session_date);?>
@@ -284,7 +298,6 @@ foreach ($feedback_data as $feedback) {
                                     if (!empty($ongoing_sessions)): 
                                         foreach ($ongoing_sessions as $session): 
                                             $course_id = $session->course_id;
-                                            $group_number = $session->group_number;
                                             $session_date = $session->session_date;
                                             $session_date = date('M d, Y', strtotime($session->session_date));
                                             $status = $session->status;
@@ -293,19 +306,31 @@ foreach ($feedback_data as $feedback) {
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                         <div class="course-card">
                                             <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                                 alt="Course Image" class="course-image">
-                                            <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                            <span
+                                                class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                             <h3 class="course-title">
                                                 <?php echo esc_html($course->title); ?>
                                             </h3>
                                             <div class="course-info">
-                                                <p class="date">
-                                                    Groupe:
-                                                    <?php echo esc_html($group_number);?>
-                                                </p>
                                                 <p class="date">
                                                     Date:
                                                     <?php echo esc_html($session_date);?>
@@ -341,7 +366,6 @@ foreach ($feedback_data as $feedback) {
                                     if (!empty($completed_sessions)): 
                                         foreach ($completed_sessions as $session): 
                                             $course_id = $session->course_id;
-                                            $group_number = $session->group_number;
                                             $session_date = $session->session_date;
                                             $session_date = date('M d, Y', strtotime($session->session_date));
                                             $status = $session->status;
@@ -350,19 +374,31 @@ foreach ($feedback_data as $feedback) {
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                         <div class="course-card">
                                             <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                                 alt="Course Image" class="course-image">
-                                            <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                            <span
+                                                class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                             <h3 class="course-title">
                                                 <?php echo esc_html($course->title); ?>
                                             </h3>
                                             <div class="course-info">
-                                                <p class="date">
-                                                    Groupe:
-                                                    <?php echo esc_html($group_number);?>
-                                                </p>
                                                 <p class="date">
                                                     Date:
                                                     <?php echo esc_html($session_date);?>
@@ -398,7 +434,6 @@ foreach ($feedback_data as $feedback) {
                                     if (!empty($cancelled_sessions)): 
                                         foreach ($cancelled_sessions as $session): 
                                             $course_id = $session->course_id;
-                                            $group_number = $session->group_number;
                                             $session_date = $session->session_date;
                                             $session_date = date('M d, Y', strtotime($session->session_date));
                                             $status = $session->status;
@@ -407,19 +442,31 @@ foreach ($feedback_data as $feedback) {
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                         <div class="course-card">
                                             <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                                 alt="Course Image" class="course-image">
-                                            <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                            <span
+                                                class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                             <h3 class="course-title">
                                                 <?php echo esc_html($course->title); ?>
                                             </h3>
                                             <div class="course-info">
-                                                <p class="date">
-                                                    Groupe:
-                                                    <?php echo esc_html($group_number);?>
-                                                </p>
                                                 <p class="date">
                                                     Date:
                                                     <?php echo esc_html($session_date);?>
@@ -448,6 +495,57 @@ foreach ($feedback_data as $feedback) {
 
                     </div>
 
+                </div>
+            </div>
+
+            <div class="row list">
+                <div class="col">
+                    <!-- payments history -->
+                    <div class="user-payments">
+                        <h3 class="section-heading">Historique des paiements</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Crédit</th>
+                                    <th>Prix ​​total</th>
+                                    <th>Statut</th>
+                                    <th>Mode de paiement</th>
+                                </tr>
+                            </thead>
+                            <?php 
+                                    if ($payments) {
+                                        // Start the table body and prepare an array for rows
+                                        $rows = [];
+                                    
+                                        // Loop through the fetched payments and prepare the rows
+                                        foreach ($payments as $payment) {
+                                            $rows[] = sprintf(
+                                                '<tr>
+                                                    <td>%s</td>
+                                                    <td class="credit">%d</td>
+                                                    <td class="payment">
+                                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i> %s
+                                                    </td>
+                                                    <td>%s</td>
+                                                    <td>%s</td>
+                                                </tr>',
+                                                esc_html(date('M d, Y', strtotime($payment->created_at))),
+                                                esc_html($payment->credit),
+                                                esc_html($payment->amount),
+                                                esc_html($payment->status),
+                                                esc_html($payment->payment_method),
+                                            );
+                                        }
+                                    
+                                        // Output all rows in one go
+                                        echo '<tbody id="list">' . implode('', $rows) . '</tbody>';
+                                    } else {
+                                        echo '<tr><td colspan="5" class="no-data">Aucun paiement trouvé.</td></tr>';
+                                    }
+                                ?>
+                        </table>
+                    </div>
                 </div>
             </div>
 

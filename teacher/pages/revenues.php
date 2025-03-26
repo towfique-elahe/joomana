@@ -20,13 +20,6 @@ global $wpdb;
 
 $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments WHERE teacher_id = $teacher_id");
 
-// Query to get total in progress
-$total_in_progress = (int) $wpdb->get_var($wpdb->prepare( 
-    "SELECT SUM(due) FROM {$wpdb->prefix}teacher_payments 
-     WHERE teacher_id = %d AND status = %s",
-    $teacher_id, 'in progress'
-));
-
 // Query to get total dues
 $total_dues = (int) $wpdb->get_var($wpdb->prepare( 
     "SELECT SUM(due) FROM {$wpdb->prefix}teacher_payments 
@@ -60,17 +53,6 @@ $total_deposits = (int) $wpdb->get_var($wpdb->prepare(
 
         <div class="content-section statistics">
             <div class="section-body">
-
-                <!-- Total in progress -->
-                <a href="javascript:void()" class="statistic-box total-in-progress">
-                    <h4 class="statistic-title">
-                        <i class="fas fa-exchange-alt"></i> Total en cours
-                    </h4>
-                    <p class="statistic-value">
-                        <?php echo esc_html($total_in_progress); ?>
-                        <span class="currecy"><i class="fas fa-euro-sign"></i></span>
-                    </p>
-                </a>
 
                 <!-- Total due -->
                 <a href="javascript:void()" class="statistic-box total-due">

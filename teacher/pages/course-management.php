@@ -95,11 +95,26 @@ $cancelled_sessions = $wpdb->get_results(
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                 <div class="course-card">
                                     <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                         alt="Course Image" class="course-image">
-                                    <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                    <span class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                     <h3 class="course-title">
                                         <?php echo esc_html($course->title); ?>
                                     </h3>
@@ -148,11 +163,26 @@ $cancelled_sessions = $wpdb->get_results(
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                 <div class="course-card">
                                     <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                         alt="Course Image" class="course-image">
-                                    <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                    <span class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                     <h3 class="course-title">
                                         <?php echo esc_html($course->title); ?>
                                     </h3>
@@ -201,11 +231,26 @@ $cancelled_sessions = $wpdb->get_results(
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                 <div class="course-card">
                                     <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                         alt="Course Image" class="course-image">
-                                    <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                    <span class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                     <h3 class="course-title">
                                         <?php echo esc_html($course->title); ?>
                                     </h3>
@@ -254,11 +299,26 @@ $cancelled_sessions = $wpdb->get_results(
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                 <div class="course-card">
                                     <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                         alt="Course Image" class="course-image">
-                                    <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                    <span class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                     <h3 class="course-title">
                                         <?php echo esc_html($course->title); ?>
                                     </h3>

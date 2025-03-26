@@ -158,8 +158,6 @@ $upcoming_sessions = $wpdb->get_results(
                     </p>
                 </a>
                 <?php endforeach; ?>
-                <?php else : ?>
-                <p>Aucune session à venir.</p>
                 <?php endif; ?>
 
             </div>

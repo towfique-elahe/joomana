@@ -110,8 +110,6 @@ $childs = $wpdb->get_results(
                     <?php echo esc_html($child->first_name) . ' ' . esc_html($child->last_name); ?>.</p>
                 <?php endif; ?>
                 <?php endforeach; ?>
-                <?php else : ?>
-                <p>🚫 Aucun enfant trouvé.</p>
                 <?php endif; ?>
 
             </div>

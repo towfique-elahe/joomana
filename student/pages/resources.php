@@ -162,6 +162,8 @@ $course_slides = $session_id ? $wpdb->get_results($wpdb->prepare(
                 </div>
             </div>
             <?php endforeach; ?>
+            <?php else :?>
+            <p class="no-data">Aucune ressource n'a été ajoutée pour ce cours</p>
             <?php endif; ?>
         </div>
     </div>

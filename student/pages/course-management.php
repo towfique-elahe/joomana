@@ -86,7 +86,6 @@ $cancelled_sessions = $wpdb->get_results(
                                     if (!empty($upcomming_sessions)): 
                                         foreach ($upcomming_sessions as $session): 
                                             $course_id = $session->course_id;
-                                            $group_number = $session->group_number;
                                             $session_date = $session->session_date;
                                             $session_date = date('M d, Y', strtotime($session->session_date));
                                             $status = $session->status;
@@ -95,19 +94,30 @@ $cancelled_sessions = $wpdb->get_results(
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                 <div class="course-card">
                                     <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                         alt="Course Image" class="course-image">
-                                    <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                    <span class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                     <h3 class="course-title">
                                         <?php echo esc_html($course->title); ?>
                                     </h3>
                                     <div class="course-info">
-                                        <p class="date">
-                                            Groupe:
-                                            <?php echo esc_html($group_number);?>
-                                        </p>
                                         <p class="date">
                                             Date:
                                             <?php echo esc_html($session_date);?>
@@ -152,19 +162,30 @@ $cancelled_sessions = $wpdb->get_results(
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                 <div class="course-card">
                                     <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                         alt="Course Image" class="course-image">
-                                    <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                    <span class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                     <h3 class="course-title">
                                         <?php echo esc_html($course->title); ?>
                                     </h3>
                                     <div class="course-info">
-                                        <p class="date">
-                                            Groupe:
-                                            <?php echo esc_html($group_number);?>
-                                        </p>
                                         <p class="date">
                                             Date:
                                             <?php echo esc_html($session_date);?>
@@ -209,19 +230,30 @@ $cancelled_sessions = $wpdb->get_results(
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                 <div class="course-card">
                                     <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                         alt="Course Image" class="course-image">
-                                    <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                    <span class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                     <h3 class="course-title">
                                         <?php echo esc_html($course->title); ?>
                                     </h3>
                                     <div class="course-info">
-                                        <p class="date">
-                                            Groupe:
-                                            <?php echo esc_html($group_number);?>
-                                        </p>
                                         <p class="date">
                                             Date:
                                             <?php echo esc_html($session_date);?>
@@ -266,19 +298,30 @@ $cancelled_sessions = $wpdb->get_results(
 
                                             $table_name = $wpdb->prefix . 'courses';
                                             $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                            // Translation map
+                                            $translations = array(
+                                                'upcoming'  => 'À venir',
+                                                'ongoing'   => 'En cours',
+                                                'completed' => 'Terminé',
+                                                'cancelled' => 'Annulé',
+                                            );
+
+                                            // Convert status to lowercase just in case
+                                            $status_key = strtolower($status);
+
+                                            // Translate
+                                            $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+                                            
                                 ?>
                                 <div class="course-card">
                                     <img src="<?php echo esc_url( $course->image ? $course->image : $default_image ); ?>"
                                         alt="Course Image" class="course-image">
-                                    <span class="course-tag in-progress"><?php echo esc_html($status); ?></span>
+                                    <span class="course-tag in-progress"><?php echo esc_html($french_status); ?></span>
                                     <h3 class="course-title">
                                         <?php echo esc_html($course->title); ?>
                                     </h3>
                                     <div class="course-info">
-                                        <p class="date">
-                                            Groupe:
-                                            <?php echo esc_html($group_number);?>
-                                        </p>
                                         <p class="date">
                                             Date:
                                             <?php echo esc_html($session_date);?>

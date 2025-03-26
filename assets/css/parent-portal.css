@@ -19,7 +19,7 @@
   color: rgb(223, 0, 130);
   font-family: var(--accent-font-family);
   font-weight: var(--accent-font-weight);
-  font-size: 1.6rem;
+  font-size: 1.5rem;
 }
 #parentDashboard .statistic-box.upcoming-session .child-info {
   color: var(--dark-text-color);
@@ -303,6 +303,23 @@
   width: 200px !important;
   height: 200px !important;
   margin: 0 auto;
+}
+#parentChildDetails .table {
+  width: 100%;
+}
+#parentChildDetails .table th,
+#parentChildDetails .table td {
+  padding: 1rem;
+}
+#parentChildDetails .table th:first-of-type,
+#parentChildDetails .table td:first-of-type {
+  text-align: left;
+}
+#parentChildDetails .table .credit {
+  color: var(--primary-color);
+}
+#parentChildDetails .table .action-buttons a {
+  font-size: 1.2rem;
 }
 
 /* add child page */

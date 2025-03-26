@@ -299,7 +299,7 @@ $completed_courses = get_student_assigned_completed_courses($student_id);
                                         // Output all rows in one go
                                         echo '<tbody id="list">' . implode('', $rows) . '</tbody>';
                                     } else {
-                                        echo '<tr><td colspan="7" class="no-data">No payments found.</td></tr>';
+                                        echo '<tr><td colspan="7" class="no-data">Aucun paiement trouvé.</td></tr>';
                                     }
                                 ?>
                         </table>

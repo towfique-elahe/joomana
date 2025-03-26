@@ -410,12 +410,6 @@ if (in_array('teacher', (array) $user->roles)) {
                                         </span>
                                     </li>
                                     <li>
-                                        Groupe:
-                                        <span class="value">
-                                            <?php echo esc_html($group_number);?>
-                                        </span>
-                                    </li>
-                                    <li>
                                         Temps 1:
                                         <span class="value">
                                             <?php echo esc_html($slot_1);?>
@@ -425,12 +419,6 @@ if (in_array('teacher', (array) $user->roles)) {
                                         Temps 2:
                                         <span class="value">
                                             <?php echo esc_html($slot_2);?>
-                                        </span>
-                                    </li>
-                                    <li>
-                                        Statut:
-                                        <span class="value">
-                                            <?php echo esc_html($status);?>
                                         </span>
                                     </li>
                                 </ul>
