@@ -72,7 +72,7 @@ function course_filter_page_shortcode() {
     <div class="sidebar col">
         <!-- category filter -->
         <div class="filter-section">
-            <h3 class="filter-section-heading">Filtrer par Catégories</h3>
+            <h3 class="filter-section-heading">Filtre par Catégories</h3>
             <div>
                 <?php
                     global $wpdb; // Access the global $wpdb object for database queries
@@ -95,7 +95,7 @@ function course_filter_page_shortcode() {
 
         <!-- grade filter -->
         <div class="filter-section">
-            <h3 class="filter-section-heading">Filtrer par Classe</h3>
+            <h3 class="filter-section-heading">Filtre par Classe</h3>
             <div>
                 <?php
                     global $wpdb; // Access the global $wpdb object for database queries
@@ -117,7 +117,7 @@ function course_filter_page_shortcode() {
 
         <!-- level filter -->
         <div class="filter-section">
-            <h3 class="filter-section-heading">Filtrer par Niveau</h3>
+            <h3 class="filter-section-heading">Filtre par Niveau</h3>
             <div>
                 <?php
                     global $wpdb; // Access the global $wpdb object for database queries
@@ -280,14 +280,16 @@ function render_available_courses($atts = [], $content = null) {
                 <?php echo esc_html($course->level); ?>
             </span>
             <h3 class="course-title">
-                <?php echo esc_html($course->title); ?>
+                <a href="<?php echo site_url('/course-details/?id=' . $course->id); ?>">
+                    <?php echo esc_html($course->title); ?>
+                </a>
             </h3>
             <p class="course-excerpt">
-                <?php echo esc_html($course->description); ?>
+                <?php echo wp_strip_all_tags($course->description); ?>
             </p>
             <div class="course-footer">
                 <span class="course-price">
-                    <span class="amount"><?php echo esc_html($course->required_credit); ?></span> Credit
+                    <span class="amount"><?php echo esc_html($course->required_credit); ?></span> Crédit
                 </span>
                 <a href="<?php echo site_url('/course-details/?id=' . $course->id); ?>" class="course-btn">Détails</a>
             </div>

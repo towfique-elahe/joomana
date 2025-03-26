@@ -60,14 +60,24 @@ function render_course_details_section() {
         ARRAY_A
     );
 
+    // Fetch course time slots from course_slots table using WPDB
+    $course_times = $wpdb->get_row(
+        $wpdb->prepare("
+            SELECT slot1_start_time, slot1_end_time, slot2_start_time, slot2_end_time 
+            FROM {$wpdb->prefix}course_slots 
+            WHERE course_id = %d",
+            $course_id
+        ),
+        ARRAY_A
+    );
+
     // Check if the course exists
     if ($course) {
         // Extract the start date and time slot
-        $start_date = strtotime($course->start_date); // Convert start date to a Unix timestamp
-        $start_date = strtotime($course->start_date); // Convert start date to a Unix timestamp
-        $year = date('Y', $start_date); // Get the year
-        $month = date('m', $start_date); // Get the month (numeric)
-        $day = date('d', $start_date); // Get the day
+        $available_date = strtotime($next_available_date); // Convert start date to a Unix timestamp
+        $year = date('Y', $available_date); // Get the year
+        $month = date('m', $available_date); // Get the month (numeric)
+        $day = date('d', $available_date); // Get the day
         $time_slot = null; // The time slot
 
         // Define months in French for the month name
@@ -261,15 +271,18 @@ function render_course_details_section() {
                         ?>
                     </span>
                 </li>
+                <?php
+                    if ($session_times) {
+                ?>
                 <li class="list-item">
                     <span class="item-name">
                         <i class="fas fa-hourglass-start"></i> Temps 1:
                     </span>
                     <span class="item-value">
                         <?php  
-        echo esc_html(date("g:i A", strtotime($session_times['slot1_start_time']))) . " - " . 
-             esc_html(date("g:i A", strtotime($session_times['slot1_end_time'])));
-        ?>
+                        echo esc_html(date("g:i A", strtotime($session_times['slot1_start_time']))) . " - " . 
+                            esc_html(date("g:i A", strtotime($session_times['slot1_end_time'])));
+                        ?>
                     </span>
                 </li>
                 <li class="list-item">
@@ -278,11 +291,39 @@ function render_course_details_section() {
                     </span>
                     <span class="item-value">
                         <?php 
-        echo esc_html(date("g:i A", strtotime($session_times['slot2_start_time']))) . " - " . 
-             esc_html(date("g:i A", strtotime($session_times['slot2_end_time'])));
-        ?>
+                        echo esc_html(date("g:i A", strtotime($session_times['slot2_start_time']))) . " - " . 
+                            esc_html(date("g:i A", strtotime($session_times['slot2_end_time'])));
+                        ?>
                     </span>
                 </li>
+                <?php
+                    } else {
+                ?>
+                <li class="list-item">
+                    <span class="item-name">
+                        <i class="fas fa-hourglass-start"></i> Temps 1:
+                    </span>
+                    <span class="item-value">
+                        <?php  
+                        echo esc_html(date("g:i A", strtotime($course_times['slot1_start_time']))) . " - " . 
+                            esc_html(date("g:i A", strtotime($course_times['slot1_end_time'])));
+                        ?>
+                    </span>
+                </li>
+                <li class="list-item">
+                    <span class="item-name">
+                        <i class="fas fa-hourglass-end"></i> Temps 2:
+                    </span>
+                    <span class="item-value">
+                        <?php 
+                        echo esc_html(date("g:i A", strtotime($course_times['slot2_start_time']))) . " - " . 
+                            esc_html(date("g:i A", strtotime($course_times['slot2_end_time'])));
+                        ?>
+                    </span>
+                </li>
+                <?php
+                    }
+                ?>
                 <?php
                     }
                 ?>
@@ -588,7 +629,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
             $status = 'in progress';
             $deposit = 0;
             $old_due = floatval($teacher->due); // Get past due amount
-            $due = ($teacher->country === 'France') ? 26 : 13; // Set due amount based on teacher's country
+            $due = ($teacher->country === 'France') ? 26 : 10; // Set due amount based on teacher's country
             $new_due = $old_due + $due;
 
             // Insert payment into the database

@@ -508,6 +508,12 @@ form .submit-button {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+#availableCourses .course-title a {
+  color: var(--primary-color);
+}
+#availableCourses .course-title a:hover {
+  color: var(--accent-color);
+}
 #availableCourses .course-excerpt {
   margin: 5px 15px;
   height: 42px;
