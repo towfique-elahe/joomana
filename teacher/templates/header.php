@@ -91,8 +91,16 @@
                         echo $greeting . ', <span class="user-name">' . esc_html($full_name) . '!</span>';
                     ?>
                 </div>
-                <a href="<?php echo home_url('/parent/settings/'); ?>" class="user-image">
-                    <img src="<?php echo get_template_directory_uri() . '/assets/image/user.png'; ?>" alt="">
+                <?php
+                    // Fetching the current user data
+                    $user_id = get_current_user_id();
+                    $table_name = $wpdb->prefix . 'teachers';
+                    $user_data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $user_id));
+                    $image = $user_data->image;
+                ?>
+                <a href="<?php echo home_url('/teacher/settings/'); ?>" class="user-image">
+                    <img src="<?php echo esc_url( $image ? $image : get_template_directory_uri() . '/assets/image/user.png' ); ?>"
+                        alt="">
                 </a>
             </div>
         </header>

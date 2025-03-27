@@ -7,52 +7,19 @@ global $pageTitle;
 $pageTitle = 'Paramètres';
 
 require_once(get_template_directory() . '/parent/templates/header.php');
-?>
 
-<div class="content-area">
-    <div class="sidebar-container">
-        <?php require_once(get_template_directory() . '/parent/templates/sidebar.php'); ?>
-    </div>
-    <div id="parentSettings" class="main-content">
-        <div class="content-header">
-            <h2 class="content-title">Paramètres</h2>
-            <div class="content-breadcrumb">
-                <a href="<?php echo home_url('/parent/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
-                <span class="separator">
-                    <i class="fa fa-angle-right" aria-hidden="true"></i>
-                </span>
-                <span class="active">Paramètres</span>
-            </div>
-        </div>
-        <div class="content-section account-info">
-            <h3 class="section-heading">
-                <i class="fa fa-info-circle" aria-hidden="true"></i>
-                Information sur le compte
-            </h3>
-            <div class="section-body account-info">
-                <!-- <div class="profile-card">
-                    <img alt="" src="<?php echo get_template_directory_uri() . '/assets/image/user.png'; ?>" />
-                    <div class="overlay">
-                        <i class="fa fa-trash-o" aria-hidden="true"></i>
-                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                    </div>
-                </div> -->
-
-                <?php
-                // Initialize variables to avoid undefined variable warnings
 $error_message = '';
 $success_message = '';
 
-
-// Assuming $wpdb is the global WordPress database object
 global $wpdb;
 
 // Fetching the current user data from the parents table
 $user_id = get_current_user_id(); // Assuming we get the current user ID
 $table_name = $wpdb->prefix . 'parents'; // Table name with prefix
-$user_data = $wpdb->get_row($wpdb->prepare("SELECT first_name, last_name, email, phone, address, city, zipcode, country FROM $table_name WHERE id = %d", $user_id));
+$user_data = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $user_id));
 
 if ($user_data) {
+    $image = $user_data->image;
     $first_name = $user_data->first_name;
     $last_name = $user_data->last_name;
     $email = $user_data->email;
@@ -66,15 +33,12 @@ if ($user_data) {
     $first_name = $last_name = $email = $phone = $address = $city = $zipcode = $country = '';
 }
 
-
-
-
 // profile update backend
 ob_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     global $wpdb;
     $table_name = $wpdb->prefix . 'parents';
-    $user_id = get_current_user_id(); // Assuming we get the current user ID
+    $user_id = get_current_user_id();
 
     // Sanitize user inputs
     $first_name = isset($_POST['first_name']) ? sanitize_text_field($_POST['first_name']) : '';
@@ -89,6 +53,93 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $old_password = isset($_POST['old_password']) ? $_POST['old_password'] : '';
     $new_password = isset($_POST['password']) ? $_POST['password'] : '';
     $password_confirmation = isset($_POST['password_confirmation']) ? $_POST['password_confirmation'] : '';
+
+    // Handle image deletion
+    if (isset($_POST['delete_image'])) {
+        if (!empty($image)) {
+            // Get attachment ID from image URL
+            $attachment_id = attachment_url_to_postid($image);
+            
+            if ($attachment_id) {
+                // Delete the attachment from media library
+                wp_delete_attachment($attachment_id, true);
+            }
+            
+            // Update database with empty image
+            $wpdb->update(
+                $table_name,
+                array('image' => ''),
+                array('id' => $user_id)
+            );
+            
+            $image = ''; // Update local variable
+            $success_message = 'Image supprimée avec succès.';
+        } else {
+            $error_message = 'Aucune image à supprimer.';
+        }
+    }
+    
+    // Handle file upload to WordPress Media Library
+    if (isset($_FILES['upload_image']) && $_FILES['upload_image']['error'] === UPLOAD_ERR_OK) {
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        $allowed_types = ['image/jpeg', 'image/png'];
+
+        if (in_array($_FILES['upload_image']['type'], $allowed_types)) {
+            if ($_FILES['upload_image']['size'] <= 2 * 1024 * 1024) {
+                // Upload the file to WordPress Media Library
+                $uploaded_file = wp_handle_upload($_FILES['upload_image'], ['test_form' => false]);
+                
+                if ($uploaded_file && !isset($uploaded_file['error'])) {
+                    // Insert the uploaded file into the media library
+                    $file = $uploaded_file['file'];
+                    $attachment = array(
+                        'guid'           => $uploaded_file['url'], 
+                        'post_mime_type' => $_FILES['upload_image']['type'],
+                        'post_title'     => sanitize_file_name($_FILES['upload_image']['name']),
+                        'post_content'   => '',
+                        'post_status'    => 'inherit'
+                    );
+                    $attachment_id = wp_insert_attachment($attachment, $file);
+                    
+                    if (!is_wp_error($attachment_id)) {
+                        // Generate metadata for the attachment
+                        require_once(ABSPATH . 'wp-admin/includes/image.php');
+                        $attachment_data = wp_generate_attachment_metadata($attachment_id, $file);
+                        wp_update_attachment_metadata($attachment_id, $attachment_data);
+                        
+                        // Get the attachment URL
+                        $uploaded_image_url = wp_get_attachment_url($attachment_id);
+                        
+                        // Delete old image if exists
+                        if (!empty($image)) {
+                            $old_attachment_id = attachment_url_to_postid($image);
+                            if ($old_attachment_id) {
+                                wp_delete_attachment($old_attachment_id, true);
+                            }
+                        }
+                        
+                        // Update database with new image
+                        $wpdb->update(
+                            $table_name,
+                            array('image' => $uploaded_image_url),
+                            array('id' => $user_id)
+                        );
+                        
+                        $image = $uploaded_image_url; // Update local variable
+                        $success_message = 'Image téléchargée avec succès.';
+                    } else {
+                        $error_message = 'Erreur lors de l\'insertion de l\'image dans la bibliothèque de médias.';
+                    }
+                } else {
+                    $error_message = 'Erreur lors du téléchargement de l\'image : ' . $uploaded_file['error'];
+                }
+            } else {
+                $error_message = 'La taille de l\'image ne doit pas dépasser 2 Mo.';
+            }
+        } else {
+            $error_message = 'Format d\'image non valide. Seuls JPEG et PNG sont autorisés.';
+        }
+    }
 
     // Validate email format
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -126,18 +177,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($error_message)) {
         // Update user information in the custom table
+        $update_data = array(
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'email' => $email,
+            'phone' => $phone,
+            'address' => $address,
+            'city' => $city,
+            'zipcode' => $zipcode,
+            'country' => $country
+        );
+        
+        // Only include image if it was updated
+        if (isset($uploaded_image_url)) {
+            $update_data['image'] = $uploaded_image_url;
+        }
+        
         $wpdb->update(
             $table_name,
-            array(
-                'first_name' => $first_name,
-                'last_name' => $last_name,
-                'email' => $email,
-                'phone' => $phone,
-                'address' => $address,
-                'city' => $city,
-                'zipcode' => $zipcode,
-                'country' => $country
-            ),
+            $update_data,
             array('id' => $user_id)
         );
 
@@ -155,14 +213,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (empty($success_message)) {
             $success_message = 'Profile updated successfully.';
         }
+
+        // Redirect to prevent duplicate submission
+        wp_redirect($_SERVER['REQUEST_URI']);
+        exit;
     }
 }
+
 ob_end_clean();
 
 ?>
 
+<div class="content-area">
+    <div class="sidebar-container">
+        <?php require_once(get_template_directory() . '/parent/templates/sidebar.php'); ?>
+    </div>
+    <div id="parentSettings" class="main-content">
+        <div class="content-header">
+            <h2 class="content-title">Paramètres</h2>
+            <div class="content-breadcrumb">
+                <a href="<?php echo home_url('/parent/dashboard'); ?>" class="breadcrumb-link">Tableau de bord</a>
+                <span class="separator">
+                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                </span>
+                <span class="active">Paramètres</span>
+            </div>
+        </div>
+        <div class="content-section account-info">
+            <h3 class="section-heading">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                Information sur le compte
+            </h3>
+            <div class="section-body account-info">
                 <!-- profile update form -->
-                <form class="parent-profile-update-form" method="post" action="">
+                <form class="parent-profile-update-form" method="post" action="" enctype="multipart/form-data">
 
                     <!-- Display error message -->
                     <?php if ($error_message): ?>
@@ -177,6 +261,28 @@ ob_end_clean();
                         <p><?php echo esc_html($success_message); ?></p>
                     </div>
                     <?php endif; ?>
+
+                    <div class="profile-card">
+                        <img alt=""
+                            src="<?php echo esc_url( $image ? $image : get_template_directory_uri() . '/assets/image/user.png' ); ?>" />
+
+                        <div class="overlay">
+                            <div class="buttons">
+                                <div class="button edit">
+                                    <label for="upload_image" class="button edit">
+                                        <i class="fas fa-upload"></i>
+                                    </label>
+                                    <input type="file" id="upload_image" name="upload_image"
+                                        accept="image/jpeg, image/png" class="upload-input">
+                                </div>
+                                <button type="submit" name="delete_image" class="button delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text">(Images uniquement, JPEG/PNG, max 2 Mo)</p>
+                    <p class="image-file-name">Aucun fichier sélectionné</p>
 
                     <!-- Personal Information -->
                     <section class="section col personal-information">

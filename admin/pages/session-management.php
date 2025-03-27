@@ -101,11 +101,16 @@ function get_enrolled_students_count($session_id) {
                         $session_id  = $session->id;
                         $session_date  = $session->session_date;
                         $course_id = $session->course_id;
+                        $teacher_id = $session->teacher_id;
                         $group_number = $session->group_number;
                         $course_title = get_course_title($course_id);
                         $enrolled_students_count = get_enrolled_students_count($session_id);
                         $slot_1 = date('h:i A', strtotime($session->slot1_start_time)) . ' - ' . date('h:i A', strtotime($session->slot1_end_time));
                         $slot_2 = date('h:i A', strtotime($session->slot2_start_time)) . ' - ' . date('h:i A', strtotime($session->slot2_end_time));
+
+                        global $wpdb;
+                        $teacher_table = $wpdb->prefix . 'teachers';
+                        $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $teacher_id));
                     ?>
                     <tr class="course-row">
                         <td class="name">
@@ -115,7 +120,10 @@ function get_enrolled_students_count($session_id) {
                             </a>
                         </td>
                         <td class="name title">
-                            <?php echo esc_html($course_title); ?>
+                            <?php echo esc_html($course_title); ?> <br>
+                            <a href="<?php echo esc_url(home_url('/admin/teacher-management/teacher-details/?id=' . $teacher_id)); ?>"
+                                class="teacher">Prof:
+                                <?php echo esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name); ?></a>
                         </td>
                         <td>
                             <?php echo esc_html($group_number); ?>

@@ -17,6 +17,18 @@ global $wpdb;
 
 $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments");
 
+// Query to get total dues
+$total_dues = (int) $wpdb->get_var($wpdb->prepare( 
+    "SELECT SUM(due) FROM {$wpdb->prefix}teacher_payments 
+     WHERE status = %s",
+    'due'
+));
+
+// Query to get total deposits
+$total_deposits = (int) $wpdb->get_var($wpdb->prepare(
+    "SELECT SUM(deposit) FROM {$wpdb->prefix}teacher_payments"
+));
+
 ?>
 
 <div class="content-area">
@@ -32,6 +44,34 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments");
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
                 <span class="active">Paiements Prof</span>
+            </div>
+        </div>
+
+        <div class="content-section statistics">
+            <div class="section-body">
+
+                <!-- Total due -->
+                <a href="javascript:void()" class="statistic-box total-due">
+                    <h4 class="statistic-title">
+                        <i class="fas fa-exchange-alt"></i> Total dû
+                    </h4>
+                    <p class="statistic-value">
+                        <?php echo esc_html($total_dues); ?>
+                        <span class="currecy"><i class="fas fa-euro-sign"></i></span>
+                    </p>
+                </a>
+
+                <!-- Total deposits -->
+                <a href="javascript:void()" class="statistic-box total-deposit">
+                    <h4 class="statistic-title">
+                        <i class="fas fa-exchange-alt"></i> Dépôt total
+                    </h4>
+                    <p class="statistic-value">
+                        <?php echo esc_html($total_deposits); ?>
+                        <span class="currecy"><i class="fas fa-euro-sign"></i></span>
+                    </p>
+                </a>
+
             </div>
         </div>
 

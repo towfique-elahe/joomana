@@ -21,10 +21,29 @@ $success_message = ''; // Initialize success message variable
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_course'])) {
     global $wpdb;
 
-    // Check if at least one teacher is selected
-    $assigned_teachers_array = isset($_POST['assigned_teachers']) ? $_POST['assigned_teachers'] : array();
-    if (empty($assigned_teachers_array)) {
+    // Check required fields
+    if (empty($_POST['description'])) {
+        $error_message = 'Veuillez fournir une description du cours.';
+    } elseif (empty($_POST['start_date'])) {
+        $error_message = 'Veuillez sélectionner une date de début.';
+    } elseif (empty($_POST['end_date'])) {
+        $error_message = 'Veuillez sélectionner une date de fin.';
+    } elseif (empty($_POST['days'])) {
+        $error_message = 'Veuillez sélectionner au moins un jour.';
+    } elseif (empty($_POST['assigned_teachers'])) {
         $error_message = 'Veuillez sélectionner au moins un enseignant.';
+    }
+
+    // Check time slots for selected days
+    if (empty($error_message)) {
+        $days = $_POST['days'];
+        foreach ($days as $day) {
+            $day_lower = strtolower($day);
+            if (empty($_POST[$day_lower . '_slot1_start_time']) || empty($_POST[$day_lower . '_slot1_end_time'])) {
+                $error_message = "Veuillez remplir tous les créneaux horaires pour le $day.";
+                break;
+            }
+        }
     }
 
     // Proceed only if there are no errors
@@ -397,11 +416,11 @@ ob_end_clean();
                     <div class="row">
                         <div class="col">
                             <label for="start_date">Date de début <span class="required">*</span></label>
-                            <input type="date" id="start_date" name="start_date">
+                            <input type="date" id="start_date" name="start_date" required>
                         </div>
                         <div class="col">
                             <label for="end_date">Date de fin <span class="required">*</span></label>
-                            <input type="date" name="end_date" id="end_date">
+                            <input type="date" name="end_date" id="end_date" required>
                         </div>
                     </div>
 

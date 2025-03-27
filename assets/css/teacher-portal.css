@@ -327,19 +327,9 @@
 }
 
 /* revenues page */
-#teacherRevenue .statistic-box.total-in-progress .currecy,
 #teacherRevenue .statistic-box.total-due .currecy,
 #teacherRevenue .statistic-box.total-deposit .currecy {
   font-size: 2rem;
-}
-#teacherRevenue .statistic-box.total-in-progress {
-  background-color: rgb(242, 248, 255);
-}
-#teacherRevenue .statistic-box.total-in-progress:hover {
-  background-color: rgb(221, 237, 255);
-}
-#teacherRevenue .statistic-box.total-in-progress .statistic-value {
-  color: rgb(0, 96, 206);
 }
 #teacherRevenue .statistic-box.total-due {
   background-color: rgb(255, 238, 248);

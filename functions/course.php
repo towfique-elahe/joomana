@@ -55,11 +55,9 @@ add_shortcode('course_categories', 'course_categories_section');
 
 
 // Course Filter Page
-
 // shortcode [course_filter_page]
 
 function course_filter_page_shortcode() {
-
     if (isset($_GET['category'])) {
         $_SESSION['category'] = urldecode($_GET['category']);
     }
@@ -75,12 +73,9 @@ function course_filter_page_shortcode() {
             <h3 class="filter-section-heading">Filtre par Catégories</h3>
             <div>
                 <?php
-                    global $wpdb; // Access the global $wpdb object for database queries
-
-                    // Query the custom 'course_categories' table
+                    global $wpdb;
                     $categories = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_categories");
 
-                    // Check if categories are available
                     if ($categories) {
                         foreach ($categories as $category) {
                             $is_checked = ($selected_category === $category->category) ? 'checked' : '';
@@ -98,12 +93,9 @@ function course_filter_page_shortcode() {
             <h3 class="filter-section-heading">Filtre par Classe</h3>
             <div>
                 <?php
-                    global $wpdb; // Access the global $wpdb object for database queries
-
-                    // Query the custom 'course_grades' table
+                    global $wpdb;
                     $grades = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_grades");
 
-                    // Check if grades are available
                     if ($grades) {
                         foreach ($grades as $grade) {
                             echo '<label><input type="checkbox" class="filter" data-filter="grade" value="' . esc_attr($grade->grade) . '">' . esc_html($grade->grade) . '</label>';
@@ -120,12 +112,9 @@ function course_filter_page_shortcode() {
             <h3 class="filter-section-heading">Filtre par Niveau</h3>
             <div>
                 <?php
-                    global $wpdb; // Access the global $wpdb object for database queries
-
-                    // Query the custom 'course_levels' table
+                    global $wpdb;
                     $levels = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_levels");
 
-                    // Check if levels are available
                     if ($levels) {
                         foreach ($levels as $level) {
                             echo '<label><input type="checkbox" class="filter" data-filter="level" value="' . esc_attr($level->level) . '">' . esc_html($level->level) . '</label>';
@@ -140,20 +129,17 @@ function course_filter_page_shortcode() {
 
     <div class="course-cards">
         <?php
-        global $wpdb; // Access the global $wpdb object for database queries
-
-        // Query the custom 'course_topics' table
+        global $wpdb;
         $topics = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}course_topics");
         $default_image = get_template_directory_uri() . '/assets/image/image-placeholder.png';
-    ?>
+        ?>
         <?php if (!empty($topics)) : ?>
         <?php foreach ($topics as $topic) : 
-        // Query to get the course count for the current topic
-        $course_count = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM {$wpdb->prefix}courses WHERE topic = %s", 
-            $topic->topic
-        ));
-    ?>
+                $course_count = $wpdb->get_var($wpdb->prepare(
+                    "SELECT COUNT(*) FROM {$wpdb->prefix}courses WHERE topic = %s", 
+                    $topic->topic
+                ));
+            ?>
         <div class="course-card" data-category="<?php echo esc_attr($topic->category); ?>"
             data-grade="<?php echo esc_attr($topic->grade); ?>" data-level="<?php echo esc_attr($topic->level); ?>">
             <img src="<?php echo esc_html($topic->image ? $topic->image : $default_image); ?>"
@@ -163,30 +149,37 @@ function course_filter_page_shortcode() {
                 <?php echo esc_html($course_count); ?> Cours
             </p>
             <a class="course-button"
-                href="<?php echo site_url('/available-courses/?topic=' . urldecode($topic->topic)); ?>">Voir
-                les
+                href="<?php echo site_url('/available-courses/?topic=' . urldecode($topic->topic)); ?>">Voir les
                 cours</a>
         </div>
         <?php endforeach; ?>
         <?php else : ?>
-        <div class="course-card">
-            <p>No topic found</p>
+        <div class="no-data-message">
+            <p>Aucun sujet trouvé</p>
         </div>
         <?php endif; ?>
+        <!-- This will be our dynamic no results message -->
+        <div class="no-data-message filter-no-results" style="display: none;">
+            <p>Aucun cours ne correspond à vos critères de filtrage</p>
+        </div>
     </div>
-
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const filters = document.querySelectorAll(".filter");
-    const cards = document.querySelectorAll(".course-card");
+    const cards = document.querySelectorAll(".course-card:not(.no-data-message)");
+    const noResultsMessage = document.querySelector(".filter-no-results");
+    const initialNoDataMessage = document.querySelector(".no-data-message:not(.filter-no-results)");
 
     // Function to apply filters
     function applyFilters() {
         const activeFilters = {};
+        let hasActiveFilters = false;
+
         filters.forEach(f => {
             if (f.checked) {
+                hasActiveFilters = true;
                 const filterType = f.dataset.filter;
                 if (!activeFilters[filterType]) {
                     activeFilters[filterType] = [];
@@ -195,20 +188,43 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
 
+        let visibleCount = 0;
+
         cards.forEach(card => {
             let visible = true;
-            for (let type in activeFilters) {
-                // Split card's data attribute values into an array (handles multiple values)
-                const cardValues = card.dataset[type] ? card.dataset[type].split(",") : [];
 
-                // Check if any active filter matches the card's values
+            // If no filters are active, show all cards
+            if (!hasActiveFilters) {
+                card.style.display = "block";
+                visibleCount++;
+                return;
+            }
+
+            // Otherwise apply filters
+            for (let type in activeFilters) {
+                const cardValues = card.dataset[type] ? card.dataset[type].split(",") : [];
                 if (!activeFilters[type].some(filterValue => cardValues.includes(filterValue))) {
                     visible = false;
                     break;
                 }
             }
-            card.style.display = visible ? "block" : "none";
+
+            if (visible) {
+                card.style.display = "block";
+                visibleCount++;
+            } else {
+                card.style.display = "none";
+            }
         });
+
+        // Handle no results message
+        if (hasActiveFilters && visibleCount === 0) {
+            noResultsMessage.style.display = "block";
+            if (initialNoDataMessage) initialNoDataMessage.style.display = "none";
+        } else {
+            noResultsMessage.style.display = "none";
+            if (initialNoDataMessage && !hasActiveFilters) initialNoDataMessage.style.display = "block";
+        }
     }
 
     // Attach event listeners to filters
