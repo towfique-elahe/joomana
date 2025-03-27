@@ -19,14 +19,16 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments");
 
 // Query to get total dues
 $total_dues = (int) $wpdb->get_var($wpdb->prepare( 
-    "SELECT SUM(due) FROM {$wpdb->prefix}teacher_payments 
+    "SELECT SUM(amount) FROM {$wpdb->prefix}teacher_payments 
      WHERE status = %s",
     'due'
 ));
 
 // Query to get total deposits
-$total_deposits = (int) $wpdb->get_var($wpdb->prepare(
-    "SELECT SUM(deposit) FROM {$wpdb->prefix}teacher_payments"
+$total_deposits = (int) $wpdb->get_var($wpdb->prepare( 
+    "SELECT SUM(amount) FROM {$wpdb->prefix}teacher_payments 
+     WHERE status = %s",
+    'completed'
 ));
 
 ?>
@@ -53,7 +55,7 @@ $total_deposits = (int) $wpdb->get_var($wpdb->prepare(
                 <!-- Total due -->
                 <a href="javascript:void()" class="statistic-box total-due">
                     <h4 class="statistic-title">
-                        <i class="fas fa-exchange-alt"></i> Total dû
+                        <i class="fas fa-exchange-alt"></i> Total à payer
                     </h4>
                     <p class="statistic-value">
                         <?php echo esc_html($total_dues); ?>
@@ -64,7 +66,7 @@ $total_deposits = (int) $wpdb->get_var($wpdb->prepare(
                 <!-- Total deposits -->
                 <a href="javascript:void()" class="statistic-box total-deposit">
                     <h4 class="statistic-title">
-                        <i class="fas fa-exchange-alt"></i> Dépôt total
+                        <i class="fas fa-exchange-alt"></i> Total terminé
                     </h4>
                     <p class="statistic-value">
                         <?php echo esc_html($total_deposits); ?>
@@ -95,9 +97,9 @@ $total_deposits = (int) $wpdb->get_var($wpdb->prepare(
                     <tr>
                         <th>Numéro de facture</th>
                         <th>Nom</th>
-                        <th>Montant</th>
-                        <th>Exigible</th>
+                        <th>Paiement</th>
                         <th>Méthode</th>
+                        <th>Statut</th>
                         <th>Date</th>
                         <th>Invoice</th>
                     </tr>
@@ -114,29 +116,20 @@ $total_deposits = (int) $wpdb->get_var($wpdb->prepare(
                             <?php echo esc_html($payment->invoice_number); ?>
                         </td>
                         <td class="name">
-                            <?php
-                                // Assuming $user_roles contains the roles of the current user
-                                if (in_array('teacher', $user_roles)) {
-                                // If the user has the 'teacher' role
-                            ?>
                             <a
                                 href="<?php echo esc_url(home_url('/admin/teacher-management/teacher-details/?id=' . $user->ID)); ?>">
                                 <?php echo esc_html($user->first_name) . ' ' . esc_html($user->last_name); ?>
                             </a>
-                            <?php
-                                }
-                            ?>
                         </td>
                         <td class="payment">
                             <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                            <?php echo esc_html($payment->deposit); ?>
-                        </td>
-                        <td class="payment">
-                            <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                            <?php echo esc_html($payment->due); ?>
+                            <?php echo intval($payment->amount) == $payment->amount ? intval($payment->amount) : number_format($payment->amount, 2); ?>
                         </td>
                         <td>
                             <?php echo esc_html($payment->payment_method); ?>
+                        </td>
+                        <td>
+                            <?php echo esc_html($payment->status === 'in progress' ? 'En attente' : ($payment->status === 'due' ? 'À payer' : ($payment->status === 'completed' ? 'Terminé' : $payment->status))); ?>
                         </td>
                         <td>
                             <?php echo esc_html(date('M d, Y', strtotime($payment->created_at))); ?>

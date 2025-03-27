@@ -260,7 +260,7 @@ ob_end_clean();
 
                     <div class="row">
                         <div class="col">
-                            <label for="description">Description</label>
+                            <label for="description">Description <span class="required">*</span></label>
                             <textarea name="description" id="description" placeholder="Description du type"
                                 rows="5"></textarea>
                         </div>
@@ -426,7 +426,7 @@ ob_end_clean();
 
                     <div class="row">
                         <div class="col">
-                            <label for="days">Jours</label>
+                            <label for="days">Jours <span class="required">*</span></label>
                             <div class="row checkbox-group">
                                 <label class="row"><input type="checkbox" name="days[]" id="recurringMonday"
                                         value="Monday">
@@ -688,7 +688,8 @@ ob_end_clean();
 
                     <div class="row">
                         <div class="col">
-                            <label for="assigned_teachers">Affecter des enseignants</label>
+                            <label for="assigned_teachers">Affecter des enseignants <span
+                                    class="required">*</span></label>
                             <div class="selected-teachers">
                                 <!-- Placeholder for selected teachers -->
                             </div>

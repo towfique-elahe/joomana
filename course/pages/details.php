@@ -234,7 +234,7 @@ if (in_array('teacher', (array) $user->roles)) {
             array(
                 'status' => 'due'  // Update status column
             ), 
-            array('id' => intval($session_id)),
+            array('session_id' => intval($session_id)),
             array('%s'),
             array('%d') // ID format: integer
         );

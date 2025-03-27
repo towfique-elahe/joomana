@@ -613,9 +613,9 @@ function custom_teacher_registration_form() {
         <h3 class="declaration-heading">Déclaration</h3>
         <div class="col checkbox-group">
             <label class="row"><input type="checkbox" id="signature" name="signature" value="I declare this" required>
-                X I certify that the information provided in this form is accurate and complete. I understand that any
-                false or misleading information may result in the rejection or termination of my application if
-                discovered after my employment. </label>
+                Je certifie que les informations fournies dans ce formulaire sont exactes et complètes. Je comprends que
+                toute information fausse ou trompeuse peut entraîner le rejet ou la résiliation de ma candidature si
+                elle est découverte après mon embauche. </label>
         </div>
     </div>
 

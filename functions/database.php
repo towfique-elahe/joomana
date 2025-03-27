@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.5.2';
+    $custom_tables_version = '1.5.3';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -350,8 +350,7 @@ function create_custom_tables() {
         session_id BIGINT(20) UNSIGNED NOT NULL,
         teacher_id BIGINT(20) UNSIGNED NOT NULL,
         currency VARCHAR(10) NOT NULL,
-        due DECIMAL(10,2) NOT NULL,
-        deposit DECIMAL(10,2) NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
         payment_method VARCHAR(50) NOT NULL,
         status ENUM('in progress', 'due', 'completed') NOT NULL DEFAULT 'in progress',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

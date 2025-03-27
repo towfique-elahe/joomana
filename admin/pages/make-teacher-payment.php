@@ -38,6 +38,13 @@ $id = isset($_SESSION['selected_teacher_id']) ? intval($_SESSION['selected_teach
 $teacher = $id ? $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $id)) : null;
 $bankinfo = $id ? $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_bankinfo_table WHERE teacher_id = %d", $id)) : null;
 
+// Query to get total dues
+$total_dues = (int) $wpdb->get_var($wpdb->prepare( 
+    "SELECT SUM(amount) FROM {$wpdb->prefix}teacher_payments 
+     WHERE teacher_id = %d AND status = %s",
+    $teacher->id, 'due'
+));
+
 ob_start();
 
 $error_message = ''; // Initialize error message variable
@@ -46,49 +53,44 @@ $success_message = ''; // Initialize success message variable
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['make_payment'])) {
     global $wpdb;
 
-    $error_message = '';
-    $success_message = '';
+    $amount_paid = floatval($_POST['amount']);
+    $remaining = $amount_paid;
 
-    do {
-        // Generate a more robust unique invoice number
-        $invoice_number = 'JMI-' . uniqid() . '-' . bin2hex(random_bytes(4));
-        // Ensure the invoice number is unique in the payments table
-        $exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $payments_table WHERE invoice_number = %s", $invoice_number));
-    } while ($exists > 0);
+    // Get all due payments for this teacher, ordered by oldest
+    $due_payments = $wpdb->get_results($wpdb->prepare("
+        SELECT id, amount 
+        FROM {$payments_table}
+        WHERE teacher_id = %d AND status = %s
+        ORDER BY created_at ASC
+    ", $teacher->id, 'due'));
 
-    // Sanitize user inputs
-    $user_id = sanitize_text_field($_POST['user_id']);
-    $deposit = sanitize_text_field($_POST['deposit']);
-    $currency = sanitize_textarea_field($_POST['currency']);
-    $payment_method = sanitize_text_field($_POST['payment_method']);
-    $status = sanitize_text_field($_POST['status']);
+    $wpdb->query('START TRANSACTION'); // optional, adds safety
 
-    if (empty($error_message)) {
-        // Insert payment into the database
-        $inserted = $wpdb->insert(
-            $payments_table,
-            [
-                'invoice_number'        => $invoice_number,
-                'user_id'               => $user_id,
-                'deposit'               => $deposit,
-                'currency'              => $currency,
-                'payment_method'        => $payment_method,
-                'status'                => $status,
-            ],
-            [
-                '%s', '%d', '%f', '%s', '%s', '%s',
-            ]
-        );
+    foreach ($due_payments as $payment) {
+        if ($remaining >= floatval($payment->amount)) {
+            // Full payment covered – mark as completed
+            $wpdb->update(
+                $payments_table,
+                ['status' => 'completed'],
+                ['id' => $payment->id],
+                ['%s'],
+                ['%d']
+            );
 
-        if ($inserted === false) {
-            $error_message = 'Erreur: ' . esc_html($wpdb->last_error);
+            $remaining -= floatval($payment->amount);
         } else {
-            $success_message = 'Le cours a été ajouté avec succès.';
-            wp_redirect(home_url('/admin/teacher-payments/'));
-            exit;
+            // Not enough remaining to cover this payment – stop here
+            break;
         }
     }
+
+    $wpdb->query('COMMIT');
+
+    $success_message = 'Paiement effectué avec succès.';
+    wp_redirect(home_url('/admin/teacher-payments/'));
+    exit;
 }
+
 
 ob_end_clean();
 
@@ -209,27 +211,24 @@ ob_end_clean();
                             <tr>
                                 <th>Total dû</th>
                                 <td>
-                                    <?= !empty($teacher->due) ? $teacher->due : '---' ?>
+                                    <span id="totalDue"><?= $total_dues ?></span> €
                                 </td>
                             </tr>
                             <tr>
                                 <th>Dépôt</th>
                                 <td>
-                                    <input type="number" name="deposit" id="deposit" min="5" max="" required>
+                                    <input type="number" name="amount" id="amount"
+                                        min="<?= ($teacher->country === 'France') ? 26 : 10 ?>" max="<?= $total_dues ?>"
+                                        step="<?= ($teacher->country === 'France') ? 26 : 10 ?>" required> €
                                 </td>
                             </tr>
                             <tr>
                                 <th>Restant dû</th>
                                 <td>
-                                    <?= !empty($teacher->due) ? $teacher->due : '---' ?>
+                                    <span id="remainingDue"><?= $total_dues ?></span> €
                                 </td>
                             </tr>
                         </table>
-                        <input type="hidden" name="invoice_number" value="<?= $invoice_number ?>">
-                        <input type="hidden" name="user_id" value="<?= $teacher->id ?>">
-                        <input type="hidden" name="currency" value="EUR">
-                        <input type="hidden" name="payment_method" value="BANK">
-                        <input type="hidden" name="status" value="Complété">
                         <div class="action-buttons">
                             <button type="submit" class="submit-button" name="make_payment">Effectuer le dépôt</button>
                         </div>
@@ -241,5 +240,25 @@ ob_end_clean();
 
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const totalDue = parseFloat(document.getElementById('totalDue').textContent);
+    const depositInput = document.getElementById('deposit');
+    const remainingSpan = document.getElementById('remainingDue');
+
+    depositInput.addEventListener('input', function() {
+        let deposit = parseFloat(depositInput.value) || 0;
+        let remaining = (totalDue - deposit).toFixed(2);
+
+        if (remaining < 0) {
+            remaining = totalDue.toFixed(2);
+            depositInput.value = "";
+        }
+
+        remainingSpan.textContent = remaining;
+    });
+});
+</script>
 
 <?php require_once(get_template_directory() . '/admin/templates/footer.php'); ?>

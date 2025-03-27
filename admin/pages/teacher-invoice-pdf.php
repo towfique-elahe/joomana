@@ -25,7 +25,7 @@ if (!$payment) {
     die('Payment not found');
 }
 
-$teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $payment->user_id));
+$teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $payment->teacher_id));
 if (!$teacher) {
     die('Teacher not found');
 }
@@ -87,16 +87,9 @@ ob_start();
         <h3>Détails de paiement</h3>
         <table class="table">
             <tr>
-                <th>Total dû</th>
-                <td><?= esc_html($teacher->due) ?></td>
-            </tr>
-            <tr>
-                <th>Dépôt total</th>
-                <td><?= esc_html($payment->deposit) ?></td>
-            </tr>
-            <tr>
-                <th>Restant dû</th>
-                <td><?= esc_html($teacher->due) ?></td>
+                <th>Paiement total</th>
+                <td><?php echo intval($payment->amount) == $payment->amount ? intval($payment->amount) : number_format($payment->amount, 2); ?>
+                </td>
             </tr>
             <tr>
                 <th>Devise</th>
@@ -104,7 +97,8 @@ ob_start();
             </tr>
             <tr>
                 <th>Statut</th>
-                <td><?= esc_html($payment->status) ?></td>
+                <td><?php echo esc_html($payment->status === 'in progress' ? 'En attente' : ($payment->status === 'due' ? 'À payer' : ($payment->status === 'completed' ? 'Terminé' : $payment->status))); ?>
+                </td>
             </tr>
             <tr>
                 <th>Mode de paiement</th>

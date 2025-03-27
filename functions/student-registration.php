@@ -346,7 +346,7 @@ function custom_student_registration_form() {
         <div class="col checkbox-group">
             <label class="row"><input type="checkbox" id="parent_consent" name="parent_consent" value="Consent"
                     required>
-                X Je certifie être le parent ou le représentant légal de l'enfant inscrit et donne mon consentement
+                Je certifie être le parent ou le représentant légal de l'enfant inscrit et donne mon consentement
                 explicite à son inscription et à sa participation aux cours de maths proposés par Joomaths </label>
         </div>
     </div>

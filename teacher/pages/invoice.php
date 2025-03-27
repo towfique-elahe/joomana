@@ -183,9 +183,6 @@ $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id 
             <div class="header-section">
                 <div class="col">
                     <h2 class="brand-title"><?php echo get_bloginfo('name'); ?></h2>
-                    <!-- <p class="brand-address">123 Main St, Anytown, USA</p>
-                    <p class="brand-phone">123-456-7890</p>
-                    <p class="brand-email">homedecorwholesale@support.com</p> -->
                 </div>
                 <div class="col">
                     <h2 class="invoice-heading">Facture</h2>
@@ -262,16 +259,9 @@ $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id 
                         <th colspan="2">Détails de paiement</th>
                     </tr>
                     <tr>
-                        <th>Total dû</th>
-                        <td><?= esc_html($teacher->due) ?></td>
-                    </tr>
-                    <tr>
-                        <th>Dépôt total</th>
-                        <td><?= esc_html($payment->deposit) ?></td>
-                    </tr>
-                    <tr>
-                        <th>Restant dû</th>
-                        <td><?= esc_html($teacher->due) ?></td>
+                        <th>Paiement total</th>
+                        <td><?php echo intval($payment->amount) == $payment->amount ? intval($payment->amount) : number_format($payment->amount, 2); ?>
+                        </td>
                     </tr>
                     <tr>
                         <th>Devise</th>
@@ -279,7 +269,8 @@ $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id 
                     </tr>
                     <tr>
                         <th>Statut</th>
-                        <td><?= esc_html($payment->status) ?></td>
+                        <td><?php echo esc_html($payment->status === 'in progress' ? 'En attente' : ($payment->status === 'due' ? 'À payer' : ($payment->status === 'completed' ? 'Terminé' : $payment->status))); ?>
+                        </td>
                     </tr>
                     <tr>
                         <th>Mode de paiement</th>

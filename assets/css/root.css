@@ -1091,7 +1091,6 @@ form .form-error p {
   font-family: var(--accent-font-family);
   font-weight: var(--accent-font-weight);
   font-size: var(--accent-font-size);
-  text-transform: capitalize;
   display: flex;
   align-items: center;
   gap: 0.7rem;

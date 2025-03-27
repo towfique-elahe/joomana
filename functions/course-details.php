@@ -440,7 +440,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
     );
     $enrolled_students_array = json_decode($enrolled_students, true);
 
-    if (in_array($student_id, $enrolled_students_array)) {
+    if (in_array((string)$student_id, $enrolled_students_array)) {
         return new WP_Error('already_enrolled', 'Vous êtes déjà inscrit à ce cours.');
     }
 
@@ -488,7 +488,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
     // Enroll student to the next available group
     $enrolled = false;
     $course_sessions_table = $wpdb->prefix . 'course_sessions';
-    $course_slots_table = $wpdb->prefix . 'course_slots'; // Table for course slots
+    $course_slots_table = $wpdb->prefix . 'course_slots';
     $assigned_teachers = json_decode($assigned_teachers_array, true);
     $max_students_per_group = $course->max_students_per_group;
 
@@ -503,9 +503,9 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
     $session_dates = [];
 
     while ($start_date_obj <= $end_date_obj) {
-        $current_day_name = $start_date_obj->format('l'); // Get day name (e.g., 'Tuesday')
+        $current_day_name = $start_date_obj->format('l');
         if (in_array($current_day_name, $recurring_days)) {
-            $session_dates[] = $start_date_obj->format('Y-m-d'); // Store session date
+            $session_dates[] = $start_date_obj->format('Y-m-d');
         }
         $start_date_obj->modify('+1 day');
     }
@@ -517,7 +517,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
             continue;
         }
 
-        // Get the day of the session date (e.g., 'Tuesday')
+        // Get the day of the session date
         $session_day = (new DateTime($session_date))->format('l');
 
         // Fetch slot times from course_slots table
@@ -526,7 +526,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
         );
 
         if (!$course_slot) {
-            continue; // Skip if no slot is found for this session day
+            continue;
         }
 
         // Fetch existing groups for this session day
@@ -544,7 +544,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
         foreach ($existing_groups as $group) {
             $group_students = json_decode($group->enrolled_students, true);
             if (count($group_students) < $max_students_per_group) {
-                $group_students[] = $student_id;
+                $group_students[] = (string)$student_id;
                 $wpdb->update(
                     $course_sessions_table,
                     ['enrolled_students' => json_encode($group_students)],
@@ -553,16 +553,14 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
                     ['%d']
                 );
                 $enrolled = true;
-                break 2; // Exit both loops
+                break 2;
             }
         }
 
         // If not enrolled yet, create a new group
         if (!$enrolled) {
-            // Shuffle the list of assigned teachers to randomize the order
             shuffle($assigned_teachers);
 
-            // Find the next available teacher who is not already assigned to a group for this session day
             $available_teacher = null;
             foreach ($assigned_teachers as $teacher_id) {
                 if (!in_array($teacher_id, $assigned_teachers_for_day)) {
@@ -572,16 +570,14 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
             }
 
             if (!$available_teacher) {
-                continue; // Skip to the next session day
+                continue;
             }
 
-            // Determine the next group number
             $next_group_number = 1;
             if (!empty($existing_groups)) {
                 $next_group_number = count($existing_groups) + 1;
             }
 
-            // Assign the available teacher to the new group
             $wpdb->insert(
                 $course_sessions_table,
                 [
@@ -589,7 +585,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
                     'session_date' => $session_date,
                     'teacher_id'  => $available_teacher,
                     'group_number' => $next_group_number,
-                    'enrolled_students' => json_encode([$student_id]),
+                    'enrolled_students' => json_encode([(string)$student_id]),
                     'slot1_start_time' => $course_slot->slot1_start_time,
                     'slot1_end_time'   => $course_slot->slot1_end_time,
                     'slot2_start_time' => $course_slot->slot2_start_time,
@@ -603,13 +599,12 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
                 ]
             );
 
-            $session_id = $wpdb->insert_id; // Get the ID of the newly inserted session
+            $session_id = $wpdb->insert_id;
 
             // Insert payment for the teacher
             $teacher_table = $wpdb->prefix . 'teachers';
             $payments_table = $wpdb->prefix . 'teacher_payments';
 
-            // Fetch teacher data
             $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $available_teacher));
 
             // Validate teacher payment details
@@ -627,26 +622,22 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
             $currency = 'EUR';
             $payment_method = 'Bank';
             $status = 'in progress';
-            $deposit = 0;
-            $old_due = floatval($teacher->due); // Get past due amount
-            $due = ($teacher->country === 'France') ? 26 : 10; // Set due amount based on teacher's country
-            $new_due = $old_due + $due;
+            $amount = ($teacher->country === 'France') ? 26 : 10;
 
             // Insert payment into the database
             $inserted_payment = $wpdb->insert(
                 $payments_table,
                 [
-                    'invoice_number'        => $invoice_number,
-                    'teacher_id'           => $available_teacher,
-                    'session_id'           => $session_id,
-                    'due'                  => $due,
-                    'deposit'             => $deposit,
-                    'currency'            => $currency,
-                    'payment_method'      => $payment_method,
-                    'status'              => $status,
+                    'invoice_number' => $invoice_number,
+                    'teacher_id'     => $available_teacher,
+                    'session_id'    => $session_id,
+                    'amount'       => $amount,
+                    'currency'     => $currency,
+                    'payment_method' => $payment_method,
+                    'status'       => $status,
                 ],
                 [
-                    '%s', '%d', '%d', '%f', '%f', '%s', '%s', '%s'
+                    '%s', '%d', '%d', '%f', '%s', '%s', '%s'
                 ]
             );
 
@@ -654,17 +645,8 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
                 return new WP_Error('payment_failed', "Échec de l'enregistrement du paiement pour l'enseignant.");
             }
 
-            // Update the 'due' column in the teachers table
-            $updated_due = $wpdb->update(
-                $teacher_table, // Table name
-                [ 'due' => $new_due ], // Data to update
-                [ 'id' => $available_teacher ], // Condition (where clause)
-                [ '%f' ], // Format for the updated value
-                [ '%d' ]  // Format for the where condition (teacher ID)
-            );
-
             $enrolled = true;
-            break; // Exit the loop
+            break;
         }
     }
 
@@ -673,7 +655,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
     }
 
     // Add the student to the course's enrolled_students list
-    $enrolled_students_array[] = $student_id;
+    $enrolled_students_array[] = (string)$student_id;
     $wpdb->update(
         $wpdb->prefix . 'courses',
         ['enrolled_students' => json_encode($enrolled_students_array)],
