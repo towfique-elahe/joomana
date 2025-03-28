@@ -32,18 +32,32 @@ function get_total_assigned_courses($teacher) {
     return (int) $total_courses;
 }
 
-// Get total payments
-function get_total_payments($teacher) {
+// Get total dues
+function get_total_dues($teacher) {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'teacher_payments';
+
+    $table = "{$wpdb->prefix}teacher_payments";
 
     $total = $wpdb->get_var($wpdb->prepare(
-        "SELECT SUM(deposit) FROM {$table_name} WHERE teacher_id = %d",
-        $teacher->id
+        "SELECT SUM(amount) FROM $table WHERE teacher_id = %d AND status = %s",
+        $teacher->id, 'due'
     ));
 
-    // Return total payments or 0 if no payments found
-    return ($total) ? $total : 0;
+    return $total ? (float) $total : 0;
+}
+
+// Get total deposits
+function get_total_deposits($teacher) {
+    global $wpdb;
+
+    $table = "{$wpdb->prefix}teacher_payments";
+
+    $total = $wpdb->get_var($wpdb->prepare(
+        "SELECT SUM(amount) FROM $table WHERE teacher_id = %d AND status = %s",
+        $teacher->id, 'completed'
+    ));
+
+    return $total ? (float) $total : 0;
 }
 
 // Delete Logic
@@ -152,7 +166,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <tr>
                         <th>Nom</th>
                         <th>Attribuer Un Cours</th>
-                        <th>Paiement Total</th>
+                        <th>Total à payer</th>
+                        <th>Total terminé</th>
                         <th>Statut</th>
                         <th>Action</th>
                     </tr>
@@ -163,7 +178,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <?php foreach ($teachers as $teacher) : ?>
                     <?php
                         $total_courses = get_total_assigned_courses($teacher);
-                        $total_payments = get_total_payments($teacher);
+                        $total_dues = get_total_dues($teacher);
+                        $total_deposits = get_total_deposits($teacher);
                     ?>
                     <tr class="teacher-row"
                         data-status="<?php echo strtolower(str_replace(' ', '-', $teacher->status)); ?>">
@@ -178,7 +194,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                         </td>
                         <td class="payment">
                             <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                            <?php echo esc_html( intval($total_payments) ); ?>
+                            <?php echo esc_html( intval($total_dues) ); ?>
+                        </td>
+                        <td class="payment">
+                            <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
+                            <?php echo esc_html( intval($total_deposits) ); ?>
                         </td>
                         <td>
                             <span class="status <?php echo strtolower(str_replace(' ', '-', $teacher->status)); ?>">

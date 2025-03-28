@@ -90,22 +90,30 @@ $childs = get_childs($parent_id);
                             alt="User Image" class="profile-image">
 
                         <h3 class="profile-name">
-                            <?php echo esc_html($parent->first_name) . " " . esc_html($parent->last_name); ?></h3>
-                        <p class="profile-username"><?php echo esc_html($wp_user->user_login); ?></p>
+                            <?php echo esc_html($parent->first_name) . " " . esc_html($parent->last_name); ?>
+                        </h3>
+                        <p class="profile-username">
+                            <?php echo esc_html($wp_user->user_login); ?>
+                        </p>
                     </div>
                     <div class="profile-details">
                         <div class="row detail-row">
                             <span class="col detail-label">Email:</span>
-                            <span class="col detail-value"><?php echo esc_html($wp_user->user_email); ?></span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($wp_user->user_email); ?>
+                            </span>
                         </div>
                         <div class="row detail-row">
                             <span class="col detail-label">Téléphone:</span>
-                            <span class="col detail-value"><?php echo esc_html($parent->phone); ?></span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($parent->phone); ?>
+                            </span>
                         </div>
                         <div class="row detail-row">
                             <span class="col detail-label">Adresse:</span>
-                            <span
-                                class="col detail-value"><?php echo esc_html($parent->address) . ", " . esc_html($parent->city) . ", " . esc_html($parent->country) . "-" . esc_html($parent->zipcode); ?></span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($parent->address) . ", " . esc_html($parent->city) . ", " . esc_html($parent->country) . "-" . esc_html($parent->zipcode); ?>
+                            </span>
                         </div>
                         <div class="row detail-row">
                             <span class="col detail-label">Paiement total:</span>
@@ -127,8 +135,8 @@ $childs = get_childs($parent_id);
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Gender</th>
+                                <th>Nom</th>
+                                <th>Genre</th>
                                 <th>Classe</th>
                                 <th>Action</th>
                             </tr>

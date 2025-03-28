@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.5.3';
+    $custom_tables_version = '1.5.4';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -218,7 +218,6 @@ function create_custom_tables() {
         parent_consent TEXT NOT NULL,
         credit DECIMAL(10) NOT NULL,
         image VARCHAR(255) DEFAULT NULL,
-        enrolled_courses TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
@@ -296,11 +295,8 @@ function create_custom_tables() {
         upload_doc4 VARCHAR(255) NULL,
         upload_doc5 VARCHAR(255) NULL,
         upload_video VARCHAR(255) NULL,
-        signature TEXT NOT NULL,
-        signature_date DATE NOT NULL,
         image VARCHAR(255) DEFAULT NULL,
-        assigned_courses TEXT NOT NULL,
-        due DECIMAL(10,2) NOT NULL,
+        consent TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id)

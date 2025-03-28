@@ -105,9 +105,6 @@ $childs = $wpdb->get_results(
                     </p>
                 </a>
                 <?php endforeach; ?>
-                <?php else : ?>
-                <p>⏳ Aucune session à venir pour
-                    <?php echo esc_html($child->first_name) . ' ' . esc_html($child->last_name); ?>.</p>
                 <?php endif; ?>
                 <?php endforeach; ?>
                 <?php endif; ?>

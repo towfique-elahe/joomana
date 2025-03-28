@@ -608,7 +608,7 @@ function enroll_in_course($course_id, $student_id, $parent_id = null) {
             $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $available_teacher));
 
             // Validate teacher payment details
-            if (!$teacher || !isset($teacher->due) || !isset($teacher->country)) {
+            if (!$teacher || !isset($teacher->country)) {
                 return new WP_Error('teacher_payment_error', "Les informations de paiement de l'enseignant sont manquantes ou invalides.");
             }
 
