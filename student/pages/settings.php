@@ -22,9 +22,8 @@ if ($user_data) {
     $image = $user_data->image;
     $first_name = $user_data->first_name;
     $last_name = $user_data->last_name;
-    $email = $user_data->email;
 } else {
-    $first_name = $last_name = $email = '';
+    $first_name = $last_name = '';
 }
 
 // Get WordPress user data

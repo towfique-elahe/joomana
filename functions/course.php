@@ -37,7 +37,7 @@ function course_categories_section() {
         </div>
         <?php endforeach; ?>
         <?php else : ?>
-        <div class="course-card">
+        <div class="no-data">
             <p>Aucune catégorie trouvée</p>
         </div>
         <?php endif; ?>

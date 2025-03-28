@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                 <div class="filter-bar">
                     <div class="search-bar">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" placeholder="Rechercher Un Parent" onkeyup="filterUser()">
+                        <input type="text" placeholder="Rechercher un parent" onkeyup="filterUser()">
                     </div>
                 </div>
             </div>
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <?php endforeach; ?>
                     <?php else : ?>
                     <tr>
-                        <td colspan="5">Aucun parent trouvé.</td>
+                        <td colspan="5" class="no-data">Aucun parent trouvé.</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>

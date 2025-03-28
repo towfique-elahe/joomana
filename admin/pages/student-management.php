@@ -48,16 +48,26 @@ function get_total_payments($student) {
 
 // Delete Student Logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'students'; // Custom students table
     $delete_item_id = intval($_POST['delete_item_id']);
 
     if ($delete_item_id > 0) {
-        require_once ABSPATH . 'wp-admin/includes/user.php'; // Ensure function is available
-        
-        // Attempt to delete the WordPress user
-        if (wp_delete_user($delete_item_id)) {
-            $success_message = 'L\'utilisateur a été supprimé avec succès.';
+        require_once ABSPATH . 'wp-admin/includes/user.php'; // Ensure wp_delete_user() is available
+
+        // Delete the student record from the custom table
+        $deleted = $wpdb->delete($table_name, ['id' => $delete_item_id], ['%d']);
+
+        if ($deleted) {
+            // Attempt to delete the WordPress user with the same ID
+            if (wp_delete_user($delete_item_id)) {
+                $success_message = 'L\'élève et l\'utilisateur associé ont été supprimés avec succès.';
+            } else {
+                $error_message = 'L\'élève a été supprimé, mais l\'utilisateur associé n\'a pas pu être supprimé.';
+            }
         } else {
-            $error_message = 'Erreur lors de la suppression de l\'utilisateur.';
+            $error_message = 'Erreur lors de la suppression de l\'élève.';
         }
 
         // Prevent form resubmission
@@ -131,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                 <div class="filter-bar">
                     <div class="search-bar">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" placeholder="Rechercher Un Elèves" onkeyup="filterUser()">
+                        <input type="text" placeholder="Rechercher un elèves" onkeyup="filterUser()">
                     </div>
                 </div>
             </div>
@@ -192,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                     <?php endforeach; ?>
                     <?php else : ?>
                     <tr>
-                        <td colspan="7" class="no-data">Aucun étudiant trouvé.</td>
+                        <td colspan="7" class="no-data">Aucun elèves trouvé.</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>

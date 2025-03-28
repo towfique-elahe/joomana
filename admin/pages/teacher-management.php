@@ -148,15 +148,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                 <div class="status-filter">
                     <button onclick="filterStatus('all', this)" class="button all active">Tous</button>
                     <button onclick="filterStatus('approuvé', this)" class="button approuvé">Approuvé</button>
-                    <button onclick="filterStatus('en-cours', this)" class="button en-cours">En Cours</button>
-                    <button onclick="filterStatus('en-révision', this)" class="button en-révision">En Révision</button>
+                    <button onclick="filterStatus('en-cours', this)" class="button en-cours">En cours</button>
+                    <button onclick="filterStatus('en-révision', this)" class="button en-révision">En révision</button>
                     <button onclick="filterStatus('rejeté', this)" class="button rejeté">Rejeté</button>
                 </div>
 
                 <div class="filter-bar">
                     <div class="search-bar">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" placeholder="Rechercher Un Professeur" onkeyup="filterUser()">
+                        <input type="text" placeholder="Rechercher un professeur" onkeyup="filterUser()">
                     </div>
                 </div>
             </div>

@@ -133,7 +133,7 @@ $upcoming_sessions = $wpdb->get_results(
                         <i class="fas fa-user-graduate"></i> Total d'elèves
                     </h4>
                     <p class="statistic-value">
-                        <?php echo esc_html($total_students); ?>
+                        <?php echo esc_html($total_students ?? 0); ?>
                     </p>
                 </a>
 

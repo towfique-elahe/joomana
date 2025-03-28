@@ -612,7 +612,7 @@ function custom_teacher_registration_form() {
     <div class="col declaration">
         <h3 class="declaration-heading">Déclaration</h3>
         <div class="col checkbox-group">
-            <label class="row"><input type="checkbox" id="signature" name="signature" value="I declare this" required>
+            <label class="row"><input type="checkbox" id="" name="" required>
                 Je certifie que les informations fournies dans ce formulaire sont exactes et complètes. Je comprends que
                 toute information fausse ou trompeuse peut entraîner le rejet ou la résiliation de ma candidature si
                 elle est découverte après mon embauche. </label>
@@ -638,6 +638,12 @@ function custom_teacher_registration_form() {
     function handle_teacher_registration_form() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_teacher_registration'])) {
             global $wpdb;
+    
+            // Verify nonce
+            if (!isset($_POST['csrf_token']) || !wp_verify_nonce($_POST['csrf_token'], 'teacher_registration_form')) {
+                $_SESSION['registration_error'] = 'Security verification failed. Please try again.';
+                return;
+            }
     
             // Sanitize and validate form inputs
             $civility = sanitize_text_field($_POST['civility']);
@@ -667,8 +673,6 @@ function custom_teacher_registration_form() {
             $friday_timeslot = !empty($_POST['friday_timeslot']) ? implode(',', array_map('sanitize_text_field', $_POST['friday_timeslot'])) : '';
             $saturday_timeslot = !empty($_POST['saturday_timeslot']) ? implode(',', array_map('sanitize_text_field', $_POST['saturday_timeslot'])) : '';
             $sunday_timeslot = !empty($_POST['sunday_timeslot']) ? implode(',', array_map('sanitize_text_field', $_POST['sunday_timeslot'])) : '';
-            $signature = sanitize_text_field($_POST['signature']);
-            $signature_date = sanitize_text_field($_POST['signature_date']);
     
             // Validate required fields
             if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($confirm_password)) {
@@ -716,7 +720,7 @@ function custom_teacher_registration_form() {
                 // Save additional information in user meta
                 update_user_meta($user_id, 'first_name', $first_name);
                 update_user_meta($user_id, 'last_name', $last_name);
-
+    
                 // Handle file uploads
                 $uploaded_files = [];
                 $file_fields = [
@@ -728,12 +732,18 @@ function custom_teacher_registration_form() {
                     'upload_doc5',
                     'upload_video'
                 ];
-
+    
                 require_once ABSPATH . 'wp-admin/includes/file.php';
                 require_once ABSPATH . 'wp-admin/includes/image.php';
-
+                require_once ABSPATH . 'wp-admin/includes/media.php';
+    
                 foreach ($file_fields as $file_key) {
-                    if (isset($_FILES[$file_key]) && $_FILES[$file_key]['error'] === UPLOAD_ERR_OK) {
+                    if (isset($_FILES[$file_key])) {
+                        // Skip if no file was uploaded or there was an error
+                        if ($_FILES[$file_key]['error'] !== UPLOAD_ERR_OK) {
+                            continue;
+                        }
+    
                         $file_type = $_FILES[$file_key]['type'];
                         $file_size = $_FILES[$file_key]['size'];
                         
@@ -747,6 +757,7 @@ function custom_teacher_registration_form() {
                             'upload_doc5' => ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
                             'upload_video' => ['video/mp4', 'video/quicktime']
                         ];
+                        
                         $size_limit = [
                             'upload_cv' => 5 * 1024 * 1024, // 5 MB
                             'upload_doc1' => 5 * 1024 * 1024,
@@ -756,47 +767,48 @@ function custom_teacher_registration_form() {
                             'upload_doc5' => 5 * 1024 * 1024,
                             'upload_video' => 50 * 1024 * 1024 // 50 MB
                         ];
-                
-                        if (in_array($file_type, $allowed_types[$file_key])) {
-                            if ($file_size <= $size_limit[$file_key]) {
-                                $upload_overrides = ['test_form' => false];
-                                $uploaded_file = wp_handle_upload($_FILES[$file_key], $upload_overrides);
-                
-                                if ($uploaded_file && !isset($uploaded_file['error'])) {
-                                    // Insert the file into the WordPress Media Library
-                                    $file_path = $uploaded_file['file'];
-                                    $attachment = [
-                                        'guid'           => $uploaded_file['url'],
-                                        'post_mime_type' => $file_type,
-                                        'post_title'     => sanitize_file_name($_FILES[$file_key]['name']),
-                                        'post_content'   => '',
-                                        'post_status'    => 'inherit',
-                                    ];
-                                    $attachment_id = wp_insert_attachment($attachment, $file_path);
-                
-                                    if (!is_wp_error($attachment_id)) {
-                                        $attach_data = wp_generate_attachment_metadata($attachment_id, $file_path);
-                                        wp_update_attachment_metadata($attachment_id, $attach_data);
-                                        $uploaded_files[$file_key] = wp_get_attachment_url($attachment_id);
-                                    } else {
-                                        $_SESSION['registration_error'] = "Erreur lors de l'insertion du fichier dans la médiathèque.";
-                                        return;
-                                    }
-                                } else {
-                                    $_SESSION['registration_error'] = 'Erreur de téléchargement de fichier: ' . $uploaded_file['error'];
-                                    return;
-                                }
-                            } else {
-                                $_SESSION['registration_error'] = 'La taille du fichier dépasse la limite autorisée pour ' . $file_key . '.';
-                                return;
-                            }
-                        } else {
+    
+                        // Check file type
+                        if (!in_array($file_type, $allowed_types[$file_key])) {
                             $_SESSION['registration_error'] = 'Type de fichier non valide pour ' . $file_key . '.';
-                            return;
+                            continue;
+                        }
+    
+                        // Check file size
+                        if ($file_size > $size_limit[$file_key]) {
+                            $_SESSION['registration_error'] = 'La taille du fichier dépasse la limite autorisée pour ' . $file_key . '.';
+                            continue;
+                        }
+    
+                        $upload_overrides = ['test_form' => false];
+                        $uploaded_file = wp_handle_upload($_FILES[$file_key], $upload_overrides);
+    
+                        if ($uploaded_file && !isset($uploaded_file['error'])) {
+                            // Prepare attachment data
+                            $attachment = [
+                                'guid'           => $uploaded_file['url'],
+                                'post_mime_type' => $file_type,
+                                'post_title'     => sanitize_file_name($_FILES[$file_key]['name']),
+                                'post_content'   => '',
+                                'post_status'    => 'inherit',
+                            ];
+    
+                            // Insert the file into the WordPress Media Library
+                            $attachment_id = wp_insert_attachment($attachment, $uploaded_file['file']);
+    
+                            if (!is_wp_error($attachment_id)) {
+                                // For non-video files, generate metadata
+                                if (strpos($file_type, 'video/') !== 0) {
+                                    $attach_data = wp_generate_attachment_metadata($attachment_id, $uploaded_file['file']);
+                                    wp_update_attachment_metadata($attachment_id, $attach_data);
+                                }
+                                
+                                $uploaded_files[$file_key] = wp_get_attachment_url($attachment_id);
+                            }
                         }
                     }
                 }
-
+    
                 // Save data to the custom 'teachers' table
                 $table_name = $wpdb->prefix . 'teachers';
                 $wpdb->insert($table_name, [
@@ -832,13 +844,11 @@ function custom_teacher_registration_form() {
                     'upload_doc4' => $uploaded_files['upload_doc4'] ?? null,
                     'upload_doc5' => $uploaded_files['upload_doc5'] ?? null,
                     'upload_video' => $uploaded_files['upload_video'] ?? null,
-                    'signature' => $signature,
-                    'signature_date' => $signature_date,
                     'created_at' => current_time('mysql'),
                 ]);
-
-                $_SESSION['registration_success'] = 'Registration successful. Welcome to Joomaths!';
-
+    
+                $_SESSION['registration_success'] = 'Inscription réussie. Bienvenue sur Joomaths !';
+    
                 // Send email to the student
                 $to = $email;
                 $subject = 'Bienvenue sur Joomaths !';
@@ -846,10 +856,10 @@ function custom_teacher_registration_form() {
                 $message .= "Nom d'utilisateur: $username\n";
                 $message .= "Mot de passe: (le mot de passe que vous avez saisi lors de l'inscription)\n\n";
                 $message .= "Nous avons hâte de vous voir sur notre plateforme !\n\nCordialement,\nL'équipe Joomaths";
-
+    
                 // Send the email
                 wp_mail($to, $subject, $message);
-
+    
                 // Redirect to the current page to prevent form resubmission
                 wp_safe_redirect($_SERVER['REQUEST_URI']);
                 exit;
@@ -859,4 +869,3 @@ function custom_teacher_registration_form() {
         }
     }
     add_action('init', 'handle_teacher_registration_form');
-    

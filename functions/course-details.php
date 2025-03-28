@@ -49,13 +49,16 @@ function render_course_details_section() {
     $next_date_obj = new DateTime($next_available_date);
     $day_name = $next_date_obj->format('l');
 
+    // Get the day name from $next_available_date
+    $next_available_day = date('l', strtotime($next_available_date)); // 'l' returns full day name like 'Monday'
+
     // Fetch session time slots from course_sessions table using WPDB
     $session_times = $wpdb->get_row(
         $wpdb->prepare("
             SELECT slot1_start_time, slot1_end_time, slot2_start_time, slot2_end_time 
-            FROM {$wpdb->prefix}course_sessions 
-            WHERE course_id = %d AND session_date = %s",
-            $course_id, $next_available_date
+            FROM {$wpdb->prefix}course_slots
+            WHERE course_id = %d AND session_day = %s", 
+            $course_id, $next_available_day 
         ),
         ARRAY_A
     );
@@ -184,7 +187,7 @@ function render_course_details_section() {
                     </tr>
                     <?php
                     // Generate the calendar for the selected month
-                    $days_in_month = date('t', $start_date); // Number of days in the month
+                    $days_in_month = date('t', strtotime($next_available_date)); // Number of days in the month
                     $first_day_of_month = date('N', strtotime("{$year}-{$month}-01")); // First day of the month
 
                     $current_day = 1;
@@ -366,12 +369,18 @@ function render_course_details_section() {
             ?>
             <div class="buttons">
                 <!-- Enrollment Form -->
+                <?php if (is_user_logged_in()) : ?>
                 <form method="post" action="">
                     <input type="hidden" name="enroll_student" value="1">
                     <button type="submit" class="button buy-now">
                         <i class="fas fa-shopping-bag"></i> Inscrire
                     </button>
                 </form>
+                <?php else : ?>
+                <a href="<?php echo esc_url(site_url('/login/')); ?>" class="button buy-now">
+                    <i class="fas fa-shopping-bag"></i> Connectez-vous pour vous inscrire
+                </a>
+                <?php endif; ?>
             </div>
             <?php
                 }

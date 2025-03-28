@@ -833,7 +833,7 @@
 #adminCourseManagement .table th:nth-child(5),
 #adminCourseManagement .table td:nth-child(5) {
   text-align: left;
-  width: 9rem;
+  width: 12rem;
 }
 #adminCourseManagement .table th:last-child,
 #adminCourseManagement .table td:last-child {

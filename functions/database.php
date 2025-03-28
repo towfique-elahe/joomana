@@ -7,7 +7,7 @@ function create_custom_tables() {
     global $wpdb;
 
     // Set your current custom schema version.
-    $custom_tables_version = '1.5.4';
+    $custom_tables_version = '1.5.5';
     $installed_version = get_option('custom_tables_version');
 
     // If the version is already current, do nothing.
@@ -268,7 +268,6 @@ function create_custom_tables() {
         last_name VARCHAR(255) NOT NULL,
         date_of_birth DATE NOT NULL,
         email VARCHAR(255) NOT NULL,
-        company_name VARCHAR(255) NULL,
         how_found VARCHAR(255) NULL,
         country VARCHAR(255) NOT NULL,
         address TEXT NOT NULL,

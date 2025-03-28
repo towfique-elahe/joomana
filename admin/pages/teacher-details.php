@@ -29,17 +29,24 @@ if ($id > 0) {
 global $wpdb;
 $teacher_table = $wpdb->prefix . 'teachers';
 $teacher_bankinfo_table = $wpdb->prefix . 'teacher_bank_details ';
-$teacher_payments_table = $wpdb->prefix . 'teacher_payments ';
 
 // Fetch the details of the teacher using the ID
 $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $id));
 $bankinfo = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_bankinfo_table WHERE teacher_id = %d", $id));
-$payments = $wpdb->get_results(
-    $wpdb->prepare(
-        "SELECT * FROM $teacher_payments_table WHERE teacher_id = %d",
-        $id
-    )
-);
+
+// Query to get total dues
+$total_dues = (int) $wpdb->get_var($wpdb->prepare( 
+    "SELECT SUM(amount) FROM {$wpdb->prefix}teacher_payments 
+     WHERE status = %s",
+    'due'
+));
+
+// Query to get total deposits
+$total_deposits = (int) $wpdb->get_var($wpdb->prepare( 
+    "SELECT SUM(amount) FROM {$wpdb->prefix}teacher_payments 
+     WHERE status = %s",
+    'completed'
+));
 
 if (!$teacher) {
     // Handle case when the teacher does not exist
@@ -172,14 +179,16 @@ if (!$teacher) {
                             </span>
                         </div>
                         <div class="row detail-row">
-                            <span class="col detail-label">Entreprise:</span>
+                            <span class="col detail-label">Total à payer:</span>
                             <span class="col detail-value">
-                                <?php echo esc_html($teacher->company_name); ?>
+                                <?php echo esc_html($total_dues); ?>
                             </span>
                         </div>
                         <div class="row detail-row">
-                            <span class="col detail-label">Paiement total:</span>
-                            <span class="col detail-value">n/a</span>
+                            <span class="col detail-label">Total terminé:</span>
+                            <span class="col detail-value">
+                                <?php echo esc_html($total_deposits); ?>
+                            </span>
                         </div>
                     </div>
                 </div>

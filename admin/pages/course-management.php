@@ -87,13 +87,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                 <a href="<?php echo home_url('/admin/course-management/courses/add-course/'); ?>"
                     class="button add-button">
                     <i class="fas fa-plus-circle"></i>
-                    Ajouter un Cours
+                    Ajouter un cours
                 </a>
 
                 <div class="filter-bar">
                     <div class="search-bar">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" placeholder="Rechercher Un Cours" onkeyup="filterUser()">
+                        <input type="text" placeholder="Rechercher un cours" onkeyup="filterUser()">
                     </div>
                 </div>
             </div>
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                         <th>Catégorie</th>
                         <th>Classe</th>
                         <th>Niveau</th>
-                        <th>Start Date</th>
+                        <th>Date de début</th>
                         <th>Actions</th>
                     </tr>
                 </thead>

@@ -135,7 +135,7 @@ $payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}payments");
                     <?php endforeach; ?>
                     <?php else : ?>
                     <tr>
-                        <td colspan="7">Aucun paiement trouvé.</td>
+                        <td colspan="7" class="no-data">Aucun paiement trouvé.</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>
