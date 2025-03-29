@@ -99,7 +99,7 @@ if (in_array('teacher', (array) $user->roles)) {
                         <div class="row detail-row">
                             <span class="col detail-label">Date de naissance:</span>
                             <span class="col detail-value">
-                                <?php echo esc_html($student->date_of_birth); ?>
+                                <?php echo esc_html(date('M d, Y', strtotime($student->date_of_birth))); ?>
                             </span>
                         </div>
                         <div class="row detail-row">

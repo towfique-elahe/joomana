@@ -181,9 +181,9 @@
   border-color: #ff748b;
 }
 #adminTeacherDetails .profile-image {
-  width: 100%;
-  max-width: 10rem;
-  max-height: 10rem;
+  width: 10rem;
+  height: 10rem;
+  object-fit: cover;
   border: var(--border);
   border-radius: 0.5rem;
 }
@@ -278,13 +278,11 @@
 #adminTeacherDetails .table td:last-of-type {
   width: 5rem;
 }
-#adminTeacherDetails .assigned-courses .table th:nth-child(3),
-#adminTeacherDetails .assigned-courses .table td:nth-child(3) {
-  width: 15rem;
-}
 #adminTeacherDetails .assigned-courses .table th:nth-child(4),
-#adminTeacherDetails .assigned-courses .table td:nth-child(4) {
-  width: 10rem;
+#adminTeacherDetails .assigned-courses .table td:nth-child(4),
+#adminTeacherDetails .assigned-courses .table th:nth-child(5),
+#adminTeacherDetails .assigned-courses .table td:nth-child(5) {
+  width: 12rem;
 }
 #adminTeacherDetails .table .invoice {
   color: var(--accent-color);
@@ -408,9 +406,9 @@
   justify-content: center;
 }
 #adminStudentDetails .profile-image {
-  width: 100%;
-  max-width: 10rem;
-  max-height: 10rem;
+  width: 10rem;
+  height: 10rem;
+  object-fit: cover;
   border: var(--border);
   border-radius: 0.4rem;
   margin-top: 2rem;
@@ -602,6 +600,93 @@
   gap: 1rem;
 }
 #adminStudentDetails .table .action-buttons a {
+  font-size: 1.2rem;
+}
+
+/* parent details */
+#adminParentDetails .section {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+#adminParentDetails .section.user-courses {
+  flex: 1.5;
+}
+#adminParentDetails .profile-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#adminParentDetails .profile-image {
+  width: 10rem;
+  height: 10rem;
+  object-fit: cover;
+  border: var(--border);
+  border-radius: 0.4rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+#adminParentDetails .profile-name {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--secondary-font-size);
+  color: var(--accent-color);
+}
+#adminParentDetails .profile-username {
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+  color: var(--text-color);
+}
+#adminParentDetails .detail-row {
+  padding: 1rem 0;
+  border-bottom: var(--border);
+}
+#adminParentDetails .detail-row:last-of-type {
+  border: none;
+}
+#adminParentDetails .detail-label {
+  font-family: var(--accent-font-family);
+  font-weight: var(--accent-font-weight);
+  font-size: var(--accent-font-size);
+  color: var(--dark-text-color);
+}
+#adminParentDetails .detail-value {
+  font-family: var(--text-font-family);
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
+  color: var(--text-color);
+}
+#adminParentDetails .table {
+  width: 100%;
+}
+#adminParentDetails .table th,
+#adminParentDetails .table td {
+  padding: 1rem;
+}
+#adminParentDetails .table th:first-of-type,
+#adminParentDetails .table td:first-of-type {
+  text-align: left;
+}
+#adminParentDetails .table th:last-of-type,
+#adminParentDetails .table td:last-of-type {
+  width: 5rem;
+}
+#adminParentDetails .table .credit,
+#adminParentDetails .table .invoice {
+  color: var(--primary-color);
+}
+#adminParentDetails .table .pdf {
+  color: crimson;
+}
+#adminParentDetails .table .action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+#adminParentDetails .table .action-buttons a {
   font-size: 1.2rem;
 }
 

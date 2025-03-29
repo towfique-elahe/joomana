@@ -197,13 +197,13 @@ if ($edit_item_id > 0) {
                             <?php endif; ?>
                             <div class="upload-button">
                                 <label for="upload_image" class="upload-label">
-                                    Upload Category Image <i class="fas fa-upload"></i>
+                                    Télécharger l'image de la catégorie <i class="fas fa-upload"></i>
                                 </label>
                                 <input type="file" id="upload_image" name="upload_image" accept="image/jpeg, image/png"
                                     class="upload-input">
                             </div>
-                            <p class="text">(Images only, JPEG/PNG, max 2 MB)</p>
-                            <p class="image-file-name">No file selected</p>
+                            <p class="text">(Images uniquement, JPEG/PNG, max 2 Mo)</p>
+                            <p class="image-file-name">Aucun fichier sélectionné</p>
                         </div>
                     </div>
                     <div class="buttons">

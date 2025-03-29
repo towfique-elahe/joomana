@@ -84,13 +84,13 @@ $total_deposits = (int) $wpdb->get_var($wpdb->prepare(
             <div class="filter-container">
                 <a href="<?php echo home_url('/teacher/revenues/bank-details/'); ?>" class="button add-button">
                     <i class="fas fa-university"></i>
-                    Informations Bancaires
+                    Informations bancaires
                 </a>
 
                 <div class="filter-bar">
                     <div class="search-bar">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" placeholder="Recherche De Paiement" onkeyup="filterUser()">
+                        <input type="text" placeholder="Recherche de paiement" onkeyup="filterUser()">
                     </div>
                 </div>
             </div>
@@ -150,7 +150,7 @@ $total_deposits = (int) $wpdb->get_var($wpdb->prepare(
                     <?php endforeach; ?>
                     <?php else : ?>
                     <tr>
-                        <td colspan="7">Aucun paiement trouvé.</td>
+                        <td colspan="7" class="no-data">Aucun paiement trouvé.</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>

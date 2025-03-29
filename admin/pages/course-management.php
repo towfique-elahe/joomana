@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_item_id'])) {
                             <?php echo esc_html($course->level); ?>
                         </td>
                         <td>
-                            <?php echo esc_html($course->start_date); ?>
+                            <?php echo esc_html(date('M d, Y', strtotime($course->start_date))); ?>
                         </td>
                         <td class="action-buttons">
                             <a href="<?php echo esc_url(home_url('/admin/course-management/courses/edit-course/?edit_item_id=' . $course->id)); ?>"

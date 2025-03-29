@@ -68,6 +68,7 @@ $credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits
         <div class="content-section">
             <div class="row list">
                 <div class="col">
+
                     <!-- payments history -->
                     <div class="credit-history">
                         <h3 class="section-heading">Historique de crédit</h3>
@@ -80,35 +81,25 @@ $credit_transactions = $wpdb->get_results($wpdb->prepare("SELECT * FROM $credits
                                     <th>Date</th>
                                 </tr>
                             </thead>
-                            <?php 
-                                    if ($credit_transactions) {
-                                        // Start the table body and prepare an array for rows
-                                        $rows = [];
-                                    
-                                        // Loop through the fetched payments and prepare the rows
-                                        foreach ($credit_transactions as $transaction) {
-                                            $rows[] = sprintf(
-                                                '<tr>
-                                                    <td class="credit">%d</td>
-                                                    <td>%s</td>
-                                                    <td>%s</td>
-                                                    <td>%s</td>
-                                                </tr>',
-                                                esc_html($transaction->credit),
-                                                esc_html($transaction->transaction_type),
-                                                esc_html($transaction->transaction_reason),
-                                                esc_html(date('M d, Y', strtotime($transaction->created_at))),
-                                            );
-                                        }
-                                    
-                                        // Output all rows in one go
-                                        echo '<tbody id="list">' . implode('', $rows) . '</tbody>';
-                                    } else {
-                                        echo '<tr><td colspan="4" class="no-data">Aucune transaction de crédit trouvée.</td></tr>';
-                                    }
-                                ?>
+                            <tbody id="list">
+                                <?php if (!empty($credit_transactions)) : ?>
+                                <?php foreach ($credit_transactions as $transaction) : ?>
+                                <tr>
+                                    <td class="credit"><?= esc_html($transaction->credit); ?></td>
+                                    <td><?= esc_html($transaction->transaction_type); ?></td>
+                                    <td><?= esc_html($transaction->transaction_reason); ?></td>
+                                    <td><?= esc_html(date('M d, Y', strtotime($transaction->created_at))); ?></td>
+                                </tr>
+                                <?php endforeach; ?>
+                                <?php else : ?>
+                                <tr>
+                                    <td colspan="4" class="no-data">Aucune transaction de crédit trouvée.</td>
+                                </tr>
+                                <?php endif; ?>
+                            </tbody>
                         </table>
                     </div>
+
                 </div>
             </div>
         </div>

@@ -129,19 +129,34 @@ foreach ($feedback_data as $feedback) {
             <!-- Attendance Rate Chart -->
             <div class="chart-card">
                 <h3 class="chart-heading">Taux de présence</h3>
+                <?php if ($present_count > 0 || $absent_count > 0) : ?>
                 <canvas id="attendanceChart"></canvas>
+                <?php else : ?>
+                <p class="no-data">Aucune donnée de présence disponible.</p>
+                <?php endif; ?>
             </div>
 
             <!-- Assignment Submission Progress Chart -->
             <div class="chart-card">
                 <h3 class="chart-heading">Progrès des devoirs</h3>
+                <?php if ($submitted_count > 0 || $not_submitted_count > 0) : ?>
                 <canvas id="submissionChart"></canvas>
+                <?php else : ?>
+                <p class="no-data">Aucune donnée de soumission disponible.</p>
+                <?php endif; ?>
             </div>
 
             <!-- Performance Feedback Chart -->
             <div class="chart-card">
                 <h3 class="chart-heading">Retour des enseignants</h3>
+                <?php
+                    $total_feedback = array_sum($feedback_counts);
+                ?>
+                <?php if ($total_feedback > 0) : ?>
                 <canvas id="feedbackChart"></canvas>
+                <?php else : ?>
+                <p class="no-data">Aucun retour d’enseignant disponible.</p>
+                <?php endif; ?>
             </div>
         </div>
 

@@ -34,6 +34,8 @@ $teacher_bankinfo_table = $wpdb->prefix . 'teacher_bank_details ';
 $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $id));
 $bankinfo = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_bankinfo_table WHERE teacher_id = %d", $id));
 
+$payments = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}teacher_payments WHERE teacher_id = $teacher->id");
+
 // Query to get total dues
 $total_dues = (int) $wpdb->get_var($wpdb->prepare( 
     "SELECT SUM(amount) FROM {$wpdb->prefix}teacher_payments 
@@ -90,19 +92,18 @@ if (!$teacher) {
         }
     }
 
-    // Function to get courses assigned to a teacher
-    function get_teacher_assigned_courses($teacher_id) {
-        global $wpdb;
-        $courses_table = $wpdb->prefix . 'courses';
+    $teacher_id = $teacher->id;
 
-        // Fetch courses where the assigned_teachers column contains the teacher ID
-        $query = $wpdb->prepare(
-            "SELECT * FROM $courses_table WHERE JSON_CONTAINS(assigned_teachers, %s)",
-            json_encode($teacher_id)
-        );
+    global $wpdb;
+    $sessions_table = $wpdb->prefix . 'course_sessions';
 
-        return $wpdb->get_results($query);
-    }
+    $sessions = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT * FROM $sessions_table 
+             WHERE teacher_id = %d",
+            $teacher_id
+        )
+    );
 
 ?>
 
@@ -407,9 +408,7 @@ if (!$teacher) {
             <div class="col">
                 <!-- assigned courses -->
                 <?php
-                    $teacher_id = $teacher->id;
-                    $courses = get_teacher_assigned_courses($teacher_id);
-                    if ($courses) {
+                    if ($sessions) {
                 ?>
                 <div class="assigned-courses">
                     <h3 class="section-heading">Cours assignés</h3>
@@ -418,26 +417,57 @@ if (!$teacher) {
                             <tr>
                                 <th>Titre</th>
                                 <th>Statut</th>
-                                <th>Date de début</th>
-                                <th>Date de fin</th>
+                                <th>Date</th>
+                                <th>Temps 1</th>
+                                <th>Temps 2</th>
                             </tr>
                         </thead>
                         <tbody id="list">
                             <?php
-                                foreach ($courses as $course) {
+                                foreach ($sessions as $session) {
+                                    $course_id = $session->course_id;
+                                    $group_number = $session->group_number;
+                                    $session_date = $session->session_date;
+                                    $session_date = date('M d, Y', strtotime($session->session_date));
+                                    $status = $session->status;
+                                    $slot_1 = date('h:i A', strtotime($session->slot1_start_time)) . ' - ' . date('h:i A', strtotime($session->slot1_end_time));
+                                    $slot_2 = date('h:i A', strtotime($session->slot2_start_time)) . ' - ' . date('h:i A', strtotime($session->slot2_end_time));
+
+                                    $table_name = $wpdb->prefix . 'courses';
+                                    $course = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $course_id));
+
+                                    // Translation map
+                                    $translations = array(
+                                        'upcoming'  => 'À venir',
+                                        'ongoing'   => 'En cours',
+                                        'completed' => 'Terminé',
+                                        'cancelled' => 'Annulé',
+                                    );
+
+                                    // Convert status to lowercase just in case
+                                    $status_key = strtolower($status);
+
+                                    // Translate
+                                    $french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
                             ?>
                             <tr>
-                                <td>
-                                    <?php echo esc_html($course->title); ?>
+                                <td class="name">
+                                    <a
+                                        href="<?php echo esc_url(home_url('/admin/session-management/session-details/?session_id=' . $session->id)); ?>">
+                                        <?php echo esc_html($course->title); ?>
+                                    </a>
                                 </td>
                                 <td>
-                                    <?php echo esc_html($course->status); ?>
+                                    <?php echo esc_html($french_status); ?>
                                 </td>
                                 <td>
-                                    <?php echo esc_html(date('M d, Y', strtotime($course->start_date))); ?>
+                                    <?php echo esc_html($session_date); ?>
                                 </td>
                                 <td>
-                                    <?php echo esc_html(date('M d, Y', strtotime($course->end_date))); ?>
+                                    <?php echo esc_html($slot_1); ?>
+                                </td>
+                                <td>
+                                    <?php echo esc_html($slot_2); ?>
                                 </td>
                             </tr>
                             <?php
@@ -459,7 +489,9 @@ if (!$teacher) {
                     <table class="table">
                         <tr>
                             <th>Nom de la banque</th>
-                            <td><?= $bankinfo->bank_name ?></td>
+                            <td>
+                                <?= $bankinfo->bank_name ?>
+                            </td>
                         </tr>
                         <tr>
                             <?php
@@ -473,23 +505,33 @@ if (!$teacher) {
                             <?php
                                 }
                             ?>
-                            <td><?= $bankinfo->account_number ?></td>
+                            <td>
+                                <?= $bankinfo->account_number ?>
+                            </td>
                         </tr>
                         <tr>
                             <th>Titulaire du compte</th>
-                            <td><?= $bankinfo->account_holder ?></td>
+                            <td>
+                                <?= $bankinfo->account_holder ?>
+                            </td>
                         </tr>
                         <tr>
                             <th>Type de compte</th>
-                            <td><?= $bankinfo->account_type ?></td>
+                            <td>
+                                <?= $bankinfo->account_type ?>
+                            </td>
                         </tr>
                         <tr>
                             <th>Code BIC/SWIFT</th>
-                            <td><?= $bankinfo->swift_code ?></td>
+                            <td>
+                                <?= $bankinfo->swift_code ?>
+                            </td>
                         </tr>
                         <tr>
                             <th>Adresse de la banque</th>
-                            <td><?= $bankinfo->bank_address ?></td>
+                            <td>
+                                <?= $bankinfo->bank_address ?>
+                            </td>
                         </tr>
                     </table>
                 </div>
@@ -504,9 +546,9 @@ if (!$teacher) {
                         <thead>
                             <tr>
                                 <th>Numéro de facture</th>
-                                <th>Montant</th>
-                                <th>Exigible</th>
+                                <th>Paiement</th>
                                 <th>Méthode</th>
+                                <th>Statut</th>
                                 <th>Date</th>
                                 <th>Invoice</th>
                             </tr>
@@ -516,21 +558,20 @@ if (!$teacher) {
                             <?php 
                         foreach ($payments as $payment) : 
                             $user = get_user_by('id', $payment->teacher_id);
-                    ?>
+                        ?>
                             <tr>
                                 <td class="invoice-number">
                                     <?php echo esc_html($payment->invoice_number); ?>
                                 </td>
                                 <td class="payment">
                                     <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                                    <?php echo esc_html($payment->deposit); ?>
-                                </td>
-                                <td class="payment">
-                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
-                                    <?php echo esc_html($payment->due); ?>
+                                    <?php echo intval($payment->amount) == $payment->amount ? intval($payment->amount) : number_format($payment->amount, 2); ?>
                                 </td>
                                 <td>
                                     <?php echo esc_html($payment->payment_method); ?>
+                                </td>
+                                <td>
+                                    <?php echo esc_html($payment->status === 'in progress' ? 'En attente' : ($payment->status === 'due' ? 'À payer' : ($payment->status === 'completed' ? 'Terminé' : $payment->status))); ?>
                                 </td>
                                 <td>
                                     <?php echo esc_html(date('M d, Y', strtotime($payment->created_at))); ?>
@@ -547,7 +588,7 @@ if (!$teacher) {
                             <?php endforeach; ?>
                             <?php else : ?>
                             <tr>
-                                <td colspan="7">Aucun paiement trouvé.</td>
+                                <td colspan="7" class="no-data">Aucun paiement trouvé.</td>
                             </tr>
                             <?php endif; ?>
                         </tbody>

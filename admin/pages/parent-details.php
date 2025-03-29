@@ -65,7 +65,7 @@ $childs = get_childs($parent_id);
     <div class="sidebar-container">
         <?php require_once(get_template_directory() . '/admin/templates/sidebar.php'); ?>
     </div>
-    <div id="adminStudentDetails" class="main-content">
+    <div id="adminParentDetails" class="main-content">
         <div class="content-header">
             <h2 class="content-title">Détails Des Parents</h2>
             <div class="content-breadcrumb">
@@ -130,7 +130,7 @@ $childs = get_childs($parent_id);
                     </div>
                 </div>
 
-                <div class="col section user-courses">
+                <div class="col section user-courses list">
                     <h3 class="section-heading">Informations sur l'enfant</h3>
                     <table class="table">
                         <thead>
@@ -141,39 +141,41 @@ $childs = get_childs($parent_id);
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <?php 
-                                    if ($childs) {
-                                        // Start the table body and prepare an array for rows
-                                        $rows = [];
-                                    
-                                        // Loop through the fetched childs and prepare the rows
-                                        foreach ($childs as $child) {
-                                            $rows[] = sprintf(
-                                                '<tr>
-                                                    <td>%s</td>
-                                                    <td>%s</td>
-                                                    <td>%s</td>
-                                                    <td>
-                                                        <div class="action-buttons">
-                                                            <a href="%s" class="action-button edit"><i class="fas fa-info-circle"></i></a>
-                                                        </div>
-                                                    </td>
-                                                </tr>',
-                                                esc_html($child->first_name . ' ' . $child->last_name),
-                                                esc_html($child->gender),
-                                                esc_html($child->grade),
-                                                esc_url(home_url('/admin/student-management/student-details/?id=' . $child->id)),
-                                            );
-                                        }
-                                    
-                                        // Output all rows in one go
-                                        echo '<tbody id="list">' . implode('', $rows) . '</tbody>';
-                                    } else {
-                                        echo '<tr><td colspan="4" class="no-data">Aucun enfant trouvé.</td></tr>';
-                                    }
-                                ?>
+                        <tbody id="list">
+                            <?php if (!empty($childs)) : ?>
+                            <?php foreach ($childs as $child) : ?>
+                            <tr>
+                                <td class="name">
+                                    <a
+                                        href="<?= esc_url(home_url('/admin/student-management/student-details/?id=' . $child->id)); ?>">
+                                        <?= esc_html($child->first_name . ' ' . $child->last_name); ?>
+                                    </a>
+                                </td>
+                                <td>
+                                    <?= esc_html($child->gender); ?>
+                                </td>
+                                <td>
+                                    <?= esc_html($child->grade); ?>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="<?= esc_url(home_url('/admin/student-management/student-details/?id=' . $child->id)); ?>"
+                                            class="action-button edit">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php else : ?>
+                            <tr>
+                                <td colspan="4" class="no-data">Aucun enfant trouvé.</td>
+                            </tr>
+                            <?php endif; ?>
+                        </tbody>
                     </table>
                 </div>
+
             </div>
 
             <div class="row list">
@@ -190,50 +192,42 @@ $childs = get_childs($parent_id);
                                     <th>Statut</th>
                                     <th>Mode de paiement</th>
                                     <th>Date</th>
-                                    <th>Invoice</th>
+                                    <th>Facture</th>
                                 </tr>
                             </thead>
-                            <?php 
-                                    if ($payments) {
-                                        // Start the table body and prepare an array for rows
-                                        $rows = [];
-                                    
-                                        // Loop through the fetched payments and prepare the rows
-                                        foreach ($payments as $payment) {
-                                            $rows[] = sprintf(
-                                                '<tr>
-                                                    <td>%s</td>
-                                                    <td class="credit">%d</td>
-                                                    <td class="payment">
-                                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i> %s
-                                                    </td>
-                                                    <td>%s</td>
-                                                    <td>%s</td>
-                                                    <td>%s</td>
-                                                    <td>
-                                                        <div class="action-buttons">
-                                                            <a href="%s" target="_blank" class="invoice"><i class="fas fa-receipt"></i></a>
-                                                            <a href="%s" target="_blank" class="pdf"><i class="fas fa-file-pdf"></i></a>
-                                                        </div>
-                                                    </td>
-                                                </tr>',
-                                                esc_html($payment->invoice_number),
-                                                esc_html($payment->credit),
-                                                esc_html($payment->amount),
-                                                esc_html($payment->status),
-                                                esc_html($payment->payment_method),
-                                                esc_html(date('M d, Y', strtotime($payment->created_at))),
-                                                esc_url(home_url('/admin/parent-management/parent-invoice/?id=' . $payment->id)),
-                                                esc_url(home_url('/admin/parent-management/parent-invoice/pdf/?id=' . $payment->id))
-                                            );
-                                        }
-                                    
-                                        // Output all rows in one go
-                                        echo '<tbody id="list">' . implode('', $rows) . '</tbody>';
-                                    } else {
-                                        echo '<tr><td colspan="7" class="no-data">No payments found.</td></tr>';
-                                    }
-                                ?>
+                            <tbody id="list">
+                                <?php if (!empty($payments)) : ?>
+                                <?php foreach ($payments as $payment) : ?>
+                                <tr>
+                                    <td><?= esc_html($payment->invoice_number); ?></td>
+                                    <td class="credit"><?= esc_html($payment->credit); ?></td>
+                                    <td class="payment">
+                                        <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
+                                        <?= esc_html($payment->amount); ?>
+                                    </td>
+                                    <td><?= esc_html($payment->status); ?></td>
+                                    <td><?= esc_html($payment->payment_method); ?></td>
+                                    <td><?= esc_html(date('M d, Y', strtotime($payment->created_at))); ?></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="<?= esc_url(home_url('/admin/parent-management/parent-invoice/?id=' . $payment->id)); ?>"
+                                                target="_blank" class="invoice">
+                                                <i class="fas fa-receipt"></i>
+                                            </a>
+                                            <a href="<?= esc_url(home_url('/admin/parent-management/parent-invoice/pdf/?id=' . $payment->id)); ?>"
+                                                target="_blank" class="pdf">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                                <?php else : ?>
+                                <tr>
+                                    <td colspan="7" class="no-data">Aucun paiement trouvé.</td>
+                                </tr>
+                                <?php endif; ?>
+                            </tbody>
                         </table>
                     </div>
                 </div>

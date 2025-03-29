@@ -121,7 +121,7 @@ $total_payments = (int) $wpdb->get_var($wpdb->prepare(
                     <?php endforeach; ?>
                     <?php else : ?>
                     <tr>
-                        <td colspan="6">Aucun paiement trouvé.</td>
+                        <td colspan="6" class="no-data">Aucun paiement trouvé.</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>

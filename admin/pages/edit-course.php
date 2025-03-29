@@ -304,7 +304,7 @@ ob_end_clean();
                                         // Fetch topics for the selected category
                                         if (!empty($course->category)) {
                                             $topics = $wpdb->get_results($wpdb->prepare(
-                                                "SELECT * FROM {$wpdb->prefix}course_topics WHERE category_id = (SELECT id FROM {$wpdb->prefix}course_categories WHERE category = %s)",
+                                                "SELECT * FROM {$wpdb->prefix}course_topics WHERE category = %s",
                                                 $course->category
                                             ));
 

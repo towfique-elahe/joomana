@@ -37,6 +37,20 @@ $class_link = $session->class_link;
 $slot_1 = date('h:i A', strtotime($session->slot1_start_time)) . ' - ' . date('h:i A', strtotime($session->slot1_end_time));
 $slot_2 = date('h:i A', strtotime($session->slot2_start_time)) . ' - ' . date('h:i A', strtotime($session->slot2_end_time));
 
+// Translation map
+$translations = array(
+    'upcoming'  => 'À venir',
+    'ongoing'   => 'En cours',
+    'completed' => 'Terminé',
+    'cancelled' => 'Annulé',
+);
+
+// Convert status to lowercase just in case
+$status_key = strtolower($status);
+
+// Translate
+$french_status = isset($translations[$status_key]) ? $translations[$status_key] : $status;
+
 // Function to get enrolled students details
 function get_enrolled_students($session_id) {
     global $wpdb;
@@ -189,7 +203,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                     <li>
                                         Statut:
                                         <span class="value">
-                                            <?php echo esc_html($status);?>
+                                            <?php echo esc_html($french_status);?>
                                         </span>
                                     </li>
                                 </ul>
@@ -443,7 +457,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                             </div>
 
                             <!-- resources and submissions -->
-                            <div class="col settings">
+                            <!-- <div class="col settings">
                                 <h4 class="settings-title">Ressources et soumissions</h4>
                                 <div class="buttons">
                                     <a href="<?php echo esc_url(home_url('/admin/session-management/courses/groups/group-resources/?group_number=' . $group_number . '&course_id=' . $course_id)); ?>"
@@ -455,7 +469,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                                         <i class="fas fa-tasks"></i> Soumissions des elèves
                                     </a>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- settings -->
                             <div class="col settings">

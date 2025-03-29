@@ -135,6 +135,8 @@ foreach ($feedback_data as $feedback) {
     }
 }
 
+$payment_table = $wpdb->prefix . 'payments';
+
 // Fetch childs payment history
 $payments = $wpdb->get_results($wpdb->prepare("SELECT * FROM $payment_table WHERE user_id = %d", $student_id));
 
@@ -500,6 +502,7 @@ $payments = $wpdb->get_results($wpdb->prepare("SELECT * FROM $payment_table WHER
 
             <div class="row list">
                 <div class="col">
+
                     <!-- payments history -->
                     <div class="user-payments">
                         <h3 class="section-heading">Historique des paiements</h3>
@@ -508,44 +511,34 @@ $payments = $wpdb->get_results($wpdb->prepare("SELECT * FROM $payment_table WHER
                                 <tr>
                                     <th>Date</th>
                                     <th>Crédit</th>
-                                    <th>Prix ​​total</th>
+                                    <th>Prix total</th>
                                     <th>Statut</th>
                                     <th>Mode de paiement</th>
                                 </tr>
                             </thead>
-                            <?php 
-                                    if ($payments) {
-                                        // Start the table body and prepare an array for rows
-                                        $rows = [];
-                                    
-                                        // Loop through the fetched payments and prepare the rows
-                                        foreach ($payments as $payment) {
-                                            $rows[] = sprintf(
-                                                '<tr>
-                                                    <td>%s</td>
-                                                    <td class="credit">%d</td>
-                                                    <td class="payment">
-                                                    <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i> %s
-                                                    </td>
-                                                    <td>%s</td>
-                                                    <td>%s</td>
-                                                </tr>',
-                                                esc_html(date('M d, Y', strtotime($payment->created_at))),
-                                                esc_html($payment->credit),
-                                                esc_html($payment->amount),
-                                                esc_html($payment->status),
-                                                esc_html($payment->payment_method),
-                                            );
-                                        }
-                                    
-                                        // Output all rows in one go
-                                        echo '<tbody id="list">' . implode('', $rows) . '</tbody>';
-                                    } else {
-                                        echo '<tr><td colspan="5" class="no-data">Aucun paiement trouvé.</td></tr>';
-                                    }
-                                ?>
+                            <tbody id="list">
+                                <?php if (!empty($payments)) : ?>
+                                <?php foreach ($payments as $payment) : ?>
+                                <tr>
+                                    <td><?= esc_html(date('M d, Y', strtotime($payment->created_at))); ?></td>
+                                    <td class="credit"><?= esc_html($payment->credit); ?></td>
+                                    <td class="payment">
+                                        <i class="fas fa-euro-sign fa-xs" style="color: #fc7837;"></i>
+                                        <?= esc_html($payment->amount); ?>
+                                    </td>
+                                    <td><?= esc_html($payment->status); ?></td>
+                                    <td><?= esc_html($payment->payment_method); ?></td>
+                                </tr>
+                                <?php endforeach; ?>
+                                <?php else : ?>
+                                <tr>
+                                    <td colspan="5" class="no-data">Aucun paiement trouvé.</td>
+                                </tr>
+                                <?php endif; ?>
+                            </tbody>
                         </table>
                     </div>
+
                 </div>
             </div>
 
@@ -555,19 +548,34 @@ $payments = $wpdb->get_results($wpdb->prepare("SELECT * FROM $payment_table WHER
             <!-- Attendance Rate Chart -->
             <div class="chart-card">
                 <h3 class="chart-heading">Taux de présence</h3>
+                <?php if ($present_count > 0 || $absent_count > 0) : ?>
                 <canvas id="attendanceChart"></canvas>
+                <?php else : ?>
+                <p class="no-data">Aucune donnée de présence disponible.</p>
+                <?php endif; ?>
             </div>
 
             <!-- Assignment Submission Progress Chart -->
             <div class="chart-card">
                 <h3 class="chart-heading">Progrès des devoirs</h3>
+                <?php if ($submitted_count > 0 || $not_submitted_count > 0) : ?>
                 <canvas id="submissionChart"></canvas>
+                <?php else : ?>
+                <p class="no-data">Aucune donnée de soumission disponible.</p>
+                <?php endif; ?>
             </div>
 
             <!-- Performance Feedback Chart -->
             <div class="chart-card">
                 <h3 class="chart-heading">Retour des enseignants</h3>
+                <?php
+                    $total_feedback = array_sum($feedback_counts);
+                ?>
+                <?php if ($total_feedback > 0) : ?>
                 <canvas id="feedbackChart"></canvas>
+                <?php else : ?>
+                <p class="no-data">Aucun retour d’enseignant disponible.</p>
+                <?php endif; ?>
             </div>
         </div>
 

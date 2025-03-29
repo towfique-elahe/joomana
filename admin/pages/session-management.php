@@ -113,14 +113,15 @@ function get_enrolled_students_count($session_id) {
                         $teacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teacher_table WHERE id = %d", $teacher_id));
                     ?>
                     <tr class="course-row">
-                        <td class="name">
-                            <a
-                                href="<?php echo esc_url(home_url('/admin/session-management/session-details/?session_id=' . $session_id)); ?>">
-                                <?php echo esc_html($session_date); ?>
-                            </a>
+                        <td>
+                            <?php echo esc_html(date('M d, Y', strtotime($session_date))); ?>
                         </td>
                         <td class="name title">
-                            <?php echo esc_html($course_title); ?> <br>
+                            <a
+                                href="<?php echo esc_url(home_url('/admin/session-management/session-details/?session_id=' . $session_id)); ?>">
+                                <?php echo esc_html($course_title); ?>
+                            </a>
+                            <br>
                             <a href="<?php echo esc_url(home_url('/admin/teacher-management/teacher-details/?id=' . $teacher_id)); ?>"
                                 class="teacher">Prof:
                                 <?php echo esc_html($teacher->first_name) . ' ' . esc_html($teacher->last_name); ?></a>
